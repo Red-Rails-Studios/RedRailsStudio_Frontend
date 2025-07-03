@@ -1,0 +1,16 @@
+@import 'src/styles/db-colors';
+
+.game-container {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  height: 100vh;
+  background-color: $db-white;
+  border: 4px solid $db-red;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  background-color: $db-white;
+}

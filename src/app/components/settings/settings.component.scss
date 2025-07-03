@@ -1,0 +1,30 @@
+@import 'src/styles/db-colors';
+
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 20px;
+  background-color: $db-grey-light;
+  
+  .round-button {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    padding: 0;
+    background-color: $db-red;
+    border-bottom: 4px solid $db-red-dark;
+    border-right: 4px solid $db-red-dark;
+    
+    img {
+      width: 32px;
+      height: 32px;
+      filter: drop-shadow(2px 2px 0 $db-red-dark);
+    }
+  }
+  
+  .menu-button {
+    margin-top: 20px;
+    width: 120px;
+  }
+}

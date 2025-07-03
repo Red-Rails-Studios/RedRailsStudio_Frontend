@@ -1,0 +1,6 @@
+<div class="resources-container">
+  <div class="resource" *ngFor="let resource of resources">
+    <img class="pixel-icon" [src]="resource.icon" [alt]="resource.name">
+    <span class="resource-counter">{{resource.amount}}</span>
+  </div>
+</div>

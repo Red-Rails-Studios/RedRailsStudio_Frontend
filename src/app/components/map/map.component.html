@@ -1,2 +1,11 @@
-<img src="assets/germanyHigh.svg" class="germany-map" alt="Map of Germany">
-<!--//TODO: what is this map?-->
+<div class="map-container">
+  <div class="pixel-map">
+    <div class="city" 
+         *ngFor="let city of cities"
+         [class.selected]="city === selectedCity"
+         (click)="selectCity(city)">
+      <div class="city-marker"></div>
+      <span class="city-name">{{city.name}}</span>
+    </div>
+  </div>
+</div>

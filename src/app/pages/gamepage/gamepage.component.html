@@ -1,1 +1,22 @@
-<p>gamepage works!</p>
+<div class="game-container pixel-art">
+  <app-map 
+    [cities]="cities" 
+    [selectedCity]="selectedCity"
+    (citySelected)="onCitySelected($event)">
+  </app-map>
+  
+  <div class="main-content">
+    <app-resources [resources]="resources"></app-resources>
+    <app-upgrades
+      [currentUpgrades]="currentUpgrades"
+      [selectedUpgradeType]="selectedUpgradeType"
+      (upgradePurchased)="onUpgradePurchased($event)"
+      (upgradeTypeChanged)="onUpgradeTypeChanged($event)">
+    </app-upgrades>
+  </div>
+  
+  <app-settings
+    (openMultiplayer)="openMultiplayer()"
+    (openLeaderboard)="openLeaderboard()">
+  </app-settings>
+</div>

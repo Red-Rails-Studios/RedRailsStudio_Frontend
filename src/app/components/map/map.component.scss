@@ -1,8 +1,40 @@
-.germany-map {
-  width: 100%; /* Full width of the container */
-  height: 100%; /* Ensure it scales properly */
-  max-width: 800px; /* Optional: Limit the maximum width */
-  max-height: 600px; /* Optional: Limit the maximum height */
-  display: block;
-  margin: 0 auto; /* Center the map */
+@import 'src/styles/db-colors';
+
+.map-container {
+  border-right: 4px solid $db-red;
+  padding: 20px;
+  background-color: $db-grey-light;
+}
+
+.pixel-map {
+  background-color: $db-white;
+  border: 4px solid $db-grey-dark;
+  height: 90%;
+  position: relative;
+}
+
+.city {
+  position: absolute;
+  cursor: pointer;
+  
+  .city-marker {
+    width: 16px;
+    height: 16px;
+    background-color: $db-red;
+    border: 2px solid $db-red-dark;
+    margin: 0 auto;
+  }
+  
+  .city-name {
+    display: block;
+    font-size: 12px;
+    margin-top: 4px;
+    color: $db-black;
+  }
+  
+  &.selected .city-marker {
+    background-color: $db-white;
+    border-color: $db-red;
+    box-shadow: 0 0 0 2px $db-red;
+  }
 }
