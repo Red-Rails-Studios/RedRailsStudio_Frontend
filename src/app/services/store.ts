@@ -9,9 +9,9 @@ import { Train } from "../models/train.model";
 })
 export class Store {
     resources = signal<Resources>( {
-        DB_coin: 0,
-        energy_capacity: 0,
-        man_power:0 
+        dbCoin: 0,
+        employees: 0,
+        power:0 
     })
 
     train = signal<Train>({

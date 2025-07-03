@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { MapComponent } from '../../components/map/map.component';
-import { ResourcesComponent } from '../../components/resources/resources.component';
 import { SettingsComponent } from '../../components/settings/settings.component';
 import { UpgradesComponent } from '../../components/upgrades/upgrades.component';
+import { ResourcesComponent } from '../../components/resources/resources.component';
 
 @Component({
   selector: 'app-gamepage',
