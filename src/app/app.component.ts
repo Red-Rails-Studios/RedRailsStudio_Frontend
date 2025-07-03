@@ -1,53 +1,14 @@
 import { Component } from '@angular/core';
-import { MapComponent } from './components/map/map.component';
-import { ResoursesComponent } from './components/resourses/resourses.component';
-import { APISService } from './services/apis.service';
+import { RouterOutlet } from '@angular/router';
+import { GamepageComponent } from './pages/gamepage/gamepage.component';
+import { HomepageComponent } from './pages/homepage/homepage.component';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
-  imports: [MapComponent, ResoursesComponent],
+  imports: [RouterOutlet, HomepageComponent, GamepageComponent],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrl: './app.component.scss'
 })
 export class AppComponent {
   title = 'rrs_frontend';
-  sessionId = new Date().getTime().toString();
-  playerName: string = '';
-
-  constructor(private apiService: APISService) {
-    this.sessionId = this.sessionId; // Initialisiert die sessionId
-  }
-
-  onSetPlayerName(name: string){
-    this.apiService.postNewPlayer(this.sessionId, name).subscribe((response)=> {console.log('New Player')},
-    (error)=> {console.error('Error player')});  //erstellt eine Player
-  }
-
-  onCreateSession() {
-    this.apiService.createSession(this.sessionId).subscribe((response) => {console.log('Session created')},
-    (error) => {console.error('Error creating session')},
-     );  //erstellt ein Session
-  }
-
-  onStartSession() {
-    this.apiService.startSession(this.sessionId).subscribe((response) => {console.log('Session started')},
-    (error) => {console.error('Error starting session')},
-    );  //startet ein Session
-  }
-
-  onKillSession(){
-    this.apiService.killSession(this.sessionId).subscribe((response) => {console.log('Session killed')},
-    (error) => {console.error('Error killing session')},
-  );  //killt ein Session
-  }
-
-  onJoinSession(playerName?: string) {
-    const name = playerName || this.playerName || 'Player2';
-    this.apiService.postNewPlayer('testsession', name).subscribe(
-      (response) => { console.log('New Player joined the Session'); },
-      (error) => { console.error('Error joining session'); }
-  ); //man joins a session
-
- }
 }

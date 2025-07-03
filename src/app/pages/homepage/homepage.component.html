@@ -1,16 +1,28 @@
-<div class="homepage">
-  <header class="header">
-    <h1>Welcome to Red Rails Studio</h1>
-    <p>Explore the map of Germany and more!</p>
-  </header>
+<img
+    src="assets/tmp_b4313719-be33-4e90-b882-c2a8b4925a9a.jpeg"
+    class="main-menu-img"
+/>
 
-  <section class="map-section">
-    <h2>Map of Germany</h2>
-    <app-map></app-map>
-  </section>
+<div class="menu-overlay">
+    <div *ngIf="!showOptions">
+        <input
+            type="text"
+            class="menu-input"
+            [(ngModel)]="inputValue"
+            placeholder="Nickname"
+        />
+        <button
+            class="menu-button"
+            [disabled]="inputValue.length < 3"
+            (click)="showOptions = true"
+        >
+            Start Game
+        </button>
+    </div>
 
-  <section class="info-section">
-    <h2>About Us</h2>
-    <p>Red Rails Studio is your go-to platform for exploring interactive maps and resources.</p>
-  </section>
+    <div *ngIf="showOptions">
+        <button class="menu-button" (click)="startMultiplayer()">Start Multiplayer</button>
+        <button class="menu-button" (click)="joinMultiplayer()">Join Multiplayer</button>
+        <button class="menu-button" (click)="startSingleplayer()">Start Singleplayer</button>
+    </div>
 </div>

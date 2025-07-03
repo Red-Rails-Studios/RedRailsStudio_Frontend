@@ -1,25 +1,5 @@
-<main class="main">
-  <div class="content">
-    <div class="left-side">
-
-    </div>
-    <div class="divider" role="separator" aria-label="Divider"></div>
-    <div class="right-side">
-      <!-- Include the map component -->
-      <app-map></app-map>
-      <app-resourses></app-resourses>
-      <input
-      type="text"
-      #playerNameInput
-      placeholder="Dein Name..."
-      style="margin-bottom: 10px; display: block;"
-      />
-      <button (click)="onSetPlayerName(playerNameInput.value)"> set Player Name</button>
-      <button (click)="onCreateSession()"> create Session</button>
-      <button (click)="onStartSession()"> start Session</button>
-      <button (click)="onJoinSession(playerNameInput.value)"> join Session</button>
-      <button (click)="onKillSession()">kill session</button>
-     <!-- <app-counter></app-counter> -->
-    </div>
-  </div>
+<main class="homepage">
+  <app-homepage>
+    
+  </app-homepage>
 </main>

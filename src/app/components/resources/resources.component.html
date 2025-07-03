@@ -1,0 +1,10 @@
+<div class="resources-panels">
+  <div class="resource-panel" *ngFor="let resource of resources">
+    <div class="resource-header">
+      <img class="pixel-icon" [src]="resource.icon" [alt]="resource.name">
+      <span class="resource-name">{{resource.name}}</span>
+    </div>
+    <input type="number" class="resource-counter" [value]="resource.amount" readonly>
+    <button class="resource-action">Buy More</button>
+  </div>
+</div>

@@ -1,11 +1,36 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { MapComponent } from '../../components/map/map.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-homepage',
-  standalone: true,
-  imports: [MapComponent], // Add MapComponent here
+  imports: [FormsModule, CommonModule],
   templateUrl: './homepage.component.html',
   styleUrls: ['./homepage.component.scss']
 })
-export class HomepageComponent {}
+export class HomepageComponent {
+  sessionName: any;
+  playerName = '';
+  inputValue: any = '';
+  showOptions: any;
+
+  startMultiplayer() {
+    if (this.sessionName) {
+      console.log('Creating multiplayer session:', this.sessionName);
+    }
+  }
+
+  joinMultiplayer() {
+    if (this.playerName) {
+      console.log('Joining multiplayer session:', this.playerName);
+    }
+  }
+
+  startSingleplayer() {
+    console.log('Singleplayer session started');
+  }
+
+  endSingleplayer() {
+    console.log('Singleplayer session ended');
+  }
+}
