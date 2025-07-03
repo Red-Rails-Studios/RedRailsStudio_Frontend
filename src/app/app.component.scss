@@ -1,0 +1,9 @@
+/* filepath: d:\projekt\RedRailsStudio\rrs_frontend\src\app\app.component.scss */
+.right-side {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  overflow: visible; /* Ensure no content is clipped */
+  height: auto; /* Allow the container to grow with the content */
+}
