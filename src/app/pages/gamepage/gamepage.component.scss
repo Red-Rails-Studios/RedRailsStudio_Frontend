@@ -1,0 +1,146 @@
+.gamepage {
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: row;
+  background-color: #f01414;
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.map-img {
+  width: 40vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: -1;
+  min-width: 0;
+}
+
+.main-content {
+  align-items: center;
+  position: relative;
+  width: 60vw;
+  height: calc(100vh - 60px);
+  margin-top: 60px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  flex-direction: column;
+  padding: 20px;
+  background-color: #f01414;
+  z-index: -1;
+}
+
+.game-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 60px;
+  padding-top: 12px;
+  background: #f01414;
+  display: flex;
+  flex-direction: row;
+  z-index: 100;
+  box-sizing: border-box;
+}
+
+.header-map {
+  width: 40vw;
+  height: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.header-main {
+  width: 60vw;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  box-sizing: border-box;
+  position: relative;
+  overflow: visible;
+  padding-right: 60px;
+}
+
+.game-button {
+  flex: 1 1 120px;
+  min-width: 100px;
+  max-width: 300px;
+  box-sizing: border-box;
+  z-index: 1;
+  font-family: Bahnschrift;
+  font-size: large;
+  font-weight: 1000;
+  text-align: center;
+  background-color: #f01414;
+  color: white;
+  margin: 10px;
+  padding: 10px 40px;
+  cursor: pointer;
+}
+
+.menu-button {
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  z-index: 2;
+  font-family: Bahnschrift;
+  font-size: 36px;
+  font-weight: 1000;
+  text-align: center;
+  background-color: #f01414;
+  color: white;
+  margin: 0;
+  padding: 0px 12px;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.tab-content {
+  width: 90%;
+  flex: 1 1 auto;
+  overflow-y: 0;
+  box-sizing: border-box;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 16px;
+  margin-top: 4px;
+  background: #fff;
+  border: 1px solid #ccc;
+  min-width: 140px;
+  max-width: 90vw;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-button {
+  font-family: Bahnschrift;
+  font-size: 16px;
+  font-weight: 1000;
+  background: none;
+  border: none;
+  padding: 12px 16px;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdown-menu button:hover {
+  background: #f01414;
+  color: #fff;
+}

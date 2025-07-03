@@ -1,8 +1,9 @@
-<table>
-    <tr>
-        <td>{{energy}} KW</td>
-        <td>{{coinZahl}} DB coin</td>
-        <td>{{workers}} Workers</td>
-    </tr>
-</table>
-
+<div class="resources-panels">
+  <div class="resource-panel">
+    <div class="resource-header">
+      <span class="resource-name"> {{ resources().dbCoin }}/DB</span>
+      <span class="resource-name">Power: {{ resources().power }}</span>
+      <span class="resource-name">Employees: {{ resources().employees }}</span>
+    </div>
+  </div>
+</div>
