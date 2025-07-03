@@ -1,1 +1,26 @@
-<p>upgrades works!</p>
+<div class="upgrades-container">
+  <div class="upgrade-types">
+    <button class="pixel-button"
+            *ngFor="let type of upgradeTypes"
+            [class.active]="type === null"
+            (click)="null">
+      {{type}}
+    </button>
+  </div>
+  
+  <div class="upgrades-list">
+    <div class="upgrade-item" *ngFor="let upgrade of currentUpgrades">
+      <img class="pixel-icon upgrade-icon" src="assets/pixel-placeholder.png" alt="Upgrade">
+      <div class="upgrade-info">
+        <h3 class="pixel-text">{{upgrade.name}}</h3>
+        <p class="pixel-text">Level: {{upgrade.level}}</p>
+        <p class="pixel-text">{{upgrade.description}}</p>
+      </div>
+      <button class="pixel-button upgrade-button"
+              [class.can-afford]="null"
+              (click)="null">
+        {{upgrade.cost}} {{upgrade.resourceType}}
+      </button>
+    </div>
+  </div>
+</div>
