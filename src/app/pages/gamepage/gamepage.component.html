@@ -1,1 +1,52 @@
-<p>gamepage works!</p>
+<div class="gamepage">
+  <img src="assets/istockphoto-1280988700-170667a.jpg"
+    class="map-img"
+  />
+
+
+  <div class="main-content">
+    <div class="game-header">
+      <div class="header-map" aria-hidden="true"></div>
+      <div class="header-main">
+        <button class="game-button" [class.active]="activeTab === 1" (click)="activeTab = 1">Trains</button>
+        <button class="game-button" [class.active]="activeTab === 2" (click)="activeTab = 2">Resources</button>
+        <button class="game-button" [class.active]="activeTab === 3" (click)="activeTab = 3">Connections</button>
+        <button class="menu-button" (click)="showDropdown = !showDropdown">≡</button>
+        <div class="dropdown-menu" *ngIf="showDropdown">
+          <button class="dropdown-button" (click)="onSettings()">Settings</button>
+          <button class="dropdown-button" (click)="onExit()">Exit</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content" *ngIf="activeTab === 1">
+        <!-- Trains Tab -->
+      <div *ngFor="let train of trains" class="train-item">
+        <div>ID: {{train.id}}</div>
+        <div>Name: {{train.name}}</div>
+        <div>Type: {{train.type}}</div>
+      </div>
+    </div>
+    <div class="tab-content" *ngIf="activeTab === 2">
+        <!-- Resources Tab -->
+      <app-resources></app-resources>
+    </div>
+    <div class="tab-content" *ngIf="activeTab === 3">
+        <!-- Connections Tab -->
+      <div *ngFor="let connection of connections" class="connection-item">
+        <div>ID: {{connection.id}}</div>
+        <div>From: {{connection.from}}</div>
+        <div>To: {{connection.to}}</div>
+      </div>
+    </div>
+
+    <div class="game-controls">
+      
+    </div>
+
+    <div class="game-timer">
+      <!-- Timer goes here -->
+    </div>
+  </div>
+</div>

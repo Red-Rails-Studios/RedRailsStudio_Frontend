@@ -1,16 +1,81 @@
-<div class="homepage">
-  <header class="header">
-    <h1>Welcome to Red Rails Studio</h1>
-    <p>Explore the map of Germany and more!</p>
-  </header>
+<img
+    src="assets/tmp_b4313719-be33-4e90-b882-c2a8b4925a9a.jpeg"
+    class="main-menu-img"
+/>
 
-  <section class="map-section">
-    <h2>Map of Germany</h2>
-    <app-map></app-map>
-  </section>
+<div class="menu-overlay">
+    <div *ngIf="showMain">
+        <button
+            class="main-menu-button"
+            (click)="showCreate = true; showJoin = false; showMain = false"
+        >
+            Create Lobby
+        </button>
+        <button
+            class="main-menu-button"
+            (click)="showJoin = true; showCreate = false; showMain = false"
+        >
+            Join Lobby
+        </button>
+    </div>
 
-  <section class="info-section">
-    <h2>About Us</h2>
-    <p>Red Rails Studio is your go-to platform for exploring interactive maps and resources.</p>
-  </section>
+    <div *ngIf="showCreate">
+        <input
+            type="text"
+            class="menu-input"
+            [(ngModel)]="inputName"
+            placeholder="Nickname"
+        />
+        <input
+            type="text"
+            class="menu-input"
+            [(ngModel)]="inputID"
+            placeholder="Lobby ID"
+            maxlength="20"
+        />
+        <button
+            class="menu-button"
+            [disabled]="inputName.length < 3 || inputID.length < 3"
+            (click)="startMultiplayer()"
+        >
+            Create Game
+        </button>
+        <button
+            class="menu-button"
+            (click)="showMain = true; showCreate = false; showJoin = false"
+            (click)="clearFields()"
+        >
+            Back
+        </button>
+    </div>
+
+    <div *ngIf="showJoin">
+        <input
+            type="text"
+            class="menu-input"
+            [(ngModel)]="inputNameJoin"
+            placeholder="Nickname"
+        />
+        <input
+            type="text"
+            class="menu-input"
+            [(ngModel)]="inputIDJoin"
+            placeholder="Lobby ID"
+            maxlength="20"
+        />
+        <button
+            class="menu-button"
+            [disabled]="inputName.length < 3 || inputID.length < 3"
+            (click)="joinMultiplayer()"
+        >
+            Join Game
+        </button>
+        <button
+            class="menu-button"
+            (click)="showMain = true; showCreate = false; showJoin = false"
+            (click)="clearFieldsJoin()"
+        >
+            Back
+        </button>
+    </div>
 </div>

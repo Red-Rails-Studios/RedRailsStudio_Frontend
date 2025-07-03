@@ -18,7 +18,7 @@ export class ResoursesComponent implements OnInit {
 
   ngOnInit(): void {
     setInterval(() => {
-    this.store.setResources(this.sessionName, this.playerUid); 
+    this.store.setResources(this.sessionName, this.playerUid);
     }, 1000);
   }
 
