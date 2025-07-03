@@ -26,8 +26,8 @@ export class Store {
 
     setResources(sessionName: string, playerUid: string){
         this.apiService.getResources(sessionName,playerUid).subscribe((resources: Resources) => {
-             this.resources.set(resources)
-             console.log('Resources updated:', this.resources());})
+            this.resources.set(resources)
+            console.log('Resources updated:', this.resources());})
     }
 
     // getTrainInfo(sessionName: string, playerUid: string, trainUid: string) {

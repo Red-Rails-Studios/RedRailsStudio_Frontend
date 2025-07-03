@@ -1,5 +1,7 @@
-import { Component, OnInit, OnDestroy, Input, SimpleChanges, OnChanges } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Store } from '../../services/store';
+import { CommonModule } from '@angular/common';
+import { Resources } from '../../models/resources.model';
 
 @Component({
   selector: 'app-resourses',
@@ -7,37 +9,26 @@ import { Store } from '../../services/store';
   templateUrl: './resourses.component.html',
   styleUrls: ['./resourses.component.scss']
 })
-export class ResoursesComponent implements OnInit, OnDestroy, OnChanges {
-  @Input() sessionName: string = '';
-  @Input() playerUid: string = '';
-  private pollingStarted = false;
+
+export class ResoursesComponent implements OnInit {
+  sessionName: string = '';
+  playerUid: string = '';
 
   constructor(public store: Store) {}
 
   ngOnInit(): void {
-    // Optionally, you can remove this if you only want to react to changes
-    this.store.setResources(this.sessionName, this.playerUid);
+    setInterval(() => {
+    this.store.setResources(this.sessionName, this.playerUid); 
+    }, 1000);
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    // if (!this.pollingStarted && this.sessionName && this.playerUid) {
-    //   this.store.setResources(this.sessionName, this.playerUid);
-    //   this.pollingStarted = true;
-    // }
-  }
-
-  ngOnDestroy(): void {
-    // No need to clearInterval, as setResources uses its own interval
-    // If you want to clear, you need to refactor Store to allow interval cleanup
-  }
-
-  get energy() {
-    return this.store.resources().energy_capacity;
-  }
-  get coinZahl() {
-    return this.store.resources().DB_coin;
-  }
-  get workers() {
-    return this.store.resources().man_power;
-  }
+  // get energy() {
+  //   return this.store.resources().energy_capacity;
+  // }
+  // get coinZahl() {
+  //   return this.store.resources().DB_coin;
+  // }
+  // get workers() {
+  //   return this.store.resources().man_power;
+  // }
 }
