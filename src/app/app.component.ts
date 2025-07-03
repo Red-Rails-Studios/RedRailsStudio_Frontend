@@ -12,8 +12,9 @@ import { APISService } from './services/apis.service';
 })
 export class AppComponent {
   title = 'rrs_frontend';
-  sessionId = new Date().getTime().toString();
+  //sessionId = new Date().getTime().toString();
   playerName: string = '';
+  sessionId: string = '';
 
   constructor(private apiService: APISService) {
     this.sessionId = this.sessionId; // Initialisiert die sessionId
@@ -24,10 +25,11 @@ export class AppComponent {
     (error)=> {console.error('Error player')});  //erstellt eine Player
   }
 
-  onCreateSession() {
-    this.apiService.createSession(this.sessionId).subscribe((response) => {console.log('Session created')},
+  onCreateSession(sessionName: string) {
+    this.apiService.createSession(sessionName).subscribe((response) => {console.log('Session created')},
     (error) => {console.error('Error creating session')},
      );  //erstellt ein Session
+     return this.sessionId = sessionName; // Setzt die sessionId
   }
 
   onStartSession() {

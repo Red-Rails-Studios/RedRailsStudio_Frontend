@@ -15,7 +15,8 @@
       style="margin-bottom: 10px; display: block;"
       />
       <button (click)="onSetPlayerName(playerNameInput.value)"> set Player Name</button>
-      <button (click)="onCreateSession()"> create Session</button>
+      <button (click)="onCreateSession(sessionIdInput.value)"> create Session</button>
+      <input type="text" #sessionIdInput placeholder="Session ID" style="margin-bottom: 10px; display: block;" />
       <button (click)="onStartSession()"> start Session</button>
       <button (click)="onJoinSession(playerNameInput.value)"> join Session</button>
       <button (click)="onKillSession()">kill session</button>
