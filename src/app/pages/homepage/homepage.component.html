@@ -4,25 +4,78 @@
 />
 
 <div class="menu-overlay">
-    <div *ngIf="!showOptions">
-        <input
-            type="text"
-            class="menu-input"
-            [(ngModel)]="inputValue"
-            placeholder="Nickname"
-        />
+    <div *ngIf="showMain">
         <button
-            class="menu-button"
-            [disabled]="inputValue.length < 3"
-            (click)="showOptions = true"
+            class="main-menu-button"
+            (click)="showCreate = true; showJoin = false; showMain = false"
         >
-            Start Game
+            Create Lobby
+        </button>
+        <button
+            class="main-menu-button"
+            (click)="showJoin = true; showCreate = false; showMain = false"
+        >
+            Join Lobby
         </button>
     </div>
 
-    <div *ngIf="showOptions">
-        <button class="menu-button" (click)="startMultiplayer()">Start Multiplayer</button>
-        <button class="menu-button" (click)="joinMultiplayer()">Join Multiplayer</button>
-        <button class="menu-button" (click)="startSingleplayer()">Start Singleplayer</button>
+    <div *ngIf="showCreate">
+        <input
+            type="text"
+            class="menu-input"
+            [(ngModel)]="inputName"
+            placeholder="Nickname"
+        />
+        <input
+            type="text"
+            class="menu-input"
+            [(ngModel)]="inputID"
+            placeholder="Lobby ID"
+            maxlength="20"
+        />
+        <button
+            class="menu-button"
+            [disabled]="inputName.length < 3 || inputID.length < 3"
+            (click)="startMultiplayer()"
+        >
+            Create Game
+        </button>
+        <button
+            class="menu-button"
+            (click)="showMain = true; showCreate = false; showJoin = false"
+            (click)="clearFields()"
+        >
+            Back
+        </button>
+    </div>
+
+    <div *ngIf="showJoin">
+        <input
+            type="text"
+            class="menu-input"
+            [(ngModel)]="inputNameJoin"
+            placeholder="Nickname"
+        />
+        <input
+            type="text"
+            class="menu-input"
+            [(ngModel)]="inputIDJoin"
+            placeholder="Lobby ID"
+            maxlength="20"
+        />
+        <button
+            class="menu-button"
+            [disabled]="inputName.length < 3 || inputID.length < 3"
+            (click)="joinMultiplayer()"
+        >
+            Join Game
+        </button>
+        <button
+            class="menu-button"
+            (click)="showMain = true; showCreate = false; showJoin = false"
+            (click)="clearFieldsJoin()"
+        >
+            Back
+        </button>
     </div>
 </div>

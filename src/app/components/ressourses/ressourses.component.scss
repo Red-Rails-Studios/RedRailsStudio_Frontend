@@ -1,0 +1,26 @@
+@import 'src/styles/db-colors';
+
+.resources-container {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 30px;
+  background-color: $db-grey-light;
+  padding: 10px;
+  border: 4px solid $db-grey-dark;
+  
+  .resource {
+    display: flex;
+    align-items: center;
+    
+    .pixel-icon {
+      width: 32px;
+      height: 32px;
+      margin-right: 10px;
+    }
+    
+    .resource-counter {
+      font-size: 16px;
+      color: $db-black;
+    }
+  }
+}

@@ -9,10 +9,16 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./homepage.component.scss']
 })
 export class HomepageComponent {
+  showMain = true;
+  showCreate = false;
+  showJoin = false;
   sessionName: any;
   playerName = '';
-  inputValue: any = '';
-  showOptions: any;
+  inputName: any = '';
+  inputID: any = '';
+  inputNameJoin: any = '';
+  inputIDJoin: any = '';
+
 
   startMultiplayer() {
     if (this.sessionName) {
@@ -26,11 +32,13 @@ export class HomepageComponent {
     }
   }
 
-  startSingleplayer() {
-    console.log('Singleplayer session started');
+  clearFields() {
+    this.inputName = '';
+    this.inputID = '';
   }
 
-  endSingleplayer() {
-    console.log('Singleplayer session ended');
+  clearFieldsJoin() {
+    this.inputNameJoin = '';
+    this.inputIDJoin = '';
   }
 }
