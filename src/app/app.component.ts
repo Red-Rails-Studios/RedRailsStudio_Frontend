@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { MapComponent } from './components/map/map.component';
-import { ResoursesComponent } from './components/resourses/resourses.component';
+import { ResoursesComponent } from './components/resources/resources.component';
 import { APISService } from './services/apis.service';
 
 @Component({

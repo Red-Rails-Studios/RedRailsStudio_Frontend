@@ -4,10 +4,10 @@ import { CommonModule } from '@angular/common';
 import { Resources } from '../../models/resources.model';
 
 @Component({
-  selector: 'app-resourses',
+  selector: 'app-resources',
   standalone: true,
-  templateUrl: './resourses.component.html',
-  styleUrls: ['./resourses.component.scss']
+  templateUrl: './resources.component.html',
+  styleUrls: ['./resources.component.scss']
 })
 
 export class ResoursesComponent implements OnInit {
