@@ -61,4 +61,8 @@ export class APISService {
   buyStation(sessionName: string, playerUid: string) {
     return this.http.post(`http://localhost:8080/session/${sessionName}/player/${playerUid}/station`, null, { responseType: 'text'}); // kauft ein baahnhof
   }
+
+  getSessionInfo(sessionName: string): Observable<any> {
+    return this.http.get(`http://localhost:8080/session`, { responseType: 'text'}); 
+  }
 }
