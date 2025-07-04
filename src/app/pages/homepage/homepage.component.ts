@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Store } from '../../services/store';
 
 @Component({
   selector: 'app-homepage',
@@ -13,14 +14,16 @@ export class HomepageComponent {
   showMain = true;
   showCreate = false;
   showJoin = false;
-  sessionName: any;
-  playerName = '';
-  inputName: any = '';
-  inputID: any = '';
-  inputNameJoin: any = '';
-  inputIDJoin: any = '';
+  sessionName = 'testSession';
+  playerName = 'testPlayer';
+  inputNameJoin = '';
+  joinSession = '';
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private store: Store) {}
+
+  onCreateSession() {
+    this.store.createSessionAndJoinFirstPlayer(this.sessionName, this.playerName);
+  }
 
   startMultiplayer() {
     if (this.sessionName) {
@@ -29,20 +32,17 @@ export class HomepageComponent {
     }
   }
 
-  joinMultiplayer() {
-    if (this.playerName) {
-      console.log('Joining multiplayer session:', this.playerName);
-      this.router.navigate(['/game']);
-    }
-  }
+  // onJoinSession() {
+  //   this.apiService.postNewPlayer(this.joinSession, )
+  // }
 
   clearFields() {
-    this.inputName = '';
-    this.inputID = '';
+    this.playerName = '';
+    this.sessionName = '';
   }
 
   clearFieldsJoin() {
     this.inputNameJoin = '';
-    this.inputIDJoin = '';
+    this.joinSession = '';
   }
 }

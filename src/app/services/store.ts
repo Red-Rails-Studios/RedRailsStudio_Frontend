@@ -2,6 +2,8 @@ import { inject, Injectable, signal } from "@angular/core";
 import { Resources } from "../models/resources.model";
 import { APISService } from "./apis.service";
 import { Train } from "../models/train.model";
+import { Session } from "../models/session.model";
+import { concat, concatMap } from "rxjs";
 
 
 @Injectable({
@@ -14,20 +16,22 @@ export class Store {
         power:0 
     })
 
-    train = signal<Train>({
-        id: 0,
-        name:``,
-        type:``,
-        level: 0,
-        production: ``,
-    })
-
+    session = signal<Session | null>(null);
     apiService = inject(APISService)
 
     setResources(sessionName: string, playerUid: string){
         this.apiService.getResources(sessionName,playerUid).subscribe((resources: Resources) => {
             this.resources.set(resources)
             console.log('Resources updated:', this.resources());})
+    }
+
+    createSessionAndJoinFirstPlayer(sessionName: string, playerName: string) {
+        this.apiService.createSession(sessionName).pipe(
+            concatMap(() => this.apiService.postNewPlayer(sessionName, playerName))
+        ).subscribe((res: Session) => {
+            this.session.set(res);
+            console.log('Session created and player joined:', this.session());
+        })
     }
 
     // getTrainInfo(sessionName: string, playerUid: string, trainUid: string) {

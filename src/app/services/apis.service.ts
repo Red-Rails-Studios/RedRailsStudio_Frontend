@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Train } from '../models/train.model';
+import { Session } from '../models/session.model';
 
 
 @Injectable({
@@ -17,8 +18,8 @@ export class APISService {
 
   }
 
-  postNewPlayer(sessionName: string, playerName: string){
-    return this.http.post(`http://localhost:8080/session/${sessionName}/${playerName}`, null, { responseType: 'text'}); //new player
+  postNewPlayer(sessionName: string, playerName: string): Observable<Session>{
+    return this.http.post<Session>(`http://localhost:8080/session/${sessionName}/${playerName}`, null); //new player
   }
 
   startSession(sessionName: string): Observable<any> {

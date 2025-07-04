@@ -9,13 +9,13 @@
             class="main-menu-button"
             (click)="showCreate = true; showJoin = false; showMain = false"
         >
-            Create Lobby
+            Create Session
         </button>
         <button
             class="main-menu-button"
             (click)="showJoin = true; showCreate = false; showMain = false"
         >
-            Join Lobby
+            Join Session
         </button>
     </div>
 
@@ -23,20 +23,20 @@
         <input
             type="text"
             class="menu-input"
-            [(ngModel)]="inputName"
+            [(ngModel)]="playerName"
             placeholder="Nickname"
         />
         <input
             type="text"
             class="menu-input"
-            [(ngModel)]="inputID"
-            placeholder="Lobby ID"
+            [(ngModel)]="sessionName"
+            placeholder="Session Name"
             maxlength="20"
         />
         <button
             class="menu-button"
-            [disabled]="inputName.length < 3 || inputID.length < 3"
-            (click)="startMultiplayer()"
+            [disabled]="playerName.length < 3 || sessionName.length < 3"
+            (click)="onCreateSession()"
         >
             Create Game
         </button>
@@ -59,14 +59,14 @@
         <input
             type="text"
             class="menu-input"
-            [(ngModel)]="inputIDJoin"
-            placeholder="Lobby ID"
+            [(ngModel)]="joinSession"
+            placeholder="Session Name"
             maxlength="20"
         />
         <button
             class="menu-button"
-            [disabled]="inputName.length < 3 || inputID.length < 3"
-            (click)="joinMultiplayer()"
+            [disabled]="playerName.length < 3 || sessionName.length < 3"
+            (click)="null"
         >
             Join Game
         </button>
