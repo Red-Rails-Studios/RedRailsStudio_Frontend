@@ -7,13 +7,14 @@
     <div *ngIf="showMain">
         <button
             class="main-menu-button"
-            (click)="showCreate = true; showJoin = false; showMain = false"
+            (click)="showCreate = true; showJoin = false; showMain = false; showStart = false"
         >
             Create Session
         </button>
+
         <button
             class="main-menu-button"
-            (click)="showJoin = true; showCreate = false; showMain = false"
+            (click)="showJoin = true; showCreate = false; showMain = false; showStart = false"
         >
             Join Session
         </button>
@@ -26,6 +27,7 @@
             [(ngModel)]="playerName"
             placeholder="Nickname"
         />
+
         <input
             type="text"
             class="menu-input"
@@ -33,16 +35,19 @@
             placeholder="Session Name"
             maxlength="20"
         />
+
         <button
             class="menu-button"
             [disabled]="playerName.length < 3 || sessionName.length < 3"
             (click)="onCreateSession()"
+            (click)="showMain = false; showCreate = false; showJoin = false; showStart = true"
         >
             Create Game
         </button>
+
         <button
             class="menu-button"
-            (click)="showMain = true; showCreate = false; showJoin = false"
+            (click)="showMain = true; showCreate = false; showJoin = false; showStart = false"
             (click)="clearFields()"
         >
             Back
@@ -56,6 +61,7 @@
             [(ngModel)]="inputNameJoin"
             placeholder="Nickname"
         />
+
         <input
             type="text"
             class="menu-input"
@@ -63,19 +69,42 @@
             placeholder="Session Name"
             maxlength="20"
         />
+
         <button
             class="menu-button"
             [disabled]="playerName.length < 3 || sessionName.length < 3"
-            (click)="null"
+            (click)="showMain = false; showCreate = false; showJoin = false; showStart = true"
+            (click)="onJoinSession()"
         >
             Join Game
         </button>
+
         <button
             class="menu-button"
-            (click)="showMain = true; showCreate = false; showJoin = false"
+            (click)="showMain = true; showCreate = false; showJoin = false; showStart = false"
             (click)="clearFieldsJoin()"
         >
             Back
+        </button>
+    </div>
+
+
+    
+    <div *ngIf="showStart">
+        <textarea [value]="sessionPlayerNames" readonly rows="4" stlye="width:100%"></textarea>
+        <button
+            class="menu-button"
+            (click)="onStartSession()"
+        >
+            Start Game
+        </button>
+
+        <button
+            class="menu-button"
+            (click)="showMain = true; showCreate = false; showJoin = false; showStart = false;"
+            (click)="onKillSession()"
+        >
+            Cancell
         </button>
     </div>
 </div>

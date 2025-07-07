@@ -14,6 +14,7 @@ export class HomepageComponent {
   showMain = true;
   showCreate = false;
   showJoin = false;
+  showStart = false;
   sessionName = 'testSession';
   playerName = 'testPlayer';
   inputNameJoin = '';
@@ -32,9 +33,25 @@ export class HomepageComponent {
     }
   }
 
-  // onJoinSession() {
-  //   this.apiService.postNewPlayer(this.joinSession, )
-  // }
+  onJoinSession() {
+    this.store.joinPlayer(this.sessionName, this.playerName)
+  }
+
+  onStartSession() {
+    
+  }
+
+  onKillSession() {
+    this.store.killSession(this.sessionName);
+  }
+
+  get sessionPlayerNames(): string {
+    const session = this.store.session();
+    if (session && session.players) {
+      return session.players.map(player => player.name).join(', \n');
+    }
+    return '';
+  }
 
   clearFields() {
     this.playerName = '';

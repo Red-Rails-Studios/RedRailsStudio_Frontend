@@ -34,6 +34,20 @@ export class Store {
         })
     }
 
+    joinPlayer(sessionName : string, playerName: string) {
+        this,this.apiService.postNewPlayer(sessionName, playerName).subscribe((res: Session) => {
+            this.session.set(res);
+            console.log('Player Joined');
+        })
+    }
+
+    killSession (sessionName: string) {
+        this.apiService.killSession(sessionName).subscribe((res: Session) => {
+            this.session.set(res);
+            console.log('Session Killed');
+        });
+    }
+
     // getTrainInfo(sessionName: string, playerUid: string, trainUid: string) {
     //     this.apiService.getTrainInfo(sessionName, playerUid, trainUid).subscribe((train: Train) => {
     //         this.train.set(train)
