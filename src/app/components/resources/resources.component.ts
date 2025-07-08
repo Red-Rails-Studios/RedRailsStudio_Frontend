@@ -1,25 +1,26 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Store } from '../../services/store';
-import { CommonModule } from '@angular/common';
-import { Resources } from '../../models/resources.model';
+import { CommonModule, CurrencyPipe, JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'app-resources',
+  imports: [CommonModule, CurrencyPipe],
   standalone: true,
   templateUrl: './resources.component.html',
   styleUrls: ['./resources.component.scss']
 })
 
-export class ResoursesComponent implements OnInit {
-  sessionName: string = '';
-  playerUid: string = '';
+export class ResourcesComponent implements OnInit {
+  sessionName: string = 'testsession';
+  playerUid: string = 'eb24bb6a-f994-4953-8b0a-723510bfda7e';
+  resources = inject(Store).resources
 
   constructor(public store: Store) {}
 
   ngOnInit(): void {
     setInterval(() => {
-    this.store.setResources(this.sessionName, this.playerUid); 
-    }, 1000);
+    this.store.setResources(this.sessionName, this.playerUid);
+    }, 5000);
   }
 
   // get energy() {

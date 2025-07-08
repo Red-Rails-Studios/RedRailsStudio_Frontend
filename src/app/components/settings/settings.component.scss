@@ -1,0 +1,28 @@
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 20px;
+  background-color: #e5e5e5;
+  
+  .round-button {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    padding: 0;
+    background-color: #f01414;
+    border-bottom: 4px solid #c01010;
+    border-right: 4px solid #c01010;
+    
+    img {
+      width: 32px;
+      height: 32px;
+      filter: drop-shadow(2px 2px 0 #c01010);
+    }
+  }
+  
+  .menu-button {
+    margin-top: 20px;
+    width: 120px;
+  }
+}
