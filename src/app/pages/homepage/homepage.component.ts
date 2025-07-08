@@ -39,6 +39,7 @@ export class HomepageComponent {
 
   onStartSession() {
     this.store.startSession(this.sessionName);
+    this.router.navigate(['game'])
   }
 
   onKillSession() {
