@@ -34,10 +34,17 @@ export class Store {
         })
     }
 
-    joinPlayer(sessionName : string, playerName: string) {
-        this,this.apiService.postNewPlayer(sessionName, playerName).subscribe((res: Session) => {
+    joinPlayer(sessionName: string, playerName: string) {
+        this.apiService.postNewPlayer(sessionName, playerName).subscribe((res: Session) => {
             this.session.set(res);
             console.log('Player Joined');
+        })
+    }
+
+    startSession(sessionName: string,) {
+        this.apiService.startSession(sessionName).subscribe((res: Session) => {
+            this.session.set(res);
+            console.log('Session Started');
         })
     }
 

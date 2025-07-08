@@ -34,11 +34,11 @@ export class HomepageComponent {
   }
 
   onJoinSession() {
-    this.store.joinPlayer(this.sessionName, this.playerName)
+    this.store.joinPlayer(this.sessionName, this.playerName);
   }
 
   onStartSession() {
-    
+    this.store.startSession(this.sessionName);
   }
 
   onKillSession() {
