@@ -2,7 +2,6 @@ import { inject, Injectable, signal } from "@angular/core";
 import { Resources } from "../models/resources.model";
 import { APISService } from "./apis.service";
 import { Train } from "../models/train.model";
-import { Store } from "./store.model";
 
 
 @Injectable({
