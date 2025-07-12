@@ -4,11 +4,12 @@ import { MapComponent } from '../../components/map/map.component';
 import { SettingsComponent } from '../../components/settings/settings.component';
 import { UpgradesComponent } from '../../components/upgrades/upgrades.component';
 import { ResourcesComponent } from '../../components/resources/resources.component';
+import { TrainsComponent } from "../../components/trains/trains.component";
 
 @Component({
   selector: 'app-gamepage',
   standalone: true,
-  imports: [MapComponent, ResourcesComponent, SettingsComponent, UpgradesComponent, CommonModule],
+  imports: [MapComponent, ResourcesComponent, SettingsComponent, UpgradesComponent, CommonModule, TrainsComponent],
   templateUrl: './gamepage.component.html',
   styleUrl: './gamepage.component.scss'
 })

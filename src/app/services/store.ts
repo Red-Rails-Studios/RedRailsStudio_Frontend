@@ -4,6 +4,8 @@ import { APISService } from "./apis.service";
 import { Train } from "../models/train.model";
 import { Session } from "../models/session.model";
 import { concat, concatMap } from "rxjs";
+import { TrainsInfo } from "../models/trainsInfo.model";
+
 
 
 @Injectable({
@@ -14,6 +16,12 @@ export class Store {
         dbCoin: 0,
         employees: 0,
         power:0 
+    })
+
+    trainsInfo = signal<TrainsInfo>({
+        total_trains: 0,
+        total_passangers: 0,
+        total_railways: 0
     })
 
     session = signal<Session | null>(null);
