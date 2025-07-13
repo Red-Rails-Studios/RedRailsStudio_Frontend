@@ -12,7 +12,7 @@ import { CommonModule, JsonPipe } from '@angular/common';
 
 export class ResourcesComponent implements OnInit {
   sessionName: string = 'testsession';
-  playerUid: string = 'eb24bb6a-f994-4953-8b0a-723510bfda7e';
+  playerUid: string = 'a7dda6fa-5fa2-4e68-882d-054e66756bcf';  //TODO: playerUid muss irgendwie geholt werden
   resources = inject(Store).resources
 
   constructor(public store: Store) {}

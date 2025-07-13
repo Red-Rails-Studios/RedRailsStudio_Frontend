@@ -1,8 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, Injectable } from '@angular/core';
 import { Train } from '../../models/train.model';
 import { CommonModule } from '@angular/common';
 import { NgFor } from '@angular/common';
+import { Store } from '../../services/store';
+import { Inject } from '@angular/core';
 
+@Injectable
 @Component({
   selector: 'app-trains',
   imports: [CommonModule, NgFor],
@@ -10,9 +13,11 @@ import { NgFor } from '@angular/common';
   styleUrl: './trains.component.scss'
 })
 export class TrainsComponent {
-  buttons: string[] = ['Button 1'];
+  trains: string[] = ['train 1'];
 
-  addButton(){
-    this.buttons.push(`Button ${this.buttons.length+1}`); //TODO: update anzahl trains in store
+  constructor(public store: Store) {}
+
+  onAddTrain(){
+    this.trains.push(`Trains ${this.trains.length+1}`); //TODO: update anzahl trains in store make to trains
   }
 }
