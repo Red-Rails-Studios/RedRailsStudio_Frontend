@@ -24,6 +24,8 @@ export class HomepageComponent {
 
   onCreateSession() {
     this.store.createSessionAndJoinFirstPlayer(this.sessionName, this.playerName);
+    localStorage.setItem('playerName', this.playerName); // Save player name
+    this.router.navigate(['/lobby']);
   }
 
   startMultiplayer() {
@@ -35,6 +37,8 @@ export class HomepageComponent {
 
   onJoinSession() {
     this.store.joinPlayer(this.sessionName, this.playerName);
+    localStorage.setItem('playerName', this.playerName); // Save player name
+    this.router.navigate(['/lobby']);
   }
 
   onStartSession() {

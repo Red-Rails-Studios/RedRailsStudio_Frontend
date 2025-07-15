@@ -1,0 +1,30 @@
+<img
+    src="assets/tmp_b4313719-be33-4e90-b882-c2a8b4925a9a.jpeg"
+    class="main-menu-img"
+/>
+
+<div class="menu-overlay">
+    <h2>Lobby</h2>
+    <p>Session Name: {{ sessionName }}</p>
+    <p>Session ID: {{ sessionId }}</p>
+
+    <div *ngIf="store.session() && store.session().players?.length">
+        <h3>Players in Lobby ({{ store.session().players.length }}/4):</h3>
+        <ul>
+            <li *ngFor="let player of store.session().players | slice:0:4">
+                {{ player.name }}
+            </li>
+        </ul>
+        <div *ngIf="store.session().players.length > 4" style="color: red;">
+            Only the first 4 players are shown.
+        </div>
+        <!-- Only show to creator -->
+        <button 
+            class="menu-button"
+            *ngIf="isCreator"
+            (click)="onStartSession()"
+        >
+            Start Game
+        </button>
+    </div>
+</div>
