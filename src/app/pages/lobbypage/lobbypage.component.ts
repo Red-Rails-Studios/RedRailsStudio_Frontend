@@ -20,7 +20,7 @@ export class LobbypageComponent {
   inputNameJoin = '';
   joinSession = '';
 
-  constructor(private router: Router, private store: Store) {}
+  constructor(private router: Router, public store: Store) {}
 
   onStartSession() {
     this.store.startSession(this.sessionName);
@@ -43,6 +43,6 @@ export class LobbypageComponent {
     const session = this.store.session();
     const currentPlayer = localStorage.getItem('playerName');
     // If the first player in the session is the creator
-    return session && session.players && session.players.length > 0 && session.players[0].name === currentPlayer;
+    return !!(session && session.players && session.players.length > 0 && session.players[0].name === currentPlayer);
   }
 }
