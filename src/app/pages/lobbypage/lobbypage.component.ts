@@ -31,18 +31,5 @@ export class LobbypageComponent {
     this.router.navigate(['home']);
   }
 
-  get sessionPlayerNames(): string {
-    const session = this.store.session();
-    if (session && session.players) {
-      return session.players.map(player => player.name).join(', \n');
-    }
-    return '';
-  }
-
-  get isCreator(): boolean {
-    const session = this.store.session();
-    const currentPlayer = localStorage.getItem('playerName');
-    // If the first player in the session is the creator
-    return !!(session && session.players && session.players.length > 0 && session.players[0].name === currentPlayer);
-  }
+  
 }

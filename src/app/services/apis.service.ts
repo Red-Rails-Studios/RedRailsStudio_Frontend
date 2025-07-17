@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Train } from '../models/train.model';
 import { Session } from '../models/session.model';
+import { Player } from '../models/player.model';
 
 
 @Injectable({
@@ -64,5 +65,9 @@ export class APISService {
 
   getSessionInfo(sessionName: string): Observable<any> {
     return this.http.get(`http://localhost:8080/session`, { responseType: 'text'}); 
+  }
+
+  getSessionPlayers(sessionName: string): Observable<Player[]> {
+    return this.http.get<Player[]>(`http://localhost:8080/session/${sessionName}/GetPlayers`);
   }
 }

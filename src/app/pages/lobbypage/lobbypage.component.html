@@ -4,8 +4,7 @@
 />
 
 <div class="menu-overlay lobby-box">
-    <h2 class="lobby-title">Lobby</h2>
-    <p class="lobby-text">Session Name: {{ sessionName }}</p>
+    <h2 class="lobby-title">Lobby {{ sessionName }}</h2>
 
     <div *ngIf="store.session()?.players?.length">
         <h3 class="lobby-text">Players in Lobby ({{ store.session()?.players?.length || 0 }}/4):</h3>
@@ -17,13 +16,14 @@
         <div *ngIf="(store.session()?.players?.length || 0) > 4" style="color: red;">
             Only the first 4 players are shown.
         </div>
-        <!-- Only show to creator -->
         <button 
             class="menu-button"
-            *ngIf="isCreator"
             (click)="onStartSession()"
         >
             Start Game
         </button>
+        <button>
+            Leave Lobby
+        </button>    
     </div>
 </div>
