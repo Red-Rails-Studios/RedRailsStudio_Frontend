@@ -17,8 +17,11 @@ export class APISService {
 
   }
 
-  postNewPlayer(sessionName: string, playerName: string){
-    return this.http.post(`http://localhost:8080/session/${sessionName}/${playerName}`, null, { responseType: 'text'}); //new player
+  postNewPlayer(sessionName: string, playerName: string) {
+    return this.http.post<{ name: string; uid: string }>(
+      `http://localhost:8080/session/${sessionName}/${playerName}`,
+      null
+    );
   }
 
   startSession(sessionName: string): Observable<any> {

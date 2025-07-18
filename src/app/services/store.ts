@@ -23,6 +23,16 @@ export class Store {
     })
 
     apiService = inject(APISService)
+    playerUid = signal<string | null>(null);
+    sessionName = signal<string | null>(null); 
+
+    setPlayerUid(uid: string) {
+        this.playerUid.set(uid);
+    }
+
+    setSessionName(name: string) { 
+        this.sessionName.set(name);
+    }
 
     setResources(sessionName: string, playerUid: string){
         this.apiService.getResources(sessionName,playerUid).subscribe((resources: Resources) => {
