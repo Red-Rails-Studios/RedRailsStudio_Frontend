@@ -6,14 +6,14 @@
 <div class="menu-overlay lobby-box">
     <h2 class="lobby-title">Lobby {{ sessionName }}</h2>
 
-    <div *ngIf="store.session()?.players?.length">
-        <h3 class="lobby-text">Players in Lobby ({{ store.session()?.players?.length || 0 }}/4):</h3>
+    <div *ngIf="lobbyPlayers.length">
+        <h3 class="lobby-text">Players in Lobby ({{ lobbyPlayers.length }}/4):</h3>
         <ul>
-            <li class="lobby-text" *ngFor="let player of (store.session()?.players || []) | slice:0:4">
+            <li class="lobby-text" *ngFor="let player of lobbyPlayers | slice:0:4">
                 {{ player.name }}
             </li>
         </ul>
-        <div *ngIf="(store.session()?.players?.length || 0) > 4" style="color: red;">
+        <div *ngIf="lobbyPlayers.length > 4" style="color: red;">
             Only the first 4 players are shown.
         </div>
         <button 
@@ -22,8 +22,11 @@
         >
             Start Game
         </button>
-        <button>
-            Leave Lobby
-        </button>    
     </div>
+    <button
+            class="menu-button"
+            (click)="onLeaveLobby()"
+        >
+            Leave Lobby
+    </button>    
 </div>

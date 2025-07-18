@@ -87,24 +87,4 @@
             Back
         </button>
     </div>
-
-
-    
-    <div *ngIf="showStart">
-        <textarea [value]="sessionPlayerNames" readonly rows="4" stlye="width:100%"></textarea>
-        <button
-            class="menu-button"
-            (click)="onStartSession()"
-        >
-            Start Game
-        </button>
-
-        <button
-            class="menu-button"
-            (click)="showMain = true; showCreate = false; showJoin = false; showStart = false;"
-            (click)="onKillSession()"
-        >
-            Cancell
-        </button>
-    </div>
 </div>

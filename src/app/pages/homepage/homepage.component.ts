@@ -27,16 +27,8 @@ export class HomepageComponent {
     this.router.navigate(['/lobby']);
   }
 
-  startMultiplayer() {
-    if (this.sessionName) {
-      console.log('Creating multiplayer session:', this.sessionName);
-      this.router.navigate(['/game']);
-    }
-  }
-
   onJoinSession() {
     this.store.joinPlayer(this.sessionName, this.playerName);
-    localStorage.setItem('playerName', this.playerName); // Save player name
     this.router.navigate(['/lobby']);
   }
 
@@ -47,14 +39,6 @@ export class HomepageComponent {
 
   onKillSession() {
     this.store.killSession(this.sessionName);
-  }
-
-  get sessionPlayerNames(): string {
-    const session = this.store.session();
-    if (session && session.players) {
-      return session.players.map(player => player.name).join(', \n');
-    }
-    return '';
   }
 
   clearFields() {
