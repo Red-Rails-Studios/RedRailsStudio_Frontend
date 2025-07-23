@@ -5,6 +5,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Train } from '../models/train.model';
+import { Session } from '../models/session.model';
+import { Player } from '../models/player.model';
 
 
 @Injectable({
@@ -22,7 +24,7 @@ export class APISService {
       `http://localhost:8080/session/${sessionName}/${playerName}`,
       null
     );
-  }
+
 
   startSession(sessionName: string): Observable<any> {
     return this.http.patch(`http://localhost:8080/session/${sessionName}/start`, null,  { responseType: 'text'}); //startet  session
@@ -66,5 +68,9 @@ export class APISService {
 
   getSessionInfo(sessionName: string): Observable<any> {
     return this.http.get(`http://localhost:8080/session`, { responseType: 'text'}); 
+  }
+
+  getSessionPlayers(sessionName: string): Observable<Player[]> {
+    return this.http.get<Player[]>(`http://localhost:8080/session/${sessionName}/GetPlayers`);
   }
 }

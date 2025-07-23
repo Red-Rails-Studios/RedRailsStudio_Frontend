@@ -2,9 +2,10 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Store } from '../../services/store';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 
+
 @Component({
   selector: 'app-resources',
-  imports: [CommonModule, CurrencyPipe],
+  imports: [CommonModule],
   standalone: true,
   templateUrl: './resources.component.html',
   styleUrls: ['./resources.component.scss']

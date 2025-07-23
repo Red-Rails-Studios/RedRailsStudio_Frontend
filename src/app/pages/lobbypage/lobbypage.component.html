@@ -1,0 +1,32 @@
+<img
+    src="assets/tmp_b4313719-be33-4e90-b882-c2a8b4925a9a.jpeg"
+    class="main-menu-img"
+/>
+
+<div class="menu-overlay lobby-box">
+    <h2 class="lobby-title">Lobby {{ sessionName }}</h2>
+
+    <div *ngIf="lobbyPlayers.length">
+        <h3 class="lobby-text">Players in Lobby ({{ lobbyPlayers.length }}/4):</h3>
+        <ul>
+            <li class="lobby-text" *ngFor="let player of lobbyPlayers | slice:0:4">
+                {{ player.name }}
+            </li>
+        </ul>
+        <div *ngIf="lobbyPlayers.length > 4" style="color: red;">
+            Only the first 4 players are shown.
+        </div>
+        <button 
+            class="menu-button"
+            (click)="onStartSession()"
+        >
+            Start Game
+        </button>
+    </div>
+    <button
+            class="menu-button"
+            (click)="onLeaveLobby()"
+        >
+            Leave Lobby
+    </button>    
+</div>

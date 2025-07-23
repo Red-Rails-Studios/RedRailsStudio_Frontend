@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { APISService } from '../../services/apis.service'; // Adjust the import path
 import { Store } from '../../services/store'; // Adjust the import path
 
+
 @Component({
   selector: 'app-homepage',
   imports: [FormsModule, CommonModule],
@@ -30,13 +31,11 @@ export class HomepageComponent {
       console.log('Creating multiplayer session:', this.sessionName);
       this.router.navigate(['/game']);
     }
+
   }
 
-  joinMultiplayer() {
-    if (this.playerName) {
-      console.log('Joining multiplayer session:', this.playerName);
-      this.router.navigate(['/game']);
-    }
+  onKillSession() {
+    this.store.killSession(this.sessionName);
   }
 
   joinSession(sessionName: string, playerName: string) {
@@ -54,12 +53,12 @@ export class HomepageComponent {
   }
 
   clearFields() {
-    this.inputName = '';
-    this.inputID = '';
+    this.playerName = '';
+    this.sessionName = '';
   }
 
   clearFieldsJoin() {
     this.inputNameJoin = '';
-    this.inputIDJoin = '';
+    this.joinSession = '';
   }
 }

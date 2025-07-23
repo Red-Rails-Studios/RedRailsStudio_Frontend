@@ -4,9 +4,11 @@ import { GamepageComponent } from './pages/gamepage/gamepage.component';
 
 import { AppComponent } from './app.component';
 import { ResourcesComponent } from './components/resources/resources.component';
+import { LobbypageComponent } from './pages/lobbypage/lobbypage.component';
 
 export const routes: Routes = [
-  { path: '', component: HomepageComponent }, // Default route
+  { path: 'home', component: HomepageComponent }, // Default route
   { path: 'game', component: GamepageComponent },
-  { path: '**', redirectTo: '' } // Fallback route
+  { path: 'lobby', component: LobbypageComponent },
+  { path: '**', redirectTo: 'home' } // Fallback route
 ];
