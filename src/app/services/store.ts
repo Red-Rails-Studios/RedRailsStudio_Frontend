@@ -38,17 +38,31 @@ export class Store {
     createSessionAndJoinFirstPlayer(sessionName: string, playerName: string) {
         this.apiService.createSession(sessionName).pipe(
             concatMap(() => this.apiService.postNewPlayer(sessionName, playerName))
-        ).subscribe((res: Session) => {
-            this.session.set(res);
-            console.log('Session created and player joined:', this.session());
-        })
+        ).subscribe({
+            next: (res: { name: string; uid: string }) => {
+                this.setPlayerUid(res.uid);
+                this.setSessionName(sessionName);
+                // Optionally fetch session info here if needed
+                console.log('Session created and player joined:', res);
+            },
+            error: (err) => {
+                console.error('Error creating session and joining player:', err);
+            }
+        });
     }
 
     joinPlayer(sessionName: string, playerName: string) {
-        this.apiService.postNewPlayer(sessionName, playerName).subscribe((res: Session) => {
-            this.session.set(res);
-            console.log('Player Joined');
-        })
+        this.apiService.postNewPlayer(sessionName, playerName).subscribe({
+            next: (res: { name: string; uid: string }) => {
+                this.setPlayerUid(res.uid);
+                this.setSessionName(sessionName);
+                // Optionally fetch session info here if needed
+                console.log('Player Joined:', res);
+            },
+            error: (err) => {
+                console.error('Error joining player:', err);
+            }
+        });
     }
 
     startSession(sessionName: string,) {

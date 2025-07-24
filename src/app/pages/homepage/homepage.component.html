@@ -4,23 +4,32 @@
 />
 
 <div class="menu-overlay">
+
+    <!-- MAIN -->
     <div *ngIf="showMain">
+
+        <!-- CREATE BUTTON -->
         <button
             class="main-menu-button"
-            (click)="showCreate = true; showJoin = false; showMain = false; showStart = false"
+            (click)="showCreate = true; showJoin = false; showMain = false; "
         >
             Create Session
         </button>
 
+        <!-- JOIN BUTTON -->
         <button
             class="main-menu-button"
-            (click)="showJoin = true; showCreate = false; showMain = false; showStart = false"
+            (click)="showJoin = true; showCreate = false; showMain = false; "
         >
             Join Session
         </button>
     </div>
+    <!-- MAIN -->
 
+    <!-- CREATE  -->    
     <div *ngIf="showCreate">
+
+        <!-- PLAYERNAME -->
         <input
             type="text"
             class="menu-input"
@@ -28,6 +37,7 @@
             placeholder="Nickname"
         />
 
+        <!-- SESSIONNAME -->
         <input
             type="text"
             class="menu-input"
@@ -36,25 +46,31 @@
             maxlength="20"
         />
 
+        <!-- CREATE BUTTON -->
         <button
             class="menu-button"
             [disabled]="playerName.length < 3 || sessionName.length < 3"
             (click)="onCreateSession()"
-            (click)="showMain = false; showCreate = false; showJoin = false; showStart = true"
+            (click)="showMain = false; showCreate = false; showJoin = false; "
         >
-            Create Game
+            Create Session
         </button>
 
+        <!-- BACK BUTTON -->
         <button
             class="menu-button"
-            (click)="showMain = true; showCreate = false; showJoin = false; showStart = false"
+            (click)="showMain = true; showCreate = false; showJoin = false; "
             (click)="clearFields()"
         >
             Back
         </button>
     </div>
+    <!-- CREATE  -->
 
+    <!-- JOIN -->
     <div *ngIf="showJoin">
+
+        <!-- PLAYERNAME -->
         <input
             type="text"
             class="menu-input"
@@ -62,29 +78,34 @@
             placeholder="Nickname"
         />
 
+        <!-- SESSIONNAME -->
         <input
             type="text"
             class="menu-input"
-            [(ngModel)]="joinSession"
+            [(ngModel)]="inputIDJoin"
             placeholder="Session Name"
             maxlength="20"
         />
 
+        <!-- JOIN BUTTON -->
         <button
             class="menu-button"
             [disabled]="playerName.length < 3 || sessionName.length < 3"
-            (click)="showMain = false; showCreate = false; showJoin = false; showStart = true"
-            (click)="onJoinSession()"
+            (click)="showMain = false; showCreate = false; showJoin = false; "
+            (click)="onJoinSession(sessionName, playerName)"
         >
-            Join Game
+            Join Session
         </button>
 
+        <!-- BACK BUTTON -->
         <button
             class="menu-button"
-            (click)="showMain = true; showCreate = false; showJoin = false; showStart = false"
+            (click)="showMain = true; showCreate = false; showJoin = false; "
             (click)="clearFieldsJoin()"
         >
             Back
         </button>
     </div>
+    <!-- JOIN -->
+     
 </div>

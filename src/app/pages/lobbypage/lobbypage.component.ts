@@ -17,7 +17,7 @@ export class LobbypageComponent {
   showCreate = false;
   showJoin = false;
   showStart = false;
-  sessionName = 'testSession';
+  //sessionName = 'testSession';
   playerName = 'testPlayer';
   inputNameJoin = '';
   joinSession = '';
@@ -31,14 +31,23 @@ export class LobbypageComponent {
   }  
 
   fetchPlayers () {
-    this.apiService.getSessionPlayers(this.sessionName).subscribe(players => {
-      this.lobbyPlayers = players || [];
-    });
+    const sessionName = this.store.sessionName();
+    if (sessionName) {
+      this.apiService.getSessionPlayers(sessionName).subscribe(players => {
+        this.lobbyPlayers = players || [];
+      });
+    }
   }
 
   onStartSession() {
-    this.store.startSession(this.sessionName);
-    this.router.navigate(['game'])
+    const sessionName = this.store.sessionName();
+    if (sessionName) {
+      this.store.startSession(sessionName);
+      this.router.navigate(['game']);
+    } else {
+      // Optionally handle the case where sessionName is null
+      console.error('No session name set!');
+    }
   }
 
   onLeaveLobby() {   

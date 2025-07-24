@@ -4,7 +4,7 @@
 />
 
 <div class="menu-overlay lobby-box">
-    <h2 class="lobby-title">Lobby {{ sessionName }}</h2>
+    <h2 class="lobby-title">Lobby {{ store.sessionName() }}</h2>
 
     <div *ngIf="lobbyPlayers.length">
         <h3 class="lobby-text">Players in Lobby ({{ lobbyPlayers.length }}/4):</h3>

@@ -25,11 +25,13 @@ export class HomepageComponent {
 
   constructor(private apiService: APISService, public store: Store, private router: Router) {}
 
-  startMultiplayer() {
+  onCreateSession() {
     if (this.sessionName) {
+      this.apiService.createSession(this.sessionName);
+      this.apiService.postNewPlayer(this.sessionName, this.playerName);
       this.store.setSessionName(this.sessionName); // Save session name in store
       console.log('Creating multiplayer session:', this.sessionName);
-      this.router.navigate(['/game']);
+      this.router.navigate(['/lobby']);
     }
 
   }
@@ -38,12 +40,12 @@ export class HomepageComponent {
     this.store.killSession(this.sessionName);
   }
 
-  joinSession(sessionName: string, playerName: string) {
+  onJoinSession(sessionName: string, playerName: string) {
     this.apiService.postNewPlayer(sessionName, playerName).subscribe({
       next: (response: { name: string; uid: string }) => {
         if (response && response.uid) {
           this.store.setPlayerUid(response.uid);
-          this.router.navigate(['/game']);
+          this.router.navigate(['/lobby']);
         }
       },
       error: (err) => {
@@ -59,6 +61,6 @@ export class HomepageComponent {
 
   clearFieldsJoin() {
     this.inputNameJoin = '';
-    this.joinSession = '';
+    this.inputIDJoin = '';
   }
 }
