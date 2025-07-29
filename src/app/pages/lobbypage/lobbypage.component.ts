@@ -17,8 +17,6 @@ export class LobbypageComponent {
   showCreate = false;
   showJoin = false;
   showStart = false;
-  //sessionName = 'testSession';
-  playerName = 'testPlayer';
   inputNameJoin = '';
   joinSession = '';
   lobbyPlayers: Player[] = [];
@@ -45,7 +43,6 @@ export class LobbypageComponent {
       this.store.startSession(sessionName);
       this.router.navigate(['game']);
     } else {
-      // Optionally handle the case where sessionName is null
       console.error('No session name set!');
     }
   }
@@ -54,5 +51,7 @@ export class LobbypageComponent {
     this.router.navigate(['home']);
   }
 
-  
+  get playerName(): string | null {
+    return this.store.playerName();
+  }
 }

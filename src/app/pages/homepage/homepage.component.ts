@@ -2,8 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { APISService } from '../../services/apis.service'; // Adjust the import path
-import { Store } from '../../services/store'; // Adjust the import path
+import { APISService } from '../../services/apis.service'; 
+import { Store } from '../../services/store'; 
 
 
 @Component({
@@ -16,22 +16,27 @@ export class HomepageComponent {
   showMain = true;
   showCreate = false;
   showJoin = false;
-  sessionName: any;
-  playerName = '';
+  sessionName: string = '';
+  playerName: string = '';
   inputName: any = '';
   inputID: any = '';
-  inputNameJoin: any = '';
-  inputIDJoin: any = '';
+  inputNameJoin: string = '';
+  inputIDJoin: string = '';
 
   constructor(private apiService: APISService, public store: Store, private router: Router) {}
 
   onCreateSession() {
-    if (this.sessionName) {
-      this.apiService.createSession(this.sessionName);
-      this.apiService.postNewPlayer(this.sessionName, this.playerName);
-      this.store.setSessionName(this.sessionName); // Save session name in store
-      console.log('Creating multiplayer session:', this.sessionName);
-      this.router.navigate(['/lobby']);
+    if (this.sessionName && this.playerName) {
+      this.apiService.createSession(this.sessionName).subscribe(() => {
+        this.apiService.postNewPlayer(this.sessionName, this.playerName).subscribe((response: { name: string; uid: string }) => {
+          if (response && response.uid) {
+            this.store.setSessionName(this.sessionName);
+            this.store.setPlayerUid(response.uid);
+            this.store.setPlayerName(this.playerName); 
+            this.router.navigate(['/lobby']);
+          }
+        });
+      });
     }
 
   }
@@ -45,11 +50,13 @@ export class HomepageComponent {
       next: (response: { name: string; uid: string }) => {
         if (response && response.uid) {
           this.store.setPlayerUid(response.uid);
+          this.store.setSessionName(sessionName);
+          this.store.setPlayerName(playerName); 
           this.router.navigate(['/lobby']);
         }
       },
       error: (err) => {
-        // handle error
+        
       }
     });
   }

@@ -20,6 +20,7 @@ export class Store {
     apiService = inject(APISService)
     playerUid = signal<string | null>(null);
     sessionName = signal<string | null>(null); 
+    playerName = signal<string | null>(null);
 
     setPlayerUid(uid: string) {
         this.playerUid.set(uid);
@@ -27,6 +28,10 @@ export class Store {
 
     setSessionName(name: string) { 
         this.sessionName.set(name);
+    }
+
+    setPlayerName(name: string) {
+        this.playerName.set(name);
     }
 
     setResources(sessionName: string, playerUid: string){

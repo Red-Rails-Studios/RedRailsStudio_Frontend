@@ -50,8 +50,7 @@
         <button
             class="menu-button"
             [disabled]="playerName.length < 3 || sessionName.length < 3"
-            (click)="onCreateSession()"
-            (click)="showMain = false; showCreate = false; showJoin = false; "
+            (click)="onCreateSession(); showMain = false; showCreate = false; showJoin = false;"
         >
             Create Session
         </button>
@@ -90,9 +89,8 @@
         <!-- JOIN BUTTON -->
         <button
             class="menu-button"
-            [disabled]="playerName.length < 3 || sessionName.length < 3"
-            (click)="showMain = false; showCreate = false; showJoin = false; "
-            (click)="onJoinSession(sessionName, playerName)"
+            [disabled]="inputNameJoin.length < 3 || inputIDJoin.length < 3"
+            (click)="onJoinSession(inputIDJoin, inputNameJoin); showMain = false; showCreate = false; showJoin = false;"
         >
             Join Session
         </button>
