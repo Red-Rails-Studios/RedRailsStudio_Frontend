@@ -13,12 +13,6 @@ import { Player } from '../../models/player.model';
   styleUrls: ['./lobbypage.component.scss']
 })
 export class LobbypageComponent {
-  showMain = true;
-  showCreate = false;
-  showJoin = false;
-  showStart = false;
-  inputNameJoin = '';
-  joinSession = '';
   lobbyPlayers: Player[] = [];
 
   constructor(private router: Router, public store: Store, private apiService: APISService) {}
@@ -49,9 +43,5 @@ export class LobbypageComponent {
 
   onLeaveLobby() {   
     this.router.navigate(['home']);
-  }
-
-  get playerName(): string | null {
-    return this.store.playerName();
   }
 }

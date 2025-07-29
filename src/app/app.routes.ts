@@ -7,8 +7,9 @@ import { ResourcesComponent } from './components/resources/resources.component';
 import { LobbypageComponent } from './pages/lobbypage/lobbypage.component';
 
 export const routes: Routes = [
-  { path: 'home', component: HomepageComponent }, // Default route
+  { path: '', redirectTo: 'home', pathMatch: 'full' }, 
+  { path: 'home', component: HomepageComponent },
   { path: 'game', component: GamepageComponent },
   { path: 'lobby', component: LobbypageComponent },
-  { path: '**', redirectTo: 'home' } // Fallback route
+  { path: '**', redirectTo: 'home' }
 ];
