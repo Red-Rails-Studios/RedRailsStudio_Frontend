@@ -9,13 +9,10 @@
     <div *ngIf="lobbyPlayers.length">
         <h3 class="lobby-text">Players in Lobby ({{ lobbyPlayers.length }}/4):</h3>
         <ul>
-            <li class="lobby-text" *ngFor="let player of lobbyPlayers | slice:0:4">
+            <li class="lobby-text" *ngFor="let player of lobbyPlayers">
                 {{ player.name }}
             </li>
         </ul>
-        <div *ngIf="lobbyPlayers.length > 4" style="color: red;">
-            Only the first 4 players are shown.
-        </div>
     </div>
     <div class="lobby-buttons-row">
         <button 
