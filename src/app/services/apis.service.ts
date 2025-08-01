@@ -74,7 +74,7 @@ export class APISService {
     return this.http.get<Player[]>(`http://localhost:8080/session/${sessionName}/GetPlayers`);
   }
 
-  removePlayer(sessionName : String, playerName : String) {
-    return this.http.post(`http://localhost:8080/session/${sessionName}/${playerName}/leave`, null);
+  removePlayer(sessionName : String, playerUid : String) {
+    return this.http.post(`http://localhost:8080/session/${sessionName}/${playerUid}/leave`, null);
   }
 }

@@ -43,9 +43,9 @@ export class LobbypageComponent {
 
   onLeaveLobby() {   
     const sessionName = this.store.sessionName();
-    const playerName = this.store.playerName();
-    if(sessionName && playerName) {
-      this.apiService.removePlayer(sessionName, playerName).subscribe({
+    const playerUid = this.store.playerUid();
+    if(sessionName && playerUid) {
+      this.apiService.removePlayer(sessionName, playerUid).subscribe({
       next: () => {
         this.router.navigate(['home']);
       },
