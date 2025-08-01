@@ -42,6 +42,20 @@ export class LobbypageComponent {
   }
 
   onLeaveLobby() {   
-    this.router.navigate(['home']);
+    const sessionName = this.store.sessionName();
+    const playerName = this.store.playerName();
+    if(sessionName && playerName) {
+      this.apiService.removePlayer(sessionName, playerName).subscribe({
+      next: () => {
+        this.router.navigate(['home']);
+      },
+      error: (err) => {
+        console.error('Failed to remove player:', err);
+        this.router.navigate(['home']);
+      }  
+      });
+    } else {
+      this.router.navigate(['home']);
+    }
   }
 }

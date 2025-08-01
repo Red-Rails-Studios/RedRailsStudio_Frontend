@@ -73,4 +73,8 @@ export class APISService {
   getSessionPlayers(sessionName: string): Observable<Player[]> {
     return this.http.get<Player[]>(`http://localhost:8080/session/${sessionName}/GetPlayers`);
   }
+
+  removePlayer(sessionName : String, playerName : String) {
+    return this.http.post(`http://localhost:8080/session/${sessionName}/${playerName}/leave`, null);
+  }
 }
