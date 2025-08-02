@@ -67,7 +67,7 @@ export class APISService {
     return this.http.get(`http://localhost:8080/session`, { responseType: 'text'}); 
   }
 
-  getPlayerInfos(sessionName: string, playerUid: string): Observable<GameState> {
-    return this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid} `) //TODO: fix please
+  getPlayerInfos(sessionName: string, playerUid: string): Observable<any> {
+    return this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid} `);
   }
 }

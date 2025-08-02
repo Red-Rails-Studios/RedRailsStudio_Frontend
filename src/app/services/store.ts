@@ -51,10 +51,6 @@ export class Store {
         })
     }
 
-    getPlayerInfo(sessionName: string, playerUid: string) {
-
-    }
-
     createSessionAndJoinFirstPlayer(sessionName: string, playerName: string) {
         this.apiService.createSession(sessionName).pipe(
             concatMap(() => this.apiService.postNewPlayer(sessionName, playerName))
