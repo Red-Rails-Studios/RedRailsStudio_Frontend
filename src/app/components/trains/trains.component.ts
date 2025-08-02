@@ -1,10 +1,8 @@
-import { Component, Injectable } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Train } from '../../models/train.model';
 import { CommonModule } from '@angular/common';
 import { NgFor } from '@angular/common';
 import { Store } from '../../services/store';
-import { Inject } from '@angular/core';
-import { APIService } from
 
 @Component({
   selector: 'app-trains',
@@ -14,14 +12,16 @@ import { APIService } from
 })
 export class TrainsComponent {
   trains: string[] = ['train 1'];
+  playerInfo = inject(Store).playerInfo;
+  sessionInfo = inject(Store).sessionInfo;
 
-  constructor(public store: Store,  apiService: APIService) {}
+  constructor(public store: Store) {}
 
   onAddTrain(){
     this.trains.push(`Trains ${this.trains.length+1}`); //TODO: update anzahl trains in store make to trains
   }
 
-  buyTrain() {
-    this.apiService.
+  onBuyTrain() {
+    this.store.buyTrain(this.sessionInfo().sessionName, this.playerInfo().uid);
   }
 }

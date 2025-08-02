@@ -4,11 +4,10 @@ import { APISService } from "./apis.service";
 import { Train } from "../models/train.model";
 import { Session } from "../models/session.model";
 import { concat, concatMap } from "rxjs";
-import { TrainsInfo } from "../models/trainsInfo.model"; 
 import { Railway } from "../models/railway.model";
 import { TrainStation } from "../models/trainStation.model";
 import { GameState } from "../models/game-state.model";
-
+import { Player } from "../models/player.model";
 
 @Injectable({
   providedIn: 'root' //Für die ganze anwendung erreichbar
@@ -20,18 +19,26 @@ export class Store {
         power:0 
     })
 
-    trainsInfo = signal<TrainsInfo>({
-        total_trains: 0,
-        total_passengers: 0,
-        total_railways: 0
+    sessionInfo = signal<Session>({
+        sessionName: 'testSession',
+        players: [] as Player[],
+        gameState: {} as GameState,
+        sessionStarted: '',
+        sessionEnded: ''
     })
 
-    playerInfo = signal<GameState>({
+    playerInfo = signal<Player>({ //
+        uid: '',
+        name: '',
         trains: [] as Train[],
         rails: [] as Railway[],
         stations: [] as TrainStation[],
-        users: [],
         accountBalance: 0,
+        runtime: 0
+    })
+
+    gamestate = signal<GameState>({
+        users: [] as Player[],
         runtime: 0
     })
 
@@ -44,12 +51,16 @@ export class Store {
             console.log('Resources updated:', this.resources());})
     }
 
-    setTrainInfo(sessionName: string, playerUid: string) {
-        this.apiService.getPlayerInfos(sessionName, playerUid).subscribe((trainsInfo: TrainsInfo) => {
-            this.trainsInfo.set(trainsInfo)
-            console.log('TrainInfos updated:', this.trainsInfo)
-        })
+    getPlayerInfos(sessionName: string, playerUid: string) {
+        this.apiService.getPlayerInfos(sessionName, playerUid);
     }
+
+    // setTrainInfo(sessionName: string, playerUid: string) {
+    //     this.apiService.getPlayerInfos(sessionName, playerUid).subscribe((trainsInfo: TrainsInfo) => {
+    //         this.trainsInfo.set(trainsInfo)
+    //         console.log('TrainInfos updated:', this.trainsInfo)
+    //     })
+    // }
 
     createSessionAndJoinFirstPlayer(sessionName: string, playerName: string) {
         this.apiService.createSession(sessionName).pipe(
@@ -82,9 +93,13 @@ export class Store {
     }
 
     getTrain (sessionName: string, playerName: string, trainUid: string) {
-        this.apiService.getTrainInfo(sessionName, playerName, trainUid).subscribe((res: TrainsInfo) => {
+        this.apiService.getTrainInfo(sessionName, playerName, trainUid).subscribe((res: Player) => {
             console.log('')
         })
+    }
+
+    buyTrain(sessionName: string, playerName: string) {
+        this.apiService.buyTrain(sessionName, playerName);
     }
 
     // getTrainInfo(sessionName: string, playerUid: string, trainUid: string) {

@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { TrainsInfo } from '../models/trainsInfo.model';
 import { Resources } from '../models/resources.model';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';

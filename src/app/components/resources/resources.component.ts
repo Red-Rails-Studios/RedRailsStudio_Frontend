@@ -11,15 +11,17 @@ import { CommonModule, JsonPipe } from '@angular/common';
 })
 
 export class ResourcesComponent implements OnInit {
-  sessionName: string = 'testsession';
-  playerUid: string = 'a7dda6fa-5fa2-4e68-882d-054e66756bcf';  //TODO: playerUid muss irgendwie geholt werden
-  resources = inject(Store).resources
+  // sessionName: string = 'testsession';
+  // playerUid: string = 'a7dda6fa-5fa2-4e68-882d-054e66756bcf';  //TODO: playerUid muss irgendwie geholt werden
+  resources = inject(Store).resources;
+  playerInfo = inject(Store).playerInfo;
+  sessionInfo = inject(Store).sessionInfo;
 
   constructor(public store: Store) {}
 
   ngOnInit(): void {
     setInterval(() => {
-    this.store.setResources(this.sessionName, this.playerUid);
+    this.store.setResources(this.store.sessionInfo().sessionName, this.playerInfo().uid);
     }, 5000);
   }
 
