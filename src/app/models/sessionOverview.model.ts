@@ -1,6 +1,6 @@
 import { Player } from "./player.model";
 
-export interface Session {
+export interface SessionOverview {
     sessionName: string;
     players: Player[];
     gameState: string;

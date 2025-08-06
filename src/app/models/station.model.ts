@@ -1,4 +1,5 @@
-export interface Train {
+export interface Station {
   uId: string;
   level: number;
 }
+  
