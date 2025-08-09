@@ -30,7 +30,7 @@ export class HomepageComponent {
       alert('Please enter both a session name and a player name.');
       return;
     }
-    this.apiService.createSession(this.sessionName).subscribe({
+   this.apiService.createSession(this.sessionName).subscribe({
       next: () => {
         this.apiService.postNewPlayer(this.sessionName, this.playerName).subscribe({
           next: (response: { name: string; uid: string }) => {

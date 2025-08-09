@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store } from '../../services/store';
 import { APISService } from '../../services/apis.service';
 import { Player } from '../../models/player.model';
+import { inject } from '@angular/core/testing'
 
 @Component({
   selector: 'app-lobbypage',
@@ -22,14 +23,18 @@ export class LobbypageComponent {
     setInterval(() => this.fetchPlayers(), 5000 );
   }  
 
-  fetchPlayers () {
-    const sessionName = this.store.sessionName();
-    if (sessionName) {
-      this.apiService.getSessionPlayers(sessionName).subscribe(players => {
-        this.lobbyPlayers = players || [];
-      });
-    }
+  fetchPlayers (){
+    this.lobbyPlayers = this.store.sessionInfo().players;
   }
+
+  // fetchPlayers () {
+  //   const sessionName = this.store.sessionName();
+  //   if (sessionName) {
+  //     this.apiService.getSessionPlayers(sessionName).subscribe(players => {
+  //       this.lobbyPlayers = players || [];
+  //     });
+  //   }
+  // }
 
   onStartSession() {
     const sessionName = this.store.sessionName();
