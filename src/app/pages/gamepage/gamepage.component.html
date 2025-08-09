@@ -6,12 +6,23 @@
 
   <div class="main-content">
     <div class="game-header">
-      <div class="header-map" aria-hidden="true"></div>
+
+      <div class="header-map" aria-hidden="true">
+        <app-map></app-map>
+      </div>
       <div class="header-main">
+
+        <div class="resources-bar">
+          <app-resources></app-resources>
+        </div>
+
+        <div class="tabs-bar">
         <button class="game-button" [class.active]="activeTab === 1" (click)="activeTab = 1">Trains</button>
-        <button class="game-button" [class.active]="activeTab === 2" (click)="activeTab = 2">Resources</button>
+        <button class="game-button" [class.active]="activeTab === 2" (click)="activeTab = 2">Resourcen Kaufen</button>
         <button class="game-button" [class.active]="activeTab === 3" (click)="activeTab = 3">Connections</button>
         <button class="menu-button" (click)="showDropdown = !showDropdown">≡</button>
+          </div>
+
         <div class="dropdown-menu" *ngIf="showDropdown">
           <button class="dropdown-button" (click)="onSettings()">Settings</button>
           <button class="dropdown-button" (click)="onExit()">Exit</button>
@@ -26,20 +37,20 @@
         <div>ID: {{train.id}}</div>
         <div>Name: {{train.name}}</div>
         <div>Type: {{train.type}}</div>
+        <app-trains></app-trains>
       </div>
     </div>
     <div class="tab-content" *ngIf="activeTab === 2">
-        <!-- Resources Tab -->
-      <app-resources></app-resources>
+        <!-- Resourcen kauf Tab -->
     </div>
     <div class="tab-content" *ngIf="activeTab === 3">
-        <!-- Connections Tab -->
+        <!-- Connections Tab (bahnhöfe und gleise kaufen/upgraden) -->
       <div *ngFor="let connection of connections" class="connection-item">
+      
         <div>ID: {{connection.id}}</div>
         <div>From: {{connection.from}}</div>
         <div>To: {{connection.to}}</div>
       </div>
-    </div>
 
     <div class="game-controls">
       
@@ -48,5 +59,3 @@
     <div class="game-timer">
       <!-- Timer goes here -->
     </div>
-  </div>
-</div>

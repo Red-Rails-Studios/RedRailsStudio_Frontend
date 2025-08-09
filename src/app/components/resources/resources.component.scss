@@ -1,6 +1,6 @@
 .resources-panels {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 30px;
   align-items: center;
 }
@@ -9,30 +9,36 @@
   position: relative;
   background: #e5e5e5;
   border: 4px solid #4a4a4a;
-  padding: 20px 20px 60px 20px;
-  width: 100%;
+  padding: 15px 15px 30px 15px;
+  min-width: 0;
+  max-width: none;
+  box-sizing: border-box;
+  margin: 0;
+  height:10px;
   display: flex;
   flex-direction: column;
   align-items: left;
+  gap: 0;
 }
 
 .resource-header {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   margin-bottom: 10px;
+  gap: 10px;
 }
 
 .pixel-icon {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   margin-right: 10px;
 }
 
 .resource-name {
   font-family: Bahnschrift;
   color: #1a1a1a;
-  font-size: 24px;
+  font-size: 16px;
   font-weight: bold;
 }
 

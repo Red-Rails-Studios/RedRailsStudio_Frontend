@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { TrainsInfo } from '../models/trainsInfo.model';
 import { Resources } from '../models/resources.model';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -7,6 +6,7 @@ import { map } from 'rxjs/operators';
 import { Train } from '../models/train.model';
 import { Session } from '../models/session.model';
 import { Player } from '../models/player.model';
+import { GameState } from '../models/game-state.model';
 
 
 @Injectable({
@@ -76,5 +76,9 @@ export class APISService {
 
   removePlayer(sessionName : String, playerUid : String) {
     return this.http.post(`http://localhost:8080/session/${sessionName}/${playerUid}/leave`, null);
+  }
+
+  getPlayerInfos(sessionName: string, playerUid: string): Observable<any> {
+    return this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid} `);
   }
 }

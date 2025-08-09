@@ -1,8 +1,10 @@
 import { Train } from "./train.model";
-import { iUser } from "./player.model";
+import { Player } from "./player.model";
+import { Railway } from "./railway.model";
+import { TrainStation } from "./trainStation.model";
+import { NumberSymbol } from "@angular/common";
+
 export interface GameState {
-  trains: Train[];
-  accountBalance: number;
+  users: Player[];
   runtime: number;
-  users: iUser[];
 }

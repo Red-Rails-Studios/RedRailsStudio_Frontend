@@ -3,8 +3,8 @@ import { Component } from '@angular/core';
 @Component({
   selector: 'app-upgrades',
   imports: [],
-  templateUrl: './upgrades.component.html',
-  styleUrl: './upgrades.component.scss'
+  templateUrl: './railsandstations.component.html',
+  styleUrl: './railsandstations.component.scss'
 })
 export class UpgradesComponent {
 
