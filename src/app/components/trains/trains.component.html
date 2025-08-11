@@ -1,4 +1,9 @@
-<button (click)="onAddTrain()">Add Button</button>
-<div>
-    <div *ngFor="let div of trains">{{div}}</div>
+<button (click)="onBuyTrain()" class="buy-button">Add Button</button>
+<div class="train-list">
+    <div *ngFor="let train of trains" class="train-block">
+        {{train.name}} 
+        type:{{train.type}} 
+        level:{{train.level}}
+        production:{{train.production}}
+    </div>
 </div>

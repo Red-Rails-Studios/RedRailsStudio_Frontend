@@ -34,9 +34,7 @@
     <div class="tab-content" *ngIf="activeTab === 1">
         <!-- Trains Tab -->
       <div *ngFor="let train of trains" class="train-item">
-        <div>ID: {{train.id}}</div>
-        <div>Name: {{train.name}}</div>
-        <div>Type: {{train.type}}</div>
+        <div class="space-leaver"></div>
         <app-trains></app-trains>
       </div>
     </div>

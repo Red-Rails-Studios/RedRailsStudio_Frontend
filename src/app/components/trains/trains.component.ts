@@ -11,17 +11,20 @@ import { Store } from '../../services/store';
   styleUrl: './trains.component.scss'
 })
 export class TrainsComponent {
-  trains: string[] = ['train 1'];
+  trains: Train[] = [];
   playerInfo = inject(Store).playerInfo;
   sessionInfo = inject(Store).sessionInfo;
 
   constructor(public store: Store) {}
 
-  onAddTrain(){
-    this.trains.push(`Trains ${this.trains.length+1}`); //TODO: update anzahl trains in store make to trains
+  ngOnInit(): void {
+    setInterval(() => {
+    this.trains = this.store.playerInfo().trains;
+    }, 5000);
   }
 
   onBuyTrain() {
     this.store.buyTrain(this.sessionInfo().sessionName, this.playerInfo().uid);
   }
+
 }
