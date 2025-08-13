@@ -31,6 +31,7 @@ export class HomepageComponent {
       return;
     }
     this.store.createSessionAndJoinFirstPlayer(this.sessionName, this.playerName);
+    this.store.getPlayerInfos(this.sessionName, this.playerName)
     this.store.playerInfo().name = this.playerName;
     this.store.sessionInfo().sessionName = this.sessionName;
     this.router.navigate(['/lobby']);

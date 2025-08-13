@@ -27,7 +27,7 @@ export class Store {
         sessionEnded: ''
     })
 
-    playerInfo = signal<Player>({ //
+    playerInfo = signal<Player>({ 
         uid: '',
         name: '',
         trains: [] as Train[],
@@ -67,7 +67,10 @@ export class Store {
     }
 
     getPlayerInfos(sessionName: string, playerUid: string) {
-        this.apiService.getPlayerInfos(sessionName, playerUid);
+        this.apiService.getPlayerInfos(sessionName, playerUid).subscribe((playerInfo: Player) => {
+            this.playerInfo.set(playerInfo);
+            console.log('PlayerInfos set', this.playerInfo());
+        });
     }
 
     createSessionAndJoinFirstPlayer(sessionName: string, playerName: string) {
@@ -102,9 +105,10 @@ export class Store {
 
     startSession(sessionName: string,) {
         this.apiService.startSession(sessionName).subscribe((res: Session) => {
-            this.session.set(res);
+            this.sessionInfo.set(res);
             console.log('Session Started');
         })
+        this.getPlayerInfos(sessionName, this.playerInfo().uid)
     }
 
     killSession (sessionName: string) {
