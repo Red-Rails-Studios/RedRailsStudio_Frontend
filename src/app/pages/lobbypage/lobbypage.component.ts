@@ -38,7 +38,7 @@ export class LobbypageComponent {
   // } 
 
   onStartSession() {
-    const sessionName = this.store.sessionName();
+    const sessionName = this.store.sessionInfo().sessionName;
     if (sessionName) {
       this.store.startSession(sessionName);
       this.router.navigate(['game']);

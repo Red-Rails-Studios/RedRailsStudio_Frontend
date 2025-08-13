@@ -126,7 +126,7 @@ export class Store {
 
     setSessionInfo(sessionName: string){
         this.apiService.getSessionInfo(sessionName).subscribe((res: Session) => {
-            this.session.set(res);
+            this.sessionInfo.set(res);
             console.log('SessionInfos set');
         });
     }
