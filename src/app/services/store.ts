@@ -20,7 +20,7 @@ export class Store {
     })
 
     sessionInfo = signal<Session>({
-        sessionName: 'testSession',
+        sessionName: '',
         players: [] as Player[],
         gameState: {} as GameState,
         sessionStarted: '',
@@ -70,13 +70,6 @@ export class Store {
         this.apiService.getPlayerInfos(sessionName, playerUid);
     }
 
-    // setTrainInfo(sessionName: string, playerUid: string) {
-    //     this.apiService.getPlayerInfos(sessionName, playerUid).subscribe((trainsInfo: TrainsInfo) => {
-    //         this.trainsInfo.set(trainsInfo)
-    //         console.log('TrainInfos updated:', this.trainsInfo)
-    //     })
-    // }
-
     createSessionAndJoinFirstPlayer(sessionName: string, playerName: string) {
         this.apiService.createSession(sessionName).pipe(
             concatMap(() => this.apiService.postNewPlayer(sessionName, playerName))
@@ -85,7 +78,7 @@ export class Store {
                 this.setPlayerUid(res.uid);
                 this.setSessionName(sessionName);
                 // Optionally fetch session info here if needed
-                console.log('Session created and player joined:', res);
+                console.log('Session created and player joined:', res, sessionName);
             },
             error: (err) => {
                 console.error('Error creating session and joining player:', err);
@@ -131,9 +124,19 @@ export class Store {
         this.apiService.buyTrain(sessionName, playerName);
     }
 
-    // getTrainInfo(sessionName: string, playerUid: string, trainUid: string) {
-    //     this.apiService.getPlayerInfo(sessionName, playerUid).subscribe((train: Train) => {
-    //         this.train.set(train)
-    //         console.log('trainsInfo', this.train());
-    // } )}
+    setSessionInfo(sessionName: string){
+        this.apiService.getSessionInfo(sessionName).subscribe((res: Session) => {
+            this.session.set(res);
+            console.log('SessionInfos set');
+        });
+    }
+
+    getSessionPlayers(sessionName: string) {
+    this.apiService.getSessionPlayers(sessionName).subscribe((players: Player[]) => {
+        this.sessionInfo.update(session => ({
+            ...session,
+            players: players
+        }));
+    });
+}
 }

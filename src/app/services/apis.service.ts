@@ -27,7 +27,7 @@ export class APISService {
   }
 
   startSession(sessionName: string): Observable<any> {
-    return this.http.patch(`http://localhost:8080/session/${sessionName}/start`, null,  { responseType: 'text'}); //startet  session
+    return this.http.patch(`http://localhost:8080/session/${sessionName}/start`, null); //startet  session
   }
 
   createSession(sessionName: string): Observable<any> {

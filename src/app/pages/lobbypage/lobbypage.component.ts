@@ -23,18 +23,19 @@ export class LobbypageComponent {
     setInterval(() => this.fetchPlayers(), 5000 );
   }  
 
-  // fetchPlayers (){
-  //   this.lobbyPlayers = this.store.sessionInfo().players;
-  // }
+  fetchPlayers (){
+    this.lobbyPlayers = this.store.sessionInfo().players;
+  }
 
-  fetchPlayers () {
-    const sessionName = this.store.sessionName();
-    if (sessionName) {
-      this.apiService.getSessionPlayers(sessionName).subscribe(players => {
-        this.lobbyPlayers = players || [];
-      });
-    }
-  } 
+  // fetchPlayers () {
+  //   const sessionName = this.store.sessionName();
+  //   if (sessionName) {
+  //     this.lobbyPlayers = this.store.sessionInfo().players;
+  //     // this.apiService.getSessionPlayers(sessionName).subscribe(players => {
+  //     //   this.lobbyPlayers = players || [];
+  //     //});
+  //   }
+  // } 
 
   onStartSession() {
     const sessionName = this.store.sessionName();

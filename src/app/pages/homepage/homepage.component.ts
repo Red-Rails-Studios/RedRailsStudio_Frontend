@@ -30,28 +30,33 @@ export class HomepageComponent {
       alert('Please enter both a session name and a player name.');
       return;
     }
-   this.apiService.createSession(this.sessionName).subscribe({
-      next: () => {
-        this.apiService.postNewPlayer(this.sessionName, this.playerName).subscribe({
-          next: (response: { name: string; uid: string }) => {
-            if (response && response.uid) {
-              this.store.setSessionName(this.sessionName);
-              this.store.setPlayerUid(response.uid);
-              this.store.setPlayerName(this.playerName);
-              this.router.navigate(['/lobby']);
-            } else {
-              alert('Failed to join session.');
-            }
-          },
-          error: () => {
-            alert('Failed to create player.');
-          }
-        });
-      },
-      error: () => {
-        alert('Failed to create session.');
-      }
-    });
+    this.store.createSessionAndJoinFirstPlayer(this.sessionName, this.playerName);
+    this.store.getPlayerInfos(this.sessionName, this.playerName);
+    this.store.setSessionInfo(this.sessionName)
+    this.router.navigate(['/lobby']);
+
+  //  this.apiService.createSession(this.sessionName).subscribe({
+  //     next: () => {
+  //       this.apiService.postNewPlayer(this.sessionName, this.playerName).subscribe({
+  //         next: (response: { name: string; uid: string }) => {
+  //           if (response && response.uid) {
+  //             this.store.setSessionName(this.sessionName);
+  //             this.store.setPlayerUid(response.uid);
+  //             this.store.setPlayerName(this.playerName);
+  //             this.router.navigate(['/lobby']);
+  //           } else {
+  //             alert('Failed to join session.');
+  //           }
+  //         },
+  //         error: () => {
+  //           alert('Failed to create player.');
+  //         }
+  //       });
+  //     },
+  //     error: () => {
+  //       alert('Failed to create session.');
+  //     }
+  //   });
   }
 
   onKillSession() {
@@ -63,21 +68,24 @@ export class HomepageComponent {
       alert('Please enter both a session name and a player name.');
       return;
     }
-    this.apiService.postNewPlayer(sessionName, playerName).subscribe({
-      next: (response: { name: string; uid: string }) => {
-        if (response && response.uid) {
-          this.store.setPlayerUid(response.uid);
-          this.store.setSessionName(sessionName);
-          this.store.setPlayerName(playerName);
-          this.router.navigate(['/lobby']);
-        } else {
-          alert('Failed to join session.');
-        }
-      },
-      error: () => {
-        alert('Failed to join session.');
-      }
-    });
+    this.store.joinPlayer(sessionName, playerName);
+    this.store.getPlayerInfos(sessionName, playerName);
+
+    // this.apiService.postNewPlayer(sessionName, playerName).subscribe({
+    //   next: (response: { name: string; uid: string }) => {
+    //     if (response && response.uid) {
+    //       this.store.setPlayerUid(response.uid);
+    //       this.store.setSessionName(sessionName);
+    //       this.store.setPlayerName(playerName);
+    //       this.router.navigate(['/lobby']);
+    //     } else {
+    //       alert('Failed to join session.');
+    //     }
+    //   },
+    //   error: () => {
+    //     alert('Failed to join session.');
+    //   }
+    // });
   }
 
   clearFields() {

@@ -15,14 +15,11 @@ export class ResourcesComponent implements OnInit {
   playerInfo = inject(Store).playerInfo;
   sessionInfo = inject(Store).sessionInfo;
 
-  sessionName: string = 'testsession';
-  playerUid = inject(Store).playerUid;
-
   constructor(public store: Store) {}
 
   ngOnInit(): void {
     setInterval(() => {
-    this.store.setResources(this.sessionInfo().sessionName, this.playerInfo().uid);
+    this.store.setResources(this.store.sessionInfo().sessionName, this.store.playerInfo().uid);
     }, 5000);
   }
 }
