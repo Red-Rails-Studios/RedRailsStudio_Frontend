@@ -30,34 +30,37 @@ export class HomepageComponent {
       alert('Please enter both a session name and a player name.');
       return;
     }
-    this.store.createSessionAndJoinFirstPlayer(this.sessionName, this.playerName);
-    this.store.getPlayerInfos(this.sessionName, this.playerName)
-    this.store.playerInfo().name = this.playerName;
-    this.store.sessionInfo().sessionName = this.sessionName;
-    this.router.navigate(['/lobby']);
+    // this.store.createSessionAndJoinFirstPlayer(this.sessionName, this.playerName);
+    // this.store.getPlayerInfos(this.sessionName, this.playerName)
+    // this.store.playerInfo().name = this.playerName;
+    // this.store.sessionInfo().sessionName = this.sessionName;
+    // this.router.navigate(['/lobby']);
 
-  //  this.apiService.createSession(this.sessionName).subscribe({
-  //     next: () => {
-  //       this.apiService.postNewPlayer(this.sessionName, this.playerName).subscribe({
-  //         next: (response: { name: string; uid: string }) => {
-  //           if (response && response.uid) {
-  //             this.store.setSessionName(this.sessionName);
-  //             this.store.setPlayerUid(response.uid);
-  //             this.store.setPlayerName(this.playerName);
-  //             this.router.navigate(['/lobby']);
-  //           } else {
-  //             alert('Failed to join session.');
-  //           }
-  //         },
-  //         error: () => {
-  //           alert('Failed to create player.');
-  //         }
-  //       });
-  //     },
-  //     error: () => {
-  //       alert('Failed to create session.');
-  //     }
-  //   });
+    this.apiService.createSession(this.sessionName).subscribe({
+       next: () => {
+         this.apiService.postNewPlayer(this.sessionName, this.playerName).subscribe({
+           next: (response: { name: string; uid: string }) => {
+             if (response && response.uid) {
+              //  this.store.setSessionName(this.sessionName);
+              //  this.store.setPlayerUid(response.uid);
+              //  this.store.setPlayerName(this.playerName);
+              this.store.sessionInfo().sessionName = this.sessionName;
+              this.store.playerInfo().name = this.playerName;
+              this.store.playerInfo().uid = response.uid;
+               this.router.navigate(['/lobby']);
+             } else {
+               alert('Failed to join session.');
+             }
+           },
+           error: () => {
+             alert('Failed to create player.');
+           }
+         });
+       },
+       error: () => {
+         alert('Failed to create session.');
+       }
+     });
   }
 
   onKillSession() {

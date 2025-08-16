@@ -16,6 +16,8 @@ import { inject } from '@angular/core/testing'
 export class LobbypageComponent {
   lobbyPlayers: Player[] = [];
 
+
+
   constructor(private router: Router, public store: Store, private apiService: APISService) {}
 
   ngOnInit() {
