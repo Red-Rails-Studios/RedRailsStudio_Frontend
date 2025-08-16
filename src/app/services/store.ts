@@ -69,7 +69,7 @@ export class Store {
     getPlayerInfos(sessionName: string, playerUid: string) {
         this.apiService.getPlayerInfos(sessionName, playerUid).subscribe((playerInfo: Player) => {
             this.playerInfo.set(playerInfo);
-            console.log('PlayerInfos set', this.playerInfo());
+            console.log('PlayerInfos set', this.playerInfo().name, this.playerInfo().uid);
         });
     }
 
@@ -124,8 +124,15 @@ export class Store {
         })
     }
 
-    buyTrain(sessionName: string, playerName: string) {
-        this.apiService.buyTrain(sessionName, playerName);
+    buyTrain(sessionName: string, playerUid: string) {
+        this.apiService.buyTrain(sessionName, playerUid).subscribe({
+            next: () => {
+                this.getPlayerInfos(sessionName, playerUid);
+            },
+            error: (err) => {
+                console.error('Error buying train:', err);
+            }
+        });
     }
 
     setSessionInfo(sessionName: string){

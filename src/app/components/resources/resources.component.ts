@@ -29,11 +29,4 @@ export class ResourcesComponent implements OnInit {
     console.error('Session name or player UID is missing!');
   }
 }
-
-  // ngOnInit(): void {
-  //   this.store.getPlayerInfos(this.store.sessionInfo().sessionName, this.store.playerInfo().uid);
-  //   setInterval(() => {
-  //   this.store.setResources(this.store.sessionInfo().sessionName, this.store.playerInfo().uid);
-  //   }, 5000);
-  // }
 }
