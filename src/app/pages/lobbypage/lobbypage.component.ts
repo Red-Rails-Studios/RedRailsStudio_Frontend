@@ -43,6 +43,7 @@ export class LobbypageComponent {
     const sessionName = this.store.sessionInfo().sessionName;
     if (sessionName) {
       this.store.startSession(sessionName);
+      console.log('Session Started ', sessionName);
       this.router.navigate(['game']);
     } else {
       console.error('No session name set!');

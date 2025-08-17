@@ -50,14 +50,17 @@ export class Store {
 
     setPlayerUid(uid: string) {
         this.playerUid.set(uid);
+        this.playerInfo().uid = uid;
     }
 
     setSessionName(name: string) { 
         this.sessionName.set(name);
+        this.sessionInfo().sessionName = name;
     }
 
     setPlayerName(name: string) {
         this.playerName.set(name);
+        this.playerInfo().name = name;
     }
 
     setResources(sessionName: string, playerUid: string) {

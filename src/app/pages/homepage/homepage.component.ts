@@ -38,6 +38,7 @@ export class HomepageComponent {
               this.store.sessionInfo().sessionName = this.sessionName;
               this.store.playerInfo().name = this.playerName;
               this.store.playerInfo().uid = response.uid;
+              console.log('Session created, PlayerCreated, player Joined', this.playerName, this.sessionName)
                this.router.navigate(['/lobby']);
              } else {
                alert('Failed to join session.');
