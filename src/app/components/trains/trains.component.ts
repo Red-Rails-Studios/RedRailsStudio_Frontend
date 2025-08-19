@@ -35,7 +35,6 @@ export class TrainsComponent {
     const sessionName = this.sessionInfo().sessionName;
     const uid = this.playerInfo().uid;
     this.store.buyTrain(sessionName, uid);
-    
     console.log('buying train with', sessionName, uid);
   }
 

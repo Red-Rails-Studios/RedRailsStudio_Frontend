@@ -32,10 +32,10 @@ export class LobbypageComponent {
    fetchPlayers () {
      const sessionName = this.store.sessionName();
      if (sessionName) {
-       this.lobbyPlayers = this.store.sessionInfo().players;
-       // this.apiService.getSessionPlayers(sessionName).subscribe(players => {
-       //   this.lobbyPlayers = players || [];
-       //});
+       //this.lobbyPlayers = this.store.sessionInfo().players;
+        this.apiService.getSessionPlayers(sessionName).subscribe(players => {
+          this.lobbyPlayers = players || [];
+       });
      }
    } 
 
