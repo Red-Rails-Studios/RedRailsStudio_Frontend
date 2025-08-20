@@ -109,7 +109,7 @@ export class Store {
     startSession(sessionName: string,) {
         this.apiService.startSession(sessionName).subscribe((res: Session) => {
             this.sessionInfo.set(res);
-            console.log('Session Started');
+            console.log('Session Started ', sessionName);
         })
         this.getPlayerInfos(sessionName, this.playerInfo().uid)
     }

@@ -32,10 +32,10 @@ export class LobbypageComponent {
    fetchPlayers () {
      const sessionName = this.store.sessionName();
      if (sessionName) {
-       //this.lobbyPlayers = this.store.sessionInfo().players;
-        this.apiService.getSessionPlayers(sessionName).subscribe(players => {
-          this.lobbyPlayers = players || [];
-       });
+      this.lobbyPlayers = this.store.sessionInfo().players;
+      //   this.apiService.getSessionPlayers(sessionName).subscribe(players => {
+      //     this.lobbyPlayers = players || [];
+      //  });
      }
    } 
 
@@ -43,7 +43,6 @@ export class LobbypageComponent {
     const sessionName = this.store.sessionInfo().sessionName;
     if (sessionName) {
       this.store.startSession(sessionName);
-      console.log('Session Started ', sessionName);
       this.router.navigate(['game']);
     } else {
       console.error('No session name set!');
