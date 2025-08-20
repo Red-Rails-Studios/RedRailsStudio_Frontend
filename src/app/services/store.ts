@@ -33,6 +33,7 @@ export class Store {
         trains: [] as Train[],
         rails: [] as Railway[],
         stations: [] as TrainStation[],
+        employees: 0,
         accountBalance: 0,
         runtime: 0
     })
@@ -152,5 +153,38 @@ export class Store {
             players: players
         }));
     });
-}
+    }
+
+    buyRail(sessionName: string, playerUid: string) {
+        this.apiService.buyRail(sessionName, playerUid).subscribe({
+            next: () => {
+                this.getPlayerInfos(sessionName, playerUid);
+            },
+            error: (err) => {
+                console.error('Error buying station:', err);
+            }
+        });
+    }
+
+    buyStation(sessionName: string, playerUid: string) {
+        this.apiService.buyStation(sessionName, playerUid).subscribe({
+            next: () => {
+                this.getPlayerInfos(sessionName, playerUid);
+            },
+            error: (err) => {
+                console.error('Error buying station:', err);
+            }
+        });
+    }
+
+    buyEmployee(sessionName: string, playerUid: string) {
+        this.apiService.buyEmployee(sessionName, playerUid).subscribe({
+            next: () => {
+                this.getPlayerInfos(sessionName, playerUid);
+            },
+            error: (err) => {
+                console.error('Error buying employee:', err);
+            }
+        });
+    }
 }

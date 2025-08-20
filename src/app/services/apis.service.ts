@@ -81,4 +81,8 @@ export class APISService {
   getPlayerInfos(sessionName: string, playerUid: string): Observable<any> {
     return this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid} `);
   }
+
+  buyEmployee(sessionName: string, playerUid: string) {
+    return this.http.post(`http://localhost:8080/session/${sessionName}/player/${playerUid}/employees`, null, { responseType: 'text'}); //kauft ein gleis
+  }
 }

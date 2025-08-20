@@ -18,7 +18,7 @@
 
         <div class="tabs-bar">
         <button class="game-button" [class.active]="activeTab === 1" (click)="activeTab = 1">Trains</button>
-        <button class="game-button" [class.active]="activeTab === 2" (click)="activeTab = 2">Resourcen Kaufen</button>
+        <button class="game-button" [class.active]="activeTab === 2" (click)="activeTab = 2">Mitarbeiter Kaufen</button>
         <button class="game-button" [class.active]="activeTab === 3" (click)="activeTab = 3">Connections</button>
         <button class="menu-button" (click)="showDropdown = !showDropdown">≡</button>
           </div>
@@ -39,16 +39,12 @@
       </div>
     </div>
     <div class="tab-content" *ngIf="activeTab === 2">
-        <!-- Resourcen kauf Tab -->
+        <!-- mitarbeiter kauf Tab -->
+
     </div>
     <div class="tab-content" *ngIf="activeTab === 3">
         <!-- Connections Tab (bahnhöfe und gleise kaufen/upgraden) -->
-      <div *ngFor="let connection of connections" class="connection-item">
-      
-        <div>ID: {{connection.id}}</div>
-        <div>From: {{connection.from}}</div>
-        <div>To: {{connection.to}}</div>
-      </div>
+     <app-upgrades></app-upgrades>
 
     <div class="game-controls">
       

@@ -1,4 +1,4 @@
-<div class="upgrades-container">
+<!--<div class="upgrades-container">
   <div class="upgrade-types">
     <button class="pixel-button"
             *ngFor="let type of upgradeTypes"
@@ -23,4 +23,24 @@
       </button>
     </div>
   </div>
+</div>-->
+
+<button (click)="onBuyRail()" class="buy-button">
+    Buy Rail</button>
+<div class="rail-list">
+    <div *ngFor="let rail of rails" class="rail-block"> 
+        level: {{rail.level}}
+        length: {{rail.length}}
+    </div>
+</div>
+
+<button (click)="onBuyStation()" class="buy-button">
+    Buy Station</button>
+<div class="station-list">
+    <div *ngFor="let station of stations" class="station-block">
+        {{station.name}} 
+        type: {{station.type}}
+        level: {{station.level}}
+        production: {{station.production}}
+    </div>
 </div>

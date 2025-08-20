@@ -8,6 +8,7 @@ export interface Player {
   trains: Train[];
   rails: Railway[];
   stations: TrainStation[];
+  employees: number;
   accountBalance: number;
   runtime: number;
 }
