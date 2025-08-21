@@ -12,6 +12,7 @@ import { Store } from '../../services/store';
 })
 export class TrainsComponent {
   trains: Train[] = [];
+  testTrain: Train[] = [];
   playerInfo = inject(Store).playerInfo;
   sessionInfo = inject(Store).sessionInfo;
 
@@ -20,10 +21,17 @@ export class TrainsComponent {
   ngOnInit(): void {
     const sessionName = this.sessionInfo().sessionName;
     const playerUid = this.playerInfo().uid;
+
+    this.trains.push({id: 1212, name: "test", type: 'new', level: 1, production: 'enough'});
+
     if (sessionName && playerUid) {
       this.store.getPlayerInfos(sessionName, playerUid);
       setInterval(() => {
-        this.trains = this.store.playerInfo().trains;
+        const trains = this.store.playerInfo().trains;
+
+        for(let i= 0; i< this.store.playerInfo().trains.length; i++){
+          this.trains.push(trains[i])
+        }
       }, 5000);
     }
     else {
