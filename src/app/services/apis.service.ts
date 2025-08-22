@@ -79,7 +79,7 @@ export class APISService {
   }
 
   getPlayerInfos(sessionName: string, playerUid: string): Observable<any> {
-    return this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid} `);
+    return this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid}/resource `);
   }
 
   buyEmployee(sessionName: string, playerUid: string) {

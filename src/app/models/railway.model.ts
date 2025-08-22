@@ -1,4 +1,4 @@
-export interface Railway {
+export interface Rail {
   level: number;
-  length: number;
+  id: string;
 }

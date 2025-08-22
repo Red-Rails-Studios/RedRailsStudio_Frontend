@@ -1,8 +1,4 @@
-export interface TrainStation {
-  id: number;
-  name: string;
-  railways: number;
-  production: string;
+export interface Station {
+  id: string;
   level: number;
-  type: string;
 }

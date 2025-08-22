@@ -30,7 +30,6 @@
 <div class="rail-list">
     <div *ngFor="let rail of rails" class="rail-block"> 
         level: {{rail.level}}
-        length: {{rail.length}}
     </div>
 </div>
 
@@ -38,9 +37,6 @@
     Buy Station</button>
 <div class="station-list">
     <div *ngFor="let station of stations" class="station-block">
-        {{station.name}} 
-        type: {{station.type}}
         level: {{station.level}}
-        production: {{station.production}}
     </div>
 </div>

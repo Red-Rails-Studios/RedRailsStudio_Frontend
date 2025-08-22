@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Store } from '../../services/store';
-import { Railway } from '../../models/railway.model';
-import { TrainStation } from '../../models/trainStation.model';
+import { Rail } from '../../models/railway.model';
+import { Station } from '../../models/trainStation.model';
 import { CommonModule } from '@angular/common';
 import { NgFor } from '@angular/common';
 
@@ -12,8 +12,8 @@ import { NgFor } from '@angular/common';
   styleUrl: './railsandstations.component.scss'
 })
 export class UpgradesComponent {
-  rails: Railway[] = [];
-  stations: TrainStation[] = [];
+  rails: Rail[] = [];
+  stations: Station[] = [];
   playerInfo = inject(Store).playerInfo;
   sessionInfo = inject(Store).sessionInfo;
 
@@ -49,4 +49,3 @@ export class UpgradesComponent {
   }
 
 }
-//TODO Logic

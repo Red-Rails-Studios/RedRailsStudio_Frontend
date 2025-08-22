@@ -4,8 +4,8 @@ import { APISService } from "./apis.service";
 import { Train } from "../models/train.model";
 import { Session } from "../models/session.model";
 import { concat, concatMap } from "rxjs";
-import { Railway } from "../models/railway.model";
-import { TrainStation } from "../models/trainStation.model";
+import { Rail } from "../models/railway.model";
+import { Station } from "../models/trainStation.model";
 import { GameState } from "../models/game-state.model";
 import { Player } from "../models/player.model";
 
@@ -19,6 +19,10 @@ export class Store {
         power:0 
     })
 
+    // map = signal<Map>({
+    //     map: [] as Map
+    // })
+
     sessionInfo = signal<Session>({
         sessionName: '',
         players: [] as Player[],
@@ -31,11 +35,11 @@ export class Store {
         uid: '',
         name: '',
         trains: [] as Train[],
-        rails: [] as Railway[],
-        stations: [] as TrainStation[],
+        rails: [] as Rail[],
+        stations: [] as Station[],
         employees: 0,
-        accountBalance: 0,
-        runtime: 0
+        dbCoin: 0,
+        power: 0
     })
 
     gamestate = signal<GameState>({
@@ -73,7 +77,7 @@ export class Store {
     getPlayerInfos(sessionName: string, playerUid: string) {
         this.apiService.getPlayerInfos(sessionName, playerUid).subscribe((playerInfo: Player) => {
             this.playerInfo.set(playerInfo);
-            console.log('PlayerInfos set', this.playerInfo().name, this.playerInfo().uid);
+            console.log('PlayerInfos set', this.playerInfo().name, this.playerInfo().uid, this.playerInfo().trains);
         });
     }
 

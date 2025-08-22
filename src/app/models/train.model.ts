@@ -1,7 +1,4 @@
 export interface Train {
-  id: number;
-  name: string;
-  type: string;
+  id: string;
   level: number;
-  production: string;
 }

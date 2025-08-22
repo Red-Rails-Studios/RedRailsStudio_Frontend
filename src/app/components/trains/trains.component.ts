@@ -21,22 +21,38 @@ export class TrainsComponent {
   ngOnInit(): void {
     const sessionName = this.sessionInfo().sessionName;
     const playerUid = this.playerInfo().uid;
+    
 
-    this.trains.push({id: 1212, name: "test", type: 'new', level: 1, production: 'enough'});
+ if (sessionName && playerUid) {
+  this.store.getPlayerInfos(sessionName, playerUid);
 
-    if (sessionName && playerUid) {
-      this.store.getPlayerInfos(sessionName, playerUid);
-      setInterval(() => {
-        const trains = this.store.playerInfo().trains;
+  setInterval(() => {
+  const trains = this.store.playerInfo().trains;
 
-        for(let i= 0; i< this.store.playerInfo().trains.length; i++){
-          this.trains.push(trains[i])
-        }
-      }, 5000);
+  if (trains.length > 0) {
+    for (let i = 0; i < trains.length; i++) {
+      this.store.getTrain(sessionName, playerUid, trains[i].id); 
     }
-    else {
-    console.error('Session name or player UID is missing!');
+  } else {
+    console.log("No trains available yet...");
   }
+}, 5000);}
+
+    //    setInterval(() => {
+    //      const trains = this.store.playerInfo().trains;
+    //      const tId = trains[0].id;
+
+    //       for (let i = 0; i< this.store.playerInfo().trains.length;i++){
+    //         this.store.getTrain(sessionName, playerUid, trains[i].id)
+    //       }
+    //       // for(let i= 0; i< this.store.playerInfo().trains.length; i++){
+    //       //   this.trains.push(trains[i])
+    //       // }
+    //    }, 5000);
+    //  }
+    //  else {
+    //    console.error('Session name or player UID is missing!');
+    //  }
   }
 
   onBuyTrain() {
