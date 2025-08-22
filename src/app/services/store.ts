@@ -16,7 +16,10 @@ export class Store {
     resources = signal<Resources>( {
         dbCoin: 0,
         employees: 0,
-        power:0 
+        power:0,
+        trainDtos: [],
+        railDtos:[],
+        stationDtos:[]
     })
 
     // map = signal<Map>({

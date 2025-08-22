@@ -1,42 +1,21 @@
-<!--<div class="upgrades-container">
-  <div class="upgrade-types">
-    <button class="pixel-button"
-            *ngFor="let type of upgradeTypes"
-            [class.active]="type === null"
-            (click)="null">
-      {{type}}
-    </button>
-  </div>
-  
-  <div class="upgrades-list">
-    <div class="upgrade-item" *ngFor="let upgrade of currentUpgrades">
-      <img class="pixel-icon upgrade-icon" src="assets/pixel-placeholder.png" alt="Upgrade">
-      <div class="upgrade-info">
-        <h3 class="pixel-text">{{upgrade.name}}</h3>
-        <p class="pixel-text">Level: {{upgrade.level}}</p>
-        <p class="pixel-text">{{upgrade.description}}</p>
-      </div>
-      <button class="pixel-button upgrade-button"
-              [class.can-afford]="null"
-              (click)="null">
-        {{upgrade.cost}} {{upgrade.resourceType}}
-      </button>
+<div class="railandstation-list">
+  <button (click)="onBuyRail()" class="buy-button">Buy Rail</button>
+
+  <div class="rail-list">
+    <div *ngFor="let rail of rails; let i = index" class="rail-block"> 
+      Rail Nr. {{i+1}}
+      level: {{rail.level}}
+      <button class="upgrade-button">upgrade<br><!--{{upgrade cost}}-->db coins</button>
     </div>
   </div>
-</div>-->
 
-<button (click)="onBuyRail()" class="buy-button">
-    Buy Rail</button>
-<div class="rail-list">
-    <div *ngFor="let rail of rails" class="rail-block"> 
-        level: {{rail.level}}
-    </div>
-</div>
+  <button (click)="onBuyStation()" class="buy-button">Buy Station</button>
 
-<button (click)="onBuyStation()" class="buy-button">
-    Buy Station</button>
-<div class="station-list">
-    <div *ngFor="let station of stations" class="station-block">
+  <div class="station-list">
+      <div *ngFor="let station of stations; let i = index" class="station-block">
+        Station Nr: {{i+1}}
         level: {{station.level}}
-    </div>
+        <button class="upgrade-button">upgrade<br><!--{{upgrade cost}}-->db coins</button>
+      </div>
+  </div>
 </div>

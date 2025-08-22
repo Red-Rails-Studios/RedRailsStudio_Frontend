@@ -24,7 +24,7 @@ export class ResourcesComponent implements OnInit {
     this.store.getPlayerInfos(sessionName, playerUid);
     setInterval(() => {
       this.store.setResources(sessionName, playerUid);
-    }, 5000);
+    }, 500);
   } else {
     console.error('Session name or player UID is missing!');
   }

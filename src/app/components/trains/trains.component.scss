@@ -1,3 +1,7 @@
+.train-set {
+  background-color: gray;
+}
+
 .train-block {
   background-color:white;
   color: black;
@@ -7,7 +11,6 @@
   display: block;
   text-align: center;
   font-size: 1.2rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   border: 10px solid gray;
 }
 
@@ -34,14 +37,32 @@
 }
 
 .buy-button {
-  background-color:white;
+  background-color:yellowgreen;
+  color: black;
+  width: 97%;
+  height: 70px;
+  margin: 8px 0;
+  display: block;
+  text-align: center;
+  font-size: 1.2rem;
+  border-color: 10px solid gray;
+  font-family:  "Silkscreen", sans-serif;
+
+  background-color:yellowgreen;
   color: black;
   width: 100%;
   height: 70px;
   margin: 8px 0;
-  border-radius: 8px;
   display: block;
   text-align: center;
   font-size: 1.2rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  border: 10px solid gray;
+  font-family:  "Silkscreen", sans-serif;
+}
+
+.upgrade-button {
+  width: 20%;
+  height: 50%;
+  background-color: yellowgreen;
+  font-family:  "Silkscreen", sans-serif;
 }

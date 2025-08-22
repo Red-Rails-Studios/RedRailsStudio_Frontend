@@ -22,30 +22,27 @@ export class UpgradesComponent {
   ngOnInit(): void {
     const sessionName = this.sessionInfo().sessionName;
     const playerUid = this.playerInfo().uid;
-    if (sessionName && playerUid) {
-      this.store.getPlayerInfos(sessionName, playerUid);
-      setInterval(() => {
-        this.rails = this.store.playerInfo().rails;
-        this.stations = this.store.playerInfo().stations;
-      }, 5000);
-    }
-    else {
-    console.error('Session name or player UID is missing!');
-  }
+
+    setInterval(() => {
+    this.rails = this.store.resources().railDtos;
+      //console.log("rails updated", this.rails);
+      this.stations = this.store.resources().stationDtos;
+      //console.log("stations updated", this.stations)
+    }, 500);
   }
 
   onBuyRail() {
     const sessionName = this.sessionInfo().sessionName;
     const uid = this.playerInfo().uid;
     this.store.buyRail(sessionName, uid);
-    console.log('buying Rail with', sessionName, uid);
+    //console.log('buying Rail with', sessionName, uid);
   }
 
   onBuyStation() {
     const sessionName = this.sessionInfo().sessionName;
     const uid = this.playerInfo().uid;
     this.store.buyStation(sessionName, uid);
-    console.log('buying Rail with', sessionName, uid);
+    //console.log('buying Rail with', sessionName, uid);
   }
 
 }

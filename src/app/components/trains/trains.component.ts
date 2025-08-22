@@ -12,7 +12,6 @@ import { Store } from '../../services/store';
 })
 export class TrainsComponent {
   trains: Train[] = [];
-  testTrain: Train[] = [];
   playerInfo = inject(Store).playerInfo;
   sessionInfo = inject(Store).sessionInfo;
 
@@ -27,39 +26,16 @@ export class TrainsComponent {
   this.store.getPlayerInfos(sessionName, playerUid);
 
   setInterval(() => {
-  const trains = this.store.playerInfo().trains;
-
-  if (trains.length > 0) {
-    for (let i = 0; i < trains.length; i++) {
-      this.store.getTrain(sessionName, playerUid, trains[i].id); 
-    }
-  } else {
-    console.log("No trains available yet...");
-  }
-}, 5000);}
-
-    //    setInterval(() => {
-    //      const trains = this.store.playerInfo().trains;
-    //      const tId = trains[0].id;
-
-    //       for (let i = 0; i< this.store.playerInfo().trains.length;i++){
-    //         this.store.getTrain(sessionName, playerUid, trains[i].id)
-    //       }
-    //       // for(let i= 0; i< this.store.playerInfo().trains.length; i++){
-    //       //   this.trains.push(trains[i])
-    //       // }
-    //    }, 5000);
-    //  }
-    //  else {
-    //    console.error('Session name or player UID is missing!');
-    //  }
+    this.trains = this.store.resources().trainDtos;
+      //console.log("trains updated", this.trains)
+    }, 500);}
   }
 
   onBuyTrain() {
     const sessionName = this.sessionInfo().sessionName;
     const uid = this.playerInfo().uid;
     this.store.buyTrain(sessionName, uid);
-    console.log('buying train with', sessionName, uid);
+    //console.log('buying train with', sessionName, uid);
   }
 
 }
