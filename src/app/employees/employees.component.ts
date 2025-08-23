@@ -10,7 +10,8 @@ import { Store } from '../services/store';
   styleUrl: './employees.component.scss'
 })
 export class EmployeesComponent {
-  employee = 8;
+  employee = 0;
+  power= 0;
   playerInfo = inject(Store).playerInfo;
   sessionInfo = inject(Store).sessionInfo;
 
@@ -23,6 +24,7 @@ export class EmployeesComponent {
       this.store.getPlayerInfos(sessionName, playerUid);
       setInterval(() => {
         this.employee = this.store.playerInfo().employees;
+        this.power = this.playerInfo().power;
       }, 5000);
     }
     else {
@@ -34,6 +36,13 @@ export class EmployeesComponent {
     const sessionName = this.sessionInfo().sessionName;
     const uid = this.playerInfo().uid;
     this.store.buyEmployee(sessionName, uid);
-    console.log('buying train with', sessionName, uid);
+    console.log('buying employee with', sessionName, uid);
+  }
+
+  onBuyPower(){
+    const sessionName = this.sessionInfo().sessionName;
+    const uid = this.playerInfo().uid;
+    this.store.buyPower(sessionName, uid);
+    console.log("power bought");
   }
 }

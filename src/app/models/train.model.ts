@@ -1,4 +1,4 @@
 export interface Train {
-  id: string;
+  uid: string;
   level: number;
 }

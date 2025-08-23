@@ -17,9 +17,9 @@ export class Store {
         dbCoin: 0,
         employees: 0,
         power:0,
-        trainDtos: [],
-        railDtos:[],
-        stationDtos:[]
+        trainDtos: [] as Train[],
+        railDtos:[] as Rail[],
+        stationDtos:[] as Station[]
     })
 
     // map = signal<Map>({
@@ -202,6 +202,17 @@ export class Store {
             },
             error: (err) => {
                 console.error('Error buying employee:', err);
+            }
+        });
+    }
+
+    buyPower(sessionName: string, playerUid: string) {
+        this.apiService.buyPower(sessionName, playerUid).subscribe({
+            next: () => {
+                this.getPlayerInfos(sessionName, playerUid);
+            },
+            error: (err) => {
+                console.error('Error buying power', err);
             }
         });
     }
