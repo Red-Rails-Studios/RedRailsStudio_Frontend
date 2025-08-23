@@ -82,4 +82,8 @@ export class APISService {
   buyEmployee(sessionName: string, playerUid: string) {
     return this.http.post(`http://localhost:8080/session/${sessionName}/player/${playerUid}/employees`, null, { responseType: 'text'}); //kauft ein gleis
   }
+
+  upgradeTrain(sessionName: string, playerUid: string, trainUid: string) {
+    return this.http.post(`http://localhost:8080/session/${sessionName}/player/${playerUid}/train/${trainUid}`, null)
+  }
 }

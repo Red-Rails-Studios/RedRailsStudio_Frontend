@@ -146,6 +146,17 @@ export class Store {
         });
     }
 
+    upgradeTrain(sessionName: string, playerUid: string, trainId: string) {
+         this.apiService.upgradeTrain(sessionName, playerUid, trainId).subscribe({
+            next: () => {
+                this.getPlayerInfos(sessionName, playerUid);
+            },
+            error: (err) => {
+                console.error('Error upgrading train', err);
+            }
+        });
+    }
+
     setSessionInfo(sessionName: string){
         this.apiService.getSessionInfo(sessionName).subscribe((res: Session) => {
             this.sessionInfo.set(res);

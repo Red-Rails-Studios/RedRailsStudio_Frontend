@@ -3,10 +3,10 @@
         <img class="buy-image homepage" src="retro-pixel-art-train-tracks-vibrant-detailed-digital-illustration_1292377-15709.avif" alt="button Image">
         Buy Train</button>
     <div class="train-list">
-        <div *ngFor="let train of trains; let i = index" class="train-block">
+        <div *ngFor="let trainDtos of trains; let i = index" class="train-block">
             train Nr. {{i+1}}
-            level:{{train.level}}
-            <button class="upgrade-button"><!--{{upgrade cost}}-->db coins</button>
+            level:{{trainDtos.level}}
+            <button (click)="onUpgradeTrain(i)" class="upgrade-button"><!--{{upgrade cost}}-->db coins</button>
         </div>
     </div>
 </div>    
