@@ -38,7 +38,7 @@ export class TrainsComponent {
     //console.log('buying train with', sessionName, uid);
   }
 
-  onUpgradeTrain(trainNr: number) {
+  onUpgradeTrain(trainNr: number) {  //TODO: need to fix upgrade see other branch
     const sessionName = this.sessionInfo().sessionName;
     const uid = this.playerInfo().uid;
     const trainId = this.store.resources().trainDtos[trainNr].id;
