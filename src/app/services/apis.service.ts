@@ -94,4 +94,20 @@ export class APISService {
   buyPower(sessionName: string, playerUid: string) {
     return this.http.post(`http://localhost:8080/session/${sessionName}/player/${playerUid}/power`, null, {responseType: 'text'});
   }
+
+  buyRequirements(sessionName: string, playerUid: string) {
+    return this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid}/buy/getRequirements`);
+  }
+
+  requirementRails(sessionName: string, playerUid: string) {
+    return this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid}/rails/getUpgradeRequirements`);
+  }
+
+  requirementStations(sessionName: string, playerUid: string) {
+    return this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid}/station/getUpgradeRequirements`);
+  }
+
+  requirementTrain(sessionName: string, playerUid: string) {
+    return this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid}/train/getUpgradeRequirements`);
+  }
 }

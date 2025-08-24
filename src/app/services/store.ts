@@ -140,6 +140,10 @@ export class Store {
         });
     }
 
+    buyRequirements(sessionName: string, playerUid: string) {
+        this.apiService.buyRequirements(sessionName, playerUid);
+    }
+
     getTrain (sessionName: string, playerName: string, trainUid: string) {
         this.apiService.getTrainInfo(sessionName, playerName, trainUid).subscribe((res: Player) => {
             console.log('');
@@ -168,6 +172,10 @@ export class Store {
         });
     }
 
+    upgradeRequirementsTrain(sessionName: string, playerUid: string) {
+        this.apiService.requirementTrain(sessionName, playerUid);
+    }
+
     buyRail(sessionName: string, playerUid: string) {
         this.apiService.buyRail(sessionName, playerUid).subscribe({
             next: () => {
@@ -190,6 +198,10 @@ export class Store {
         });
     }
 
+    upgradeRequirementsRail(sessionName: string, playerUid: string) {
+        this.apiService.requirementRails(sessionName, playerUid);
+    }
+
     buyStation(sessionName: string, playerUid: string) {
         this.apiService.buyStation(sessionName, playerUid).subscribe({
             next: () => {
@@ -210,6 +222,10 @@ export class Store {
                 console.error('Error upgrading station', err);
             }
         });
+    }
+
+    upgradeRequirementsStation(sessionName: string, playerUid: string) {
+        this.apiService.requirementStations(sessionName, playerUid);
     }
 
     buyEmployee(sessionName: string, playerUid: string) {
