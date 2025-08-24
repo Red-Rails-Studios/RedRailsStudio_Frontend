@@ -12,6 +12,7 @@ import { Store } from '../../services/store';
   templateUrl: './homepage.component.html',
   styleUrls: ['./homepage.component.scss']
 })
+
 export class HomepageComponent {
   showMain = true;
   showCreate = false;
@@ -40,7 +41,8 @@ export class HomepageComponent {
               this.store.playerInfo().uid = response.uid;
               console.log('Session created, PlayerCreated, player Joined', this.playerName, this.sessionName)
                this.router.navigate(['/lobby']);
-             } else {
+             } 
+             else {
                alert('Failed to join session.');
              }
            },
@@ -64,21 +66,22 @@ export class HomepageComponent {
       alert('Please enter both a session name and a player name.');
       return;
     }
-     this.apiService.postNewPlayer(sessionName, playerName).subscribe({
-       next: (response: { name: string; uid: string }) => {
-         if (response && response.uid) {
-           this.store.setPlayerUid(response.uid);
-           this.store.setSessionName(sessionName);
-           this.store.setPlayerName(playerName);
-           this.router.navigate(['/lobby']);
-         } else {
-           alert('Failed to join session.');
-         }
-       },
-       error: () => {
-         alert('Failed to join session.');
-       }
-     });
+    this.apiService.postNewPlayer(sessionName, playerName).subscribe({
+      next: (response: { name: string; uid: string }) => {
+        if (response && response.uid) {
+          this.store.setPlayerUid(response.uid);
+          this.store.setSessionName(sessionName);
+          this.store.setPlayerName(playerName);
+          this.router.navigate(['/lobby']);
+        } 
+        else {
+          alert('Failed to join session.');
+        }
+      },
+      error: () => {
+        alert('Failed to join session.');
+      }
+    });
   }
 
   clearFields() {

@@ -21,14 +21,14 @@ export class TrainsComponent {
     const sessionName = this.sessionInfo().sessionName;
     const playerUid = this.playerInfo().uid;
     
+    if (sessionName && playerUid) {
+      this.store.getPlayerInfos(sessionName, playerUid);
 
- if (sessionName && playerUid) {
-  this.store.getPlayerInfos(sessionName, playerUid);
-
-  setInterval(() => {
-    this.trains = this.store.resources().trainDtos;
-      //console.log("trains updated", this.trains)
-    }, 500);}
+      setInterval(() => {
+        this.trains = this.store.resources().trainDtos;
+        //console.log("trains updated", this.trains)
+      }, 1000);
+    }
   }
 
   onBuyTrain() {
@@ -42,7 +42,6 @@ export class TrainsComponent {
     const sessionName = this.sessionInfo().sessionName;
     const uid = this.playerInfo().uid;
     const trainId = this.store.resources().trainDtos[trainNr].uid;
-    //const trainId = this.trains[trainNr].id;
     console.log(trainId);
     this.store.upgradeTrain(sessionName, uid, trainId);
   }
