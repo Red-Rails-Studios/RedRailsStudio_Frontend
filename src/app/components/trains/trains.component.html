@@ -7,6 +7,7 @@
         <div *ngFor="let trainDtos of trains; let i=index" class="train-block">
             train Nr. {{i+1}}
             level:{{trainDtos.level}}
+            {{upgrades[i].dbCoins}}
             <button (click)="onUpgradeTrain(i)" class="upgrade-button"><!--{{upgrade cost}}-->/db</button>
         </div>
     </div>

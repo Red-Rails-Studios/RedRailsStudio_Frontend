@@ -3,7 +3,7 @@ import { Resources } from "../models/resources.model";
 import { APISService } from "./apis.service";
 import { Train } from "../models/train.model";
 import { Session } from "../models/session.model";
-import { concatMap } from "rxjs";
+import { concatMap, Observable } from "rxjs";
 import { Rail } from "../models/railway.model";
 import { Station } from "../models/trainStation.model";
 import { GameState } from "../models/game-state.model";
@@ -172,8 +172,8 @@ export class Store {
         });
     }
 
-    upgradeRequirementsTrain(sessionName: string, playerUid: string) {
-        this.apiService.requirementTrain(sessionName, playerUid);
+    upgradeRequirementsTrain(sessionName: string, playerUid: string, trainId: string): Observable<any> {
+        return this.apiService.requirementTrain(sessionName, playerUid, trainId);
     }
 
     buyRail(sessionName: string, playerUid: string) {
@@ -198,8 +198,8 @@ export class Store {
         });
     }
 
-    upgradeRequirementsRail(sessionName: string, playerUid: string) {
-        this.apiService.requirementRails(sessionName, playerUid);
+    upgradeRequirementsRail(sessionName: string, playerUid: string, railId: string) {
+        return this.apiService.requirementRails(sessionName, playerUid, railId);
     }
 
     buyStation(sessionName: string, playerUid: string) {
@@ -224,8 +224,8 @@ export class Store {
         });
     }
 
-    upgradeRequirementsStation(sessionName: string, playerUid: string) {
-        this.apiService.requirementStations(sessionName, playerUid);
+    upgradeRequirementsStation(sessionName: string, playerUid: string, stationId: string) {
+       return this.apiService.requirementStations(sessionName, playerUid, stationId);
     }
 
     buyEmployee(sessionName: string, playerUid: string) {
