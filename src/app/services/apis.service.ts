@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Train } from '../models/train.model';
-import { Session } from '../models/session.model';
+import { Session } from '../models/sessionOverview.model';
 import { Player } from '../models/player.model';
 import { GameState } from '../models/game-state.model';
 

@@ -1,17 +1,16 @@
-import { Rail } from "./railway.model";
+import { Station } from "./station.model";
 import { Train } from "./train.model";
-import { Station } from "./trainStation.model";
+import { Rail } from "./rail.model";
 
 export interface Player {
-  uid: string;
+  uId: string;
   name: string;
 
-  trains: Train[];
-  rails: Rail[];
-  stations: Station[];
-
-  employees: number;
   dbCoin: number;
+  employees: number;
   power: number;
 
+  stations: Station[];
+  trains: Train[];
+  rails: Rail[];
 }

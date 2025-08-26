@@ -2,7 +2,7 @@ import { inject, Injectable, signal } from "@angular/core";
 import { Resources } from "../models/resources.model";
 import { APISService } from "./apis.service";
 import { Train } from "../models/train.model";
-import { Session } from "../models/session.model";
+import { Session } from "../models/sessionOverview.model";
 import { concat, concatMap } from "rxjs";
 import { Rail } from "../models/railway.model";
 import { Station } from "../models/trainStation.model";
