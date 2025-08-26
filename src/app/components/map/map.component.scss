@@ -9,30 +9,62 @@
   border: 4px solid #4a4a4a;
   height: 90%;
   position: relative;
+  padding: 8px;
 }
 
-.city {
+.grid {
+  display: grid;
+  gap: 2px;
+}
+
+.cell {
+  width: 24px;
+  height: 24px;
+  border: 1px solid #d0d0d0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  font-size: 8px;
+  color: #333;
+  background: #fafafa;
+}
+
+/* Type-based coloring */
+.cell.STATION {
+  background: #ffe7e7;
+  border-color: #f5b5b5;
+}
+
+.cell.RAIL {
+  background: #e7f1ff;
+  border-color: #b5ccf5;
+}
+
+.cell.EMPTY, .cell.empty {
+  background: #fafafa;
+}
+
+.marker {
+  width: 8px;
+  height: 8px;
+  background-color: #f01414;
+  border: 1px solid #c01010;
+  border-radius: 2px;
+}
+
+.name {
   position: absolute;
-  cursor: pointer;
-  
-  .city-marker {
-    width: 16px;
-    height: 16px;
-    background-color: #f01414;
-    border: 2px solid #c01010;
-    margin: 0 auto;
-  }
-  
-  .city-name {
-    display: block;
-    font-size: 12px;
-    margin-top: 4px;
-    color: #1a1a1a;
-  }
-  
-  &.selected .city-marker {
-    background-color: #ffffff;
-    border-color: #f01414;
-    box-shadow: 0 0 0 2px #f01414;
-  }
+  bottom: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: #222;
+  white-space: nowrap;
+}
+
+.loading {
+  padding: 16px;
+  color: #666;
 }

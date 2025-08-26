@@ -4,9 +4,10 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Train } from '../models/train.model';
-import { Session } from '../models/sessionOverview.model';
+import { SessionOverview } from '../models/sessionOverview.model';
 import { Player } from '../models/player.model';
 import { GameState } from '../models/game-state.model';
+import { Map } from '../models/map.model';
 
 
 @Injectable({
@@ -85,5 +86,9 @@ export class APISService {
 
   upgradeTrain(sessionName: string, playerUid: string, trainUid: string) {
     return this.http.post(`http://localhost:8080/session/${sessionName}/player/${playerUid}/train/${trainUid}`, null)
+  }
+
+  getMap(sessionName: string) {
+    return this.http.get<Map>(`http://localhost:8080/session/${sessionName}/map`);
   }
 }

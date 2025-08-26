@@ -37,7 +37,7 @@ export class HomepageComponent {
              if (response && response.uid) {
               this.store.sessionInfo().sessionName = this.sessionName;
               this.store.playerInfo().name = this.playerName;
-              this.store.playerInfo().uid = response.uid;
+              this.store.playerInfo().uId = response.uid;
               console.log('Session created, PlayerCreated, player Joined', this.playerName, this.sessionName)
                this.router.navigate(['/lobby']);
              } else {

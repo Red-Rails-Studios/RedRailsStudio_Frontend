@@ -1,7 +1,21 @@
 <div class="map-container">
-  <div class="pixel-map">
-    <div class="city">
-      <img src="assets/istockphoto-931217112-612x612.jpp" alt="map" class="">
+  <div class="pixel-map" *ngIf="mapData as md">
+    <!-- Render a grid using CSS grid; columns count from the first row length -->
+    <div
+      class="grid"
+      [style.gridTemplateColumns]="'repeat(' + (md.map[0]?.length || 0) + ', 24px)'"><!-- adjust cell size as needed -->
+      <ng-container *ngFor="let row of md.map; let y = index">
+        <ng-container *ngFor="let cell of row; let x = index">
+          <div class="cell" [attr.data-x]="x" [attr.data-y]="y" [ngClass]="cell.location?.type || 'empty'">
+            <span class="marker" *ngIf="cell.location?.type === 'STATION'"></span>
+            <span class="name" *ngIf="cell.location?.name">{{ cell.location.name }}</span>
+          </div>
+        </ng-container>
+      </ng-container>
     </div>
+  </div>
+
+  <div class="pixel-map" *ngIf="!mapData">
+    <div class="loading">Loading map...</div>
   </div>
 </div>
