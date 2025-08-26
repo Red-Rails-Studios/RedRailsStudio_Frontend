@@ -2,10 +2,10 @@ import { inject, Injectable, signal } from "@angular/core";
 import { Resources } from "../models/resources.model";
 import { APISService } from "./apis.service";
 import { Train } from "../models/train.model";
-import { Session } from "../models/sessionOverview.model";
+import { SessionOverview } from "../models/sessionOverview.model";
 import { concat, concatMap } from "rxjs";
-import { Rail } from "../models/railway.model";
-import { Station } from "../models/trainStation.model";
+import { Rail } from "../models/rail.model";
+import { Station } from "../models/station.model";
 import { GameState } from "../models/game-state.model";
 import { Player } from "../models/player.model";
 
@@ -26,7 +26,7 @@ export class Store {
     //     map: [] as Map
     // })
 
-    sessionInfo = signal<Session>({
+    sessionInfo = signal<SessionOverview>({
         sessionName: '',
         players: [] as Player[],
         gameState: {} as GameState,
@@ -50,7 +50,7 @@ export class Store {
         runtime: 0
     })
 
-    session = signal<Session | null>(null);
+    session = signal<SessionOverview | null>(null);
     apiService = inject(APISService)
     playerUid = signal<string | null>(null);
     sessionName = signal<string | null>(null); 
@@ -115,7 +115,7 @@ export class Store {
     }
 
     startSession(sessionName: string,) {
-        this.apiService.startSession(sessionName).subscribe((res: Session) => {
+        this.apiService.startSession(sessionName).subscribe((res: SessionOverview) => {
             this.sessionInfo.set(res);
             console.log('Session Started ', sessionName);
         })
@@ -123,7 +123,7 @@ export class Store {
     }
 
     killSession (sessionName: string) {
-        this.apiService.killSession(sessionName).subscribe((res: Session) => {
+        this.apiService.killSession(sessionName).subscribe((res: SessionOverview) => {
             this.session.set(res);
             console.log('Session Killed');
         });
@@ -158,7 +158,7 @@ export class Store {
     }
 
     setSessionInfo(sessionName: string){
-        this.apiService.getSessionInfo(sessionName).subscribe((res: Session) => {
+        this.apiService.getSessionInfo(sessionName).subscribe((res: SessionOverview) => {
             this.sessionInfo.set(res);
             console.log('SessionInfos set');
         });

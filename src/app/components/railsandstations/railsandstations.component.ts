@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Store } from '../../services/store';
-import { Rail } from '../../models/railway.model';
-import { Station } from '../../models/trainStation.model';
+import { Rail } from '../../models/rail.model';
+import { Station } from '../../models/station.model';
 import { CommonModule } from '@angular/common';
 import { NgFor } from '@angular/common';
 

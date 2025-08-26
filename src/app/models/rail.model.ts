@@ -1,4 +1,4 @@
 export interface Rail {
-  uId: string;
+  uid: string;
   level: number;
 }

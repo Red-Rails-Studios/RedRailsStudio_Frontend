@@ -3,7 +3,7 @@ import { Train } from "./train.model";
 import { Rail } from "./rail.model";
 
 export interface Player {
-  uId: string;
+  uid: string;
   name: string;
 
   dbCoin: number;
