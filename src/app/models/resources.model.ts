@@ -1,6 +1,6 @@
-import { Rail } from "./railway.model";
+import { Rail } from "./rail.model";
 import { Train } from "./train.model";
-import { Station } from "./trainStation.model";
+import { Station } from "./station.model";
 
 export interface Resources {
   dbCoin: number;
