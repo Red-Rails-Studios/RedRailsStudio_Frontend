@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Store } from '../../services/store';
-import { Rail } from '../../models/railway.model';
-import { Station } from '../../models/trainStation.model';
+import { Rail } from '../../models/rail.model';
+import { Station } from '../../models/station.model';
 import { CommonModule } from '@angular/common';
 import { NgFor } from '@angular/common';
 
@@ -21,7 +21,7 @@ export class UpgradesComponent {
 
   ngOnInit(): void {
     const sessionName = this.sessionInfo().sessionName;
-    const playerUid = this.playerInfo().uid;
+    const playerUid = this.playerInfo().uId;
 
     setInterval(() => {
     this.rails = this.store.resources().railDtos;
@@ -33,15 +33,15 @@ export class UpgradesComponent {
 
   onBuyRail() {
     const sessionName = this.sessionInfo().sessionName;
-    const uid = this.playerInfo().uid;
-    this.store.buyRail(sessionName, uid);
+    const uId = this.playerInfo().uId;
+    this.store.buyRail(sessionName, uId);
     //console.log('buying Rail with', sessionName, uid);
   }
 
   onBuyStation() {
     const sessionName = this.sessionInfo().sessionName;
-    const uid = this.playerInfo().uid;
-    this.store.buyStation(sessionName, uid);
+    const uId = this.playerInfo().uId;
+    this.store.buyStation(sessionName, uId);
     //console.log('buying Rail with', sessionName, uid);
   }
 

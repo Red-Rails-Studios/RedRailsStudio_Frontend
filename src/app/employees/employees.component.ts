@@ -18,9 +18,9 @@ export class EmployeesComponent {
 
   ngOnInit(): void {
     const sessionName = this.sessionInfo().sessionName;
-    const playerUid = this.playerInfo().uid;
-    if (sessionName && playerUid) {
-      this.store.getPlayerInfos(sessionName, playerUid);
+    const playerUId = this.playerInfo().uId;
+    if (sessionName && playerUId) {
+      this.store.getPlayerInfos(sessionName, playerUId);
       setInterval(() => {
         this.employee = this.store.playerInfo().employees;
       }, 5000);
@@ -32,8 +32,8 @@ export class EmployeesComponent {
 
   onBuyEmployee() {
     const sessionName = this.sessionInfo().sessionName;
-    const uid = this.playerInfo().uid;
-    this.store.buyEmployee(sessionName, uid);
-    console.log('buying train with', sessionName, uid);
+    const uId = this.playerInfo().uId;
+    this.store.buyEmployee(sessionName, uId);
+    console.log('buying train with', sessionName, uId);
   }
 }

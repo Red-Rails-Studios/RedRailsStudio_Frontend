@@ -19,11 +19,11 @@ export class TrainsComponent {
 
   ngOnInit(): void {
     const sessionName = this.sessionInfo().sessionName;
-    const playerUid = this.playerInfo().uid;
+    const playerUId = this.playerInfo().uId;
     
 
- if (sessionName && playerUid) {
-  this.store.getPlayerInfos(sessionName, playerUid);
+ if (sessionName && playerUId) {
+  this.store.getPlayerInfos(sessionName, playerUId);
 
   setInterval(() => {
     this.trains = this.store.resources().trainDtos;
@@ -33,18 +33,18 @@ export class TrainsComponent {
 
   onBuyTrain() {
     const sessionName = this.sessionInfo().sessionName;
-    const uid = this.playerInfo().uid;
-    this.store.buyTrain(sessionName, uid);
+    const uId = this.playerInfo().uId;
+    this.store.buyTrain(sessionName, uId);
     //console.log('buying train with', sessionName, uid);
   }
 
   onUpgradeTrain(trainNr: number) {  //TODO: need to fix upgrade see other branch
     const sessionName = this.sessionInfo().sessionName;
-    const uid = this.playerInfo().uid;
-    const trainId = this.store.resources().trainDtos[trainNr].id;
+    const uId = this.playerInfo().uId;
+    const trainId = this.store.resources().trainDtos[trainNr].uId;
     //const trainId = this.trains[trainNr].id;
     console.log(trainId);
-    this.store.upgradeTrain(sessionName, uid, trainId);
+    this.store.upgradeTrain(sessionName, uId, trainId);
   }
 
 }
