@@ -37,15 +37,15 @@ export class APISService {
   }
 
   getTrainInfo(sessionName: string, playerUid: string, trainUid: string): Observable<any>{
-    return this,this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid}/train/${trainUid}`, { responseType: 'text'}); // holt infos zu einem zug
+  return this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid}/train/${trainUid}`, { responseType: 'text'}); // holt infos zu einem zug
   }
 
   getRailInfo(sessionName: string, playerUid: string, railUid: string): Observable<any> {
-    return this.http.get(`http://localhost:8080//session/${sessionName}/player/${playerUid}/rail/${railUid}`, { responseType: 'text'}); //holt infos zur gleise
+  return this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid}/rail/${railUid}`, { responseType: 'text'}); //holt infos zur gleise
   }
 
   getStationInfo(sessionName: string, playerUid: string, stationUid: string): Observable<any> {
-    return this.http.get(`http://localhost:8080//session/${sessionName}/player/${playerUid}/station/${stationUid}`, { responseType: 'text'}); //holt zur bahnhöfe
+  return this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid}/station/${stationUid}`, { responseType: 'text'}); //holt zur bahnhöfe
   }
 
   getResources(sessionName: string, playerUid: string): Observable<any> {
@@ -64,8 +64,8 @@ export class APISService {
     return this.http.post(`http://localhost:8080/session/${sessionName}/player/${playerUid}/station`, null, { responseType: 'text'}); // kauft ein baahnhof
   }
 
-  getSessionInfo(sessionName: string): Observable<any> {
-    return this.http.get(`http://localhost:8080/session`, { responseType: 'text'}); 
+  getSessionInfo(sessionName: string): Observable<SessionOverview> {
+    return this.http.get<SessionOverview>(`http://localhost:8080/session/${sessionName}`);
   }
 
   getSessionPlayers(sessionName: string): Observable<Player[]> {
@@ -77,7 +77,7 @@ export class APISService {
   }
 
   getPlayerInfos(sessionName: string, playerUid: string): Observable<any> {
-    return this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid}/resource `);
+    return this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid}/resource`);
   }
 
   buyEmployee(sessionName: string, playerUid: string) {

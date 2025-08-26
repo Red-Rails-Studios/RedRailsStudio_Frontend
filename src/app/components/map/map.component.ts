@@ -17,12 +17,26 @@ export class MapComponent implements OnInit {
   constructor(private apiService: APISService, public store: Store) {}
 
   ngOnInit(): void {
-    const sessionName = this.store.sessionInfo().sessionName;
-    if (sessionName) {
-      this.apiService.getMap(sessionName).subscribe({
-        next: (m) => this.mapData = m,
-        error: (err) => console.error('Failed to load map', err)
-      });
+    const sessionNameSignal = this.store.sessionName();
+    const sessionOverviewName = this.store.sessionInfo().sessionName;
+    const sessionName = sessionNameSignal || sessionOverviewName;
+
+    console.log('🗺️ MapComponent init. sessionName signal:', sessionNameSignal, 'sessionInfo:', sessionOverviewName);
+
+    if (!sessionName) {
+      console.warn('MapComponent: no sessionName available, skipping map load.');
+      return;
     }
+
+    console.log('MapComponent: loading map for session:', sessionName);
+    this.apiService.getMap(sessionName).subscribe({
+      next: (m) => {
+        this.mapData = m;
+        console.log('Map loaded:', m);
+      },
+      error: (err) => {
+        console.error('Failed to load map', err);
+      }
+    });
   }
 }
