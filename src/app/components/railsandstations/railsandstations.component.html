@@ -5,7 +5,7 @@
     <div *ngFor="let rail of rails; let i = index" class="rail-block"> 
       Rail Nr. {{i+1}}
       level: {{rail.level}}
-      <button class="upgrade-button">upgrade<br><!--{{upgrade cost}}-->db coins</button>
+      <button class="upgrade-button" (click)="onUpgradeRail(i)">upgrade<br><!--{{upgrade cost}}-->db coins</button>
     </div>
   </div>
 
@@ -15,7 +15,7 @@
       <div *ngFor="let station of stations; let i = index" class="station-block">
         Station Nr: {{i+1}}
         level: {{station.level}}
-        <button class="upgrade-button">upgrade<br><!--{{upgrade cost}}-->db coins</button>
+        <button class="upgrade-button" (click)="onUpgradeStation(i)">upgrade<br><!--{{upgrade cost}}-->db coins</button>
       </div>
   </div>
 </div>
