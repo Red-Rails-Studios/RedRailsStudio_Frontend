@@ -1,6 +1,6 @@
 export interface Requirements {
   uid: string;
-  dbCoins: number;
-  employees: number;
-  power: number;
+  requiredDbCoins: number;
+  requiredEmployees: number;
+  requiredPower: number;
 }

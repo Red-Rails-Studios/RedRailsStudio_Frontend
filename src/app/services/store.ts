@@ -125,7 +125,7 @@ export class Store {
     }
 
     setSessionInfo(sessionName: string){
-        this.apiService.getSessionInfo(sessionName).subscribe((res: Session) => {
+        this.apiService.getSessionInfo(sessionName).subscribe((res: SessionOverview) => {
             this.sessionInfo.set(res);
             console.log('SessionInfos set');
         });
@@ -172,20 +172,8 @@ export class Store {
         });
     }
 
-    setSessionInfo(sessionName: string){
-        this.apiService.getSessionInfo(sessionName).subscribe((res: SessionOverview) => {
-            this.sessionInfo.set(res);
-            console.log('SessionInfos set');
-        });
-    }
-
-    getSessionPlayers(sessionName: string) {
-    this.apiService.getSessionPlayers(sessionName).subscribe((players: Player[]) => {
-        this.sessionInfo.update(session => ({
-            ...session,
-            players: players
-        }));
-    });
+    upgradeRequirementsTrain(sessionName: string, playerUid: string, trainId: string) {
+       return this.apiService.requirementTrain(sessionName, playerUid, trainId);
     }
 
     buyRail(sessionName: string, playerUid: string) {
