@@ -28,7 +28,6 @@ export class MapComponent implements OnInit {
 
     if (!sessionName) {
       console.warn('MapComponent: no sessionName available yet, starting poll to wait for sessionName...');
-      // poll for sessionName for up to 30s
       let attempts = 0;
       this.pollIntervalId = setInterval(() => {
         attempts++;
@@ -46,7 +45,7 @@ export class MapComponent implements OnInit {
       return;
     }
 
-    // If we have sessionName, load map immediately
+    
     this.loadMap(sessionName);
   }
 
@@ -68,7 +67,7 @@ export class MapComponent implements OnInit {
     });
   }
 
-  // Manual reload callable from template
+  
   reloadMap() {
     const sName = this.store.sessionName() || this.store.sessionInfo().sessionName;
     if (!sName) {
