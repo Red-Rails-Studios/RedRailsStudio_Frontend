@@ -5,63 +5,42 @@
 
 <div class="menu-overlay">
 
-    <!-- MAIN -->
-    <div *ngIf="showMain">
+    <div *ngIf="showMain"> <!-- MAIN -->
 
         <!-- CREATE BUTTON -->
-        <button
-            class="main-menu-button"
-            (click)="showCreate = true; showJoin = false; showMain = false; "
-        >
+        <button class="main-menu-button" (click)="showCreate = true; showJoin = false; showMain = false; ">
             Create Session
         </button>
 
         <!-- JOIN BUTTON -->
-        <button
-            class="main-menu-button"
-            (click)="showJoin = true; showCreate = false; showMain = false; "
-        >
+        <button class="main-menu-button" (click)="showJoin = true; showCreate = false; showMain = false; ">
             Join Session
         </button>
     </div>
-    <!-- MAIN -->
-
-    <!-- CREATE  -->    
-    <div *ngIf="showCreate">
+    
+    <div *ngIf="showCreate"> <!-- CREATE  -->
 
         <!-- PLAYERNAME -->
-        <input
-            type="text"
-            class="menu-input"
-            [(ngModel)]="playerName"
-            placeholder="Nickname"
-        />
+        <input type="text" class="menu-input" [(ngModel)]="playerName" placeholder="Nickname"/>
 
         <!-- SESSIONNAME -->
-        <input
-            type="text"
-            class="menu-input"
+        <input 
+            type="text" 
+            class="menu-input" 
             [(ngModel)]="sessionName"
             placeholder="Session Name"
-            maxlength="20"
-        />
+            maxlength="20"/>
 
         <!-- CREATE BUTTON -->
-        <button
-            class="menu-button"
+        <button 
+            class="menu-button" 
             [disabled]="playerName.length < 3 || sessionName.length < 3"
-            (click)="onCreateSession(); showMain = false; showCreate = false; showJoin = false;"
-        >
+            (click)="onCreateSession(); showMain = false; showCreate = false; showJoin = false;">
             Create Session
         </button>
 
         <!-- BACK BUTTON -->
-        <button
-            class="menu-button"
-            (click)="showMain = true; showCreate = false; showJoin = false; clearFields()"
-        >
-            Back
-        </button>
+        <button class="menu-button" (click)="showMain = true; showCreate = false; showJoin = false; clearFields()">Back</button>
     </div>
     <!-- CREATE  -->
 
@@ -73,8 +52,7 @@
             type="text"
             class="menu-input"
             [(ngModel)]="inputNameJoin"
-            placeholder="Nickname"
-        />
+            placeholder="Nickname"/>
 
         <!-- SESSIONNAME -->
         <input

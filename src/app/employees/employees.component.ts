@@ -9,6 +9,7 @@ import { Store } from '../services/store';
   templateUrl: './employees.component.html',
   styleUrl: './employees.component.scss'
 })
+
 export class EmployeesComponent {
   employee = 8;
   power = 10;
@@ -24,11 +25,12 @@ export class EmployeesComponent {
       this.store.getPlayerInfos(sessionName, playerUid);
       setInterval(() => {
         this.employee = this.store.playerInfo().employees;
-      }, 5000);
+        this.power = this.playerInfo().power;
+      }, 1000);
     }
     else {
-    console.error('Session name or player UID is missing!');
-  }
+      console.error('Session name or player UID is missing!');
+    }
   }
 
   onBuyEmployee() {
