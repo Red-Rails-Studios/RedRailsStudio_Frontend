@@ -14,8 +14,11 @@
       </ng-container>
     </div>
   </div>
-
   <div class="pixel-map" *ngIf="!mapData">
-    <div class="loading">Loading map...</div>
+    <div class="loading">{{ loading ? 'Loading map...' : 'Map not loaded' }}</div>
+    <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
+    <div style="margin-top:8px;">
+      <button (click)="reloadMap()">Reload Map</button>
+    </div>
   </div>
 </div>
