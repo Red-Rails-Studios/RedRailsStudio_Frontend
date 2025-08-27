@@ -205,4 +205,15 @@ export class Store {
             }
         });
     }
+
+    buyPower(sessionName: string, playerUid: string) {
+        this.apiService.buyPower(sessionName, playerUid).subscribe({
+            next: () => {
+                this.getPlayerInfos(sessionName, playerUid);
+            },
+            error: (err) => {
+                console.error('Error buying power', err);
+            }
+        });
+    }
 }

@@ -86,4 +86,8 @@ export class APISService {
   upgradeTrain(sessionName: string, playerUid: string, trainUid: string) {
     return this.http.post(`http://localhost:8080/session/${sessionName}/player/${playerUid}/train/${trainUid}`, null)
   }
+
+  buyPower(sessionName: string, playerUid: string) {
+    return this.http.post(`http://localhost:8080/session/${sessionName}/player/${playerUid}/power`, null, {responseType: 'text'});
+  }
 }

@@ -36,4 +36,11 @@ export class EmployeesComponent {
     this.store.buyEmployee(sessionName, uid);
     console.log('buying train with', sessionName, uid);
   }
+
+  onBuyPower(){
+    const sessionName = this.sessionInfo().sessionName;
+    const uid = this.playerInfo().uid;
+    this.store.buyPower(sessionName, uid);
+    console.log("power bought");
+  }
 }
