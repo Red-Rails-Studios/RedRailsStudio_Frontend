@@ -11,6 +11,7 @@ import { Store } from '../services/store';
 })
 export class EmployeesComponent {
   employee = 8;
+  power = 10;
   playerInfo = inject(Store).playerInfo;
   sessionInfo = inject(Store).sessionInfo;
 
