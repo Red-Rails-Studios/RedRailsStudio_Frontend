@@ -140,9 +140,9 @@ export class Store {
         });
     }
 
-    buyRequirements(sessionName: string, playerUid: string) {
-        this.apiService.buyRequirements(sessionName, playerUid);
-    }
+    // buyRequirements(sessionName: string, playerUid: string) {
+    //     this.apiService.buyRequirements(sessionName, playerUid);
+    // }
 
     getTrain (sessionName: string, playerName: string, trainUid: string) {
         this.apiService.getTrainInfo(sessionName, playerName, trainUid).subscribe((res: Player) => {
@@ -172,9 +172,9 @@ export class Store {
         });
     }
 
-    upgradeRequirementsTrain(sessionName: string, playerUid: string, trainId: string) {
-       return this.apiService.requirementTrain(sessionName, playerUid, trainId);
-    }
+    // upgradeRequirementsTrain(sessionName: string, playerUid: string, trainId: string) {
+    //    return this.apiService.requirementTrain(sessionName, playerUid, trainId);
+    // }
 
     buyRail(sessionName: string, playerUid: string) {
         this.apiService.buyRail(sessionName, playerUid).subscribe({
@@ -198,9 +198,9 @@ export class Store {
         });
     }
 
-    upgradeRequirementsRail(sessionName: string, playerUid: string, railId: string) {
-        return this.apiService.requirementRails(sessionName, playerUid, railId);
-    }
+    // upgradeRequirementsRail(sessionName: string, playerUid: string, railId: string) {
+    //     return this.apiService.requirementRails(sessionName, playerUid, railId);
+    // }
 
     buyStation(sessionName: string, playerUid: string) {
         this.apiService.buyStation(sessionName, playerUid).subscribe({
@@ -224,9 +224,9 @@ export class Store {
         });
     }
 
-    upgradeRequirementsStation(sessionName: string, playerUid: string, stationId: string) {
-       return this.apiService.requirementStations(sessionName, playerUid, stationId);
-    }
+    // upgradeRequirementsStation(sessionName: string, playerUid: string, stationId: string) {
+    //    return this.apiService.requirementStations(sessionName, playerUid, stationId);
+    // }
 
     buyEmployee(sessionName: string, playerUid: string) {
         this.apiService.buyEmployee(sessionName, playerUid).subscribe({
