@@ -34,15 +34,16 @@ export class HomepageComponent {
        next: () => {
          this.apiService.postNewPlayer(this.sessionName, this.playerName).subscribe({
            next: (response: { name: string; uid: string }) => {
-             if (response && response.uid) {
-              this.store.sessionInfo().sessionName = this.sessionName;
-              this.store.playerInfo().name = this.playerName;
-              this.store.playerInfo().uId = response.uid;
-              console.log('Session created, PlayerCreated, player Joined', this.playerName, this.sessionName)
-               this.router.navigate(['/lobby']);
-             } else {
-               alert('Failed to join session.');
-             }
+            if (response && response.uid) {
+                // use the Store setters so signals stay in sync
+                this.store.setSessionName(this.sessionName);
+                this.store.setPlayerName(this.playerName);
+                this.store.setPlayerUid(response.uid);
+                console.log('Session created, PlayerCreated, player Joined', this.playerName, this.sessionName)
+                 this.router.navigate(['/lobby']);
+               } else {
+                 alert('Failed to join session.');
+               }
            },
            error: () => {
              alert('Failed to create player.');

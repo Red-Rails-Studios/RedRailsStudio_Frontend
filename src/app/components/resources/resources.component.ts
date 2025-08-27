@@ -19,7 +19,7 @@ export class ResourcesComponent implements OnInit {
 
   ngOnInit(): void {
   const sessionName = this.store.sessionInfo().sessionName;
-  const playerUid = this.store.playerInfo().uId;
+  const playerUid = this.store.playerUid();
   if (sessionName && playerUid) {
     this.store.getPlayerInfos(sessionName, playerUid);
     setInterval(() => {

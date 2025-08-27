@@ -19,23 +19,37 @@ export class TrainsComponent {
 
   ngOnInit(): void {
     const sessionName = this.sessionInfo().sessionName;
-    const playerUId = this.playerInfo().uId;
-    
+    const playerUId = this.store.playerUid();
 
- if (sessionName && playerUId) {
-  this.store.getPlayerInfos(sessionName, playerUId);
+    if (sessionName && playerUId) {
+      this.store.getPlayerInfos(sessionName, playerUId);
 
-  setInterval(() => {
-    this.trains = this.store.resources().trainDtos;
-      //console.log("trains updated", this.trains)
-    }, 500);}
+      setInterval(() => {
+        this.trains = this.store.resources().trainDtos;
+        //console.log("trains updated", this.trains)
+      }, 500);
+    }
   }
 
   onBuyTrain() {
     const sessionName = this.sessionInfo().sessionName;
-    const uId = this.playerInfo().uId;
+    // prefer store.playerUid() signal because it is the authoritative uid
+    const uIdFromStore = this.store.playerUid();
+    const uIdFromPlayerInfo = this.playerInfo().uId;
+    const uId = uIdFromStore || uIdFromPlayerInfo;
+
+    console.log('onBuyTrain called. sessionName:', sessionName, 'uIdFromStore:', uIdFromStore, 'uIdFromPlayerInfo:', uIdFromPlayerInfo);
+
+    if (!sessionName) {
+      console.error('Cannot buy train: sessionName is missing');
+      return;
+    }
+    if (!uId) {
+      console.error('Cannot buy train: player UID is missing');
+      return;
+    }
+
     this.store.buyTrain(sessionName, uId);
-    //console.log('buying train with', sessionName, uid);
   }
 
   onUpgradeTrain(trainNr: number) {  //TODO: need to fix upgrade see other branch

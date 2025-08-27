@@ -136,8 +136,19 @@ export class Store {
     }
 
     buyTrain(sessionName: string, playerUid: string) {
+        console.log('Store.buyTrain called with', { sessionName, playerUid });
+        if (!sessionName) {
+            console.error('buyTrain aborted: sessionName is undefined');
+            return;
+        }
+        if (!playerUid) {
+            console.error('buyTrain aborted: playerUid is undefined');
+            return;
+        }
+
         this.apiService.buyTrain(sessionName, playerUid).subscribe({
             next: () => {
+                console.log('buyTrain API call succeeded, refreshing player infos');
                 this.getPlayerInfos(sessionName, playerUid);
             },
             error: (err) => {
@@ -202,6 +213,21 @@ export class Store {
             },
             error: (err) => {
                 console.error('Error buying employee:', err);
+            }
+        });
+    }
+
+    buyPower(sessionName: string, playerUid: string) {
+        if (!sessionName || !playerUid) {
+            console.error('buyPower aborted: sessionName or playerUid missing');
+            return;
+        }
+        this.apiService.buyPower(sessionName, playerUid).subscribe({
+            next: () => {
+                this.getPlayerInfos(sessionName, playerUid);
+            },
+            error: (err) => {
+                console.error('Error buying power:', err);
             }
         });
     }

@@ -33,14 +33,22 @@ export class UpgradesComponent {
 
   onBuyRail() {
     const sessionName = this.sessionInfo().sessionName;
-    const uId = this.playerInfo().uId;
+    const uId = this.store.playerUid();
+    if (!sessionName || !uId) {
+      console.error('Cannot buy rail: sessionName or playerUid missing');
+      return;
+    }
     this.store.buyRail(sessionName, uId);
     //console.log('buying Rail with', sessionName, uid);
   }
 
   onBuyStation() {
     const sessionName = this.sessionInfo().sessionName;
-    const uId = this.playerInfo().uId;
+    const uId = this.store.playerUid();
+    if (!sessionName || !uId) {
+      console.error('Cannot buy station: sessionName or playerUid missing');
+      return;
+    }
     this.store.buyStation(sessionName, uId);
     //console.log('buying Rail with', sessionName, uid);
   }
