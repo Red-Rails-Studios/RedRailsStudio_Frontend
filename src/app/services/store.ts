@@ -8,6 +8,7 @@ import { Rail } from "../models/rail.model";
 import { Station } from "../models/station.model";
 import { GameState } from "../models/game-state.model";
 import { Player } from "../models/player.model";
+import { Requirements } from "../models/requierment.model";
 
 @Injectable({
   providedIn: 'root'
@@ -51,6 +52,9 @@ export class Store {
     playerUid = signal<string | null>(null);
     sessionName = signal<string | null>(null); 
     playerName = signal<string | null>(null);
+    upgradeResourcesTrain = signal<Requirements[] | null>
+    upgradeResourcesRail = signal<Requirements[] | null>
+    upgradeResourcesStation = signal<Requirements[] | null>
 
     setPlayerUid(uid: string) {
         this.playerUid.set(uid);
@@ -140,9 +144,9 @@ export class Store {
         });
     }
 
-    // buyRequirements(sessionName: string, playerUid: string) {
-    //     this.apiService.buyRequirements(sessionName, playerUid);
-    // }
+    buyRequirements(sessionName: string, playerUid: string) {
+        this.apiService.buyRequirements(sessionName, playerUid);
+    }
 
     getTrain (sessionName: string, playerName: string, trainUid: string) {
         this.apiService.getTrainInfo(sessionName, playerName, trainUid).subscribe((res: Player) => {
@@ -172,9 +176,9 @@ export class Store {
         });
     }
 
-    // upgradeRequirementsTrain(sessionName: string, playerUid: string, trainId: string) {
-    //    return this.apiService.requirementTrain(sessionName, playerUid, trainId);
-    // }
+    upgradeRequirementsTrain(sessionName: string, playerUid: string, trainId: string) {
+       return this.apiService.requirementTrain(sessionName, playerUid, trainId);
+    }
 
     buyRail(sessionName: string, playerUid: string) {
         this.apiService.buyRail(sessionName, playerUid).subscribe({
@@ -198,9 +202,11 @@ export class Store {
         });
     }
 
-    // upgradeRequirementsRail(sessionName: string, playerUid: string, railId: string) {
-    //     return this.apiService.requirementRails(sessionName, playerUid, railId);
-    // }
+    upgradeRequirementsRail(sessionName: string, playerUid: string, railId: string) {
+        this.apiService.requirementRails(sessionName, playerUid, railId).subscribe((upgradeResourcesRail: Requirements) => {
+            this.upgradeResourcesRail.set(upgradeResourcesRail);
+        });
+    }
 
     buyStation(sessionName: string, playerUid: string) {
         this.apiService.buyStation(sessionName, playerUid).subscribe({
@@ -224,9 +230,9 @@ export class Store {
         });
     }
 
-    // upgradeRequirementsStation(sessionName: string, playerUid: string, stationId: string) {
-    //    return this.apiService.requirementStations(sessionName, playerUid, stationId);
-    // }
+    upgradeRequirementsStation(sessionName: string, playerUid: string, stationId: string) {
+       return this.apiService.requirementStations(sessionName, playerUid, stationId);
+    }
 
     buyEmployee(sessionName: string, playerUid: string) {
         this.apiService.buyEmployee(sessionName, playerUid).subscribe({

@@ -98,19 +98,19 @@ export class APISService {
     return this.http.post(`http://localhost:8080/session/${sessionName}/player/${playerUid}/power`, null, {responseType: 'text'});
   }
 
-  // buyRequirements(sessionName: string, playerUid: string) {
-  //   return this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid}/buy/getRequirements`);
-  // }
+  buyRequirements(sessionName: string, playerUid: string) {
+    return this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid}/buy/getRequirements`);
+  }
 
-  // requirementRails(sessionName: string, playerUid: string, railUid: string): Observable<any> {
-  //   return this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid}/rails/${railUid}/getUpgradeRequirements`);
-  // }
+  requirementRails(sessionName: string, playerUid: string, railUid: string): Observable<any> {
+    return this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid}/rails/${railUid}/getUpgradeRequirements`);
+  }
 
-  // requirementStations(sessionName: string, playerUid: string, stationUid: string): Observable<any> {
-  //   return this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid}/station/${stationUid}/getUpgradeRequirements`);
-  // }
+  requirementStations(sessionName: string, playerUid: string, stationUid: string): Observable<any> {
+    return this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid}/station/${stationUid}/getUpgradeRequirements`);
+  }
 
-  // requirementTrain(sessionName: string, playerUid: string, trainUid: string): Observable<any> {
-  //   return this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid}/train/${trainUid}/getUpgradeRequirements`);
-  // }
+  requirementTrain(sessionName: string, playerUid: string, trainUid: string): Observable<any> {
+    return this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid}/train/${trainUid}/getUpgradeRequirements`);
+  }
 }
