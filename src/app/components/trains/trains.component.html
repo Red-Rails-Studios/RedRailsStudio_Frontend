@@ -7,7 +7,10 @@
         <div *ngFor="let trainDtos of trains; let i=index" class="train-block">
             train Nr. {{i+1}}
             level:{{trainDtos.level}}
-           <!-- {{upgrades[i].requiredDbCoins}}-->
+            <div *ngIf="upgrades !== null">
+              We have {{ upgrades[i].requiredDbCoins }} upgrades available!
+            </div>
+           <!-- {{upgrades[i].requiredDbCoins}} -->
             <button (click)="onUpgradeTrain(i)" class="upgrade-button"><!--{{upgrade cost}}-->/db</button>
         </div>
     </div>

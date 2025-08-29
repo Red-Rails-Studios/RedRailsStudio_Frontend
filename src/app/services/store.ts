@@ -177,7 +177,12 @@ export class Store {
     }
 
     upgradeRequirementsTrain(sessionName: string, playerUid: string, trainId: string) {
-       return this.apiService.requirementTrain(sessionName, playerUid, trainId);
+       this.apiService.requirementTrain(sessionName, playerUid, trainId)
+          .subscribe((upgradeResourcesTrain: Requirements[]) => {
+              this.upgradeResourcesTrain.set(upgradeResourcesTrain);
+          }, (err) => {
+              console.error('Error fetching train requirements', err);
+          });
     }
 
     buyRail(sessionName: string, playerUid: string) {
@@ -234,7 +239,12 @@ export class Store {
     }
 
     upgradeRequirementsStation(sessionName: string, playerUid: string, stationId: string) {
-       return this.apiService.requirementStations(sessionName, playerUid, stationId);
+       this.apiService.requirementStations(sessionName, playerUid, stationId)
+          .subscribe((upgradeResourcesStation: Requirements[]) => {
+              this.upgradeResourcesStation.set(upgradeResourcesStation);
+          }, (err) => {
+              console.error('Error fetching station requirements', err);
+          });
     }
 
     buyEmployee(sessionName: string, playerUid: string) {
