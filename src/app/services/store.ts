@@ -31,7 +31,7 @@ export class Store {
         sessionEnded: ''
     })
 
-    playerInfo = signal<Player>({ 
+    playerInfo = signal<Player>({
         uid: '',
         name: '',
         trains: [] as Train[],
@@ -50,18 +50,18 @@ export class Store {
     session = signal<SessionOverview | null>(null);
     apiService = inject(APISService)
     playerUid = signal<string | null>(null);
-    sessionName = signal<string | null>(null); 
+    sessionName = signal<string | null>(null);
     playerName = signal<string | null>(null);
-    upgradeResourcesTrain = signal<Requirements[] | null>
-    upgradeResourcesRail = signal<Requirements[] | null>
-    upgradeResourcesStation = signal<Requirements[] | null>
+    upgradeResourcesTrain = signal<Requirements[] | null>(null);
+    upgradeResourcesRail = signal<Requirements[] | null>(null);
+    upgradeResourcesStation = signal<Requirements[] | null>(null);
 
     setPlayerUid(uid: string) {
         this.playerUid.set(uid);
         this.playerInfo().uid = uid;
     }
 
-    setSessionName(name: string) { 
+    setSessionName(name: string) {
         this.sessionName.set(name);
         this.sessionInfo().sessionName = name;
     }
@@ -203,9 +203,12 @@ export class Store {
     }
 
     upgradeRequirementsRail(sessionName: string, playerUid: string, railId: string) {
-        this.apiService.requirementRails(sessionName, playerUid, railId).subscribe((upgradeResourcesRail: Requirements) => {
-            this.upgradeResourcesRail.set(upgradeResourcesRail);
-        });
+        this.apiService.requirementRails(sessionName, playerUid, railId)
+          .subscribe((upgradeResourcesRail: Requirements[]) => {
+              this.upgradeResourcesRail.set(upgradeResourcesRail);
+          }, (err) => {
+              console.error('Error fetching rail requirements', err);
+          });
     }
 
     buyStation(sessionName: string, playerUid: string) {
