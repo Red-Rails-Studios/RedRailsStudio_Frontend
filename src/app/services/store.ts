@@ -98,6 +98,9 @@ export class Store {
             this.resources.set(resources);
             console.log('Resources updated:', this.resources());
         })
+        for (let i = 0; i <= this.resources().trainDtos.length; i++) {
+            this.upgradeRequirementsTrain(sessionName, playerUid, this.resources().trainDtos[i].uid)
+        }
     }
 
     joinPlayer(sessionName: string, playerName: string) {
