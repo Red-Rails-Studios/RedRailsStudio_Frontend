@@ -1,17 +1,12 @@
 <div class="map-container">
   <div class="pixel-map" *ngIf="mapData as md">
-    <div
-      class="grid"
-      [style.gridTemplateColumns]="'repeat(' + (md.map[0]?.length || 0) + ', 24px)'">
-      <ng-container *ngFor="let row of md.map; let y = index">
-        <ng-container *ngFor="let cell of row; let x = index">
-          <div class="cell" [attr.data-x]="x" [attr.data-y]="y" [ngClass]="cell.location?.type || 'empty'">
-            <span class="marker" *ngIf="cell.location?.type === 'STATION'"></span>
-            <span class="name" *ngIf="cell.location?.name">{{ cell.location.name }}</span>
-          </div>
-        </ng-container>
-      </ng-container>
-    </div>
+    <canvas #mapCanvas
+            class="map-canvas"
+            [attr.width]="canvasWidth"
+            [attr.height]="canvasHeight"
+            [style.width.px]="canvasWidth"
+            [style.height.px]="canvasHeight">
+    </canvas>
   </div>
   <div class="pixel-map" *ngIf="!mapData">
     <div class="loading">{{ loading ? 'Loading map...' : 'Map not loaded' }}</div>

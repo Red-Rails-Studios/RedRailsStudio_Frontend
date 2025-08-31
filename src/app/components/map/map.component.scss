@@ -12,59 +12,11 @@
   padding: 8px;
 }
 
-.grid {
-  display: grid;
-  gap: 2px;
-}
-
-.cell {
-  width: 24px;
-  height: 24px;
-  border: 1px solid #d0d0d0;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  font-size: 8px;
-  color: #333;
-  background: #fafafa;
-}
-
-/* Type-based coloring */
-.cell.STATION {
-  background: #ffe7e7;
-  border-color: #f5b5b5;
-}
-
-.cell.RAIL {
-  background: #e7f1ff;
-  border-color: #b5ccf5;
-}
-
-.cell.EMPTY, .cell.empty {
-  background: #fafafa;
-}
-
-.marker {
-  width: 8px;
-  height: 8px;
-  background-color: #f01414;
-  border: 1px solid #c01010;
-  border-radius: 2px;
-}
-
-.name {
-  position: absolute;
-  bottom: -14px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 10px;
-  color: #222;
-  white-space: nowrap;
-}
-
 .loading {
   padding: 16px;
   color: #666;
+}
+
+.map-canvas {
+  display: block;
 }
