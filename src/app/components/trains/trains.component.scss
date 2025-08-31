@@ -8,15 +8,28 @@
   width: 97%;
   height: 100px;
   margin: 8px 0;
-  display: block;
+  display: flex;
   text-align: center;
   font-size: 1.2rem;
   border: 10px solid gray;
+  grid-template-columns: 1fr;
+  grid-template-rows: 0.3fr 0.4fr 0.3fr;
+  gap: 0;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "map resources resources"
+    "map tabs tabs"
+    "map tabcontent tabcontent";
 }
 
-.buy-image {
-  width: 20px;
-  height: 20px;
+.train-pic {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  background-color: #f0f0f0;
+  padding: 10px;
+  border-radius: 8px;
 }
 
 .train-list {
@@ -61,8 +74,9 @@
 }
 
 .upgrade-button {
+  font-family:  "Silkscreen", sans-serif;
   width: 20%;
   height: 50%;
   background-color: yellowgreen;
-  font-family:  "Silkscreen", sans-serif;
+  padding: 10px;
 }
