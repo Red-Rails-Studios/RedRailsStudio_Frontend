@@ -174,43 +174,19 @@ export class MapComponent implements OnInit, AfterViewInit {
         const px = x * (this.tileSize + this.gap);
         const py = y * (this.tileSize + this.gap);
 
-        if (locType === 'STATION') {
-          ctx.fillStyle = '#ffe7e7';
-          ctx.strokeStyle = '#f5b5b5';
-        } else if (locType === 'RAIL') {
-          ctx.fillStyle = '#e7f1ff';
-          ctx.strokeStyle = '#b5ccf5';
-        } else {
-          ctx.fillStyle = '#fafafa';
-          ctx.strokeStyle = '#d0d0d0';
-        }
-        ctx.lineWidth = 1;
+        // Dot color: black for stations, grey for non-stations
+        ctx.fillStyle = locType === 'STATION' ? '#000000' : '#9e9e9e';
+        ctx.lineWidth = 0.5;
 
-        // DE: Kachel zeichnen (Füllung + 1px-Rahmen)
-        ctx.fillRect(px, py, this.tileSize, this.tileSize);
-        ctx.strokeRect(px + 0.5, py + 0.5, this.tileSize - 1, this.tileSize - 1);
+        // Draw a circle/dot at the center of the tile
+        const cx = px + this.tileSize / 2;
+        const cy = py + this.tileSize / 2;
+        const r = Math.floor(this.tileSize * 0.35);
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fill();
 
-        if (locType === 'STATION') {
-          // DE: Station-Markierung (kleines rotes Quadrat) mittig in der Kachel
-          const markerSize = 8;
-          const mx = px + (this.tileSize - markerSize) / 2;
-          const my = py + (this.tileSize - markerSize) / 2;
-          ctx.fillStyle = '#f01414';
-          ctx.strokeStyle = '#c01010';
-          ctx.fillRect(mx, my, markerSize, markerSize);
-          ctx.strokeRect(mx + 0.5, my + 0.5, markerSize - 1, markerSize - 1);
-
-          const name = field?.location?.name;
-          if (name) {
-            // DE: Optionaler Name unterhalb des Markers, zentriert in der Kachel
-            ctx.fillStyle = '#222';
-            ctx.font = '8px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'bottom';
-            ctx.fillText(name, px + this.tileSize / 2, py + this.tileSize - 2);
-          }
-        }
-      }
+              }
     }
   }
 }
