@@ -8,6 +8,7 @@ import { Rail } from "../models/rail.model";
 import { Station } from "../models/station.model";
 import { GameState } from "../models/game-state.model";
 import { Player } from "../models/player.model";
+import { Requirements } from "../models/requierment.model";
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +31,7 @@ export class Store {
         sessionEnded: ''
     })
 
-    playerInfo = signal<Player>({ 
+    playerInfo = signal<Player>({
         uid: '',
         name: '',
         trains: [] as Train[],
@@ -49,15 +50,18 @@ export class Store {
     session = signal<SessionOverview | null>(null);
     apiService = inject(APISService)
     playerUid = signal<string | null>(null);
-    sessionName = signal<string | null>(null); 
+    sessionName = signal<string | null>(null);
     playerName = signal<string | null>(null);
+    upgradeResourcesTrain = signal<Requirements[] | null>(null);
+    upgradeResourcesRail = signal<Requirements[] | null>(null);
+    upgradeResourcesStation = signal<Requirements[] | null>(null);
 
     setPlayerUid(uid: string) {
         this.playerUid.set(uid);
         this.playerInfo().uid = uid;
     }
 
-    setSessionName(name: string) { 
+    setSessionName(name: string) {
         this.sessionName.set(name);
         this.sessionInfo().sessionName = name;
     }
@@ -94,6 +98,9 @@ export class Store {
             this.resources.set(resources);
             console.log('Resources updated:', this.resources());
         })
+        for (let i = 0; i <= this.resources().trainDtos.length; i++) {
+            this.upgradeRequirementsTrain(sessionName, playerUid, this.resources().trainDtos[i].uid)
+        }
     }
 
     joinPlayer(sessionName: string, playerName: string) {
@@ -140,9 +147,9 @@ export class Store {
         });
     }
 
-    // buyRequirements(sessionName: string, playerUid: string) {
-    //     this.apiService.buyRequirements(sessionName, playerUid);
-    // }
+    buyRequirements(sessionName: string, playerUid: string) {
+        this.apiService.buyRequirements(sessionName, playerUid);
+    }
 
     getTrain (sessionName: string, playerName: string, trainUid: string) {
         this.apiService.getTrainInfo(sessionName, playerName, trainUid).subscribe((res: Player) => {
@@ -172,9 +179,14 @@ export class Store {
         });
     }
 
-    // upgradeRequirementsTrain(sessionName: string, playerUid: string, trainId: string) {
-    //    return this.apiService.requirementTrain(sessionName, playerUid, trainId);
-    // }
+    upgradeRequirementsTrain(sessionName: string, playerUid: string, trainId: string) {
+       this.apiService.requirementTrain(sessionName, playerUid, trainId)
+          .subscribe((upgradeResourcesTrain: Requirements[]) => {
+              this.upgradeResourcesTrain.set(upgradeResourcesTrain);
+          }, (err) => {
+              console.error('Error fetching train requirements', err);
+          });
+    }
 
     buyRail(sessionName: string, playerUid: string) {
         this.apiService.buyRail(sessionName, playerUid).subscribe({
@@ -198,9 +210,14 @@ export class Store {
         });
     }
 
-    // upgradeRequirementsRail(sessionName: string, playerUid: string, railId: string) {
-    //     return this.apiService.requirementRails(sessionName, playerUid, railId);
-    // }
+    upgradeRequirementsRail(sessionName: string, playerUid: string, railId: string) {
+        this.apiService.requirementRails(sessionName, playerUid, railId)
+          .subscribe((upgradeResourcesRail: Requirements[]) => {
+              this.upgradeResourcesRail.set(upgradeResourcesRail);
+          }, (err) => {
+              console.error('Error fetching rail requirements', err);
+          });
+    }
 
     buyStation(sessionName: string, playerUid: string) {
         this.apiService.buyStation(sessionName, playerUid).subscribe({
@@ -224,9 +241,14 @@ export class Store {
         });
     }
 
-    // upgradeRequirementsStation(sessionName: string, playerUid: string, stationId: string) {
-    //    return this.apiService.requirementStations(sessionName, playerUid, stationId);
-    // }
+    upgradeRequirementsStation(sessionName: string, playerUid: string, stationId: string) {
+       this.apiService.requirementStations(sessionName, playerUid, stationId)
+          .subscribe((upgradeResourcesStation: Requirements[]) => {
+              this.upgradeResourcesStation.set(upgradeResourcesStation);
+          }, (err) => {
+              console.error('Error fetching station requirements', err);
+          });
+    }
 
     buyEmployee(sessionName: string, playerUid: string) {
         this.apiService.buyEmployee(sessionName, playerUid).subscribe({

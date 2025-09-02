@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Train } from '../../models/train.model';
 import { CommonModule } from '@angular/common';
-import { NgFor } from '@angular/common';
+import { NgFor, NgIf } from '@angular/common';
 import { Store } from '../../services/store';
 import { Requirements } from '../../models/requierment.model';
 
@@ -15,7 +15,7 @@ export class TrainsComponent {
   trains: Train[] = [];
   playerInfo = inject(Store).playerInfo;
   sessionInfo = inject(Store).sessionInfo;
-  upgrades: Requirements[] = [];
+  upgrades: Requirements[] | null = [];
 
   constructor(public store: Store) {}
 
@@ -28,13 +28,7 @@ export class TrainsComponent {
 
       setInterval(() => {
         this.trains = this.store.resources().trainDtos;
-        // for (let i=0; i<= this.trains.length; i++) {
-        //   const trainId = this.store.resources().trainDtos[i].uid;
-        //   this.store.upgradeRequirementsTrain(sessionName, playerUid, trainId).subscribe((response:Requirements) => {
-        //     this.upgrades[i] = response;
-        //   });
-        // }
-        //console.log("trains updated", this.trains)
+        this.upgrades = this.store.upgradeResourcesTrain();
       }, 1000);
     }
   }
@@ -58,7 +52,7 @@ export class TrainsComponent {
     const sessionName = this.sessionInfo().sessionName;
     const uid = this.playerInfo().uid;
     const trainId = this.store.resources().trainDtos[trainNr].uid;
-    //this.store.upgradeRequirementsTrain(sessionName, uid, trainId);
+    this.store.upgradeRequirementsTrain(sessionName, uid, trainId);
   }
 
 }
