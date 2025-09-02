@@ -33,38 +33,38 @@ export class EmployeesComponent {
     }
   }
 
-  onBuyEmployee() {
-    const sessionName = this.sessionInfo().sessionName;
-    const uId = this.store.playerUid();
-    if (!sessionName || !uId) {
-      console.error('Cannot buy employee: sessionName or playerUid missing');
-      return;
-    }
-    this.store.buyEmployee(sessionName, uId);
-    console.log('buying employee with', sessionName, uId);
-  }
+  // onBuyEmployee() {
+  //   const sessionName = this.sessionInfo().sessionName;
+  //   const uId = this.store.playerUid();
+  //   if (!sessionName || !uId) {
+  //     console.error('Cannot buy employee: sessionName or playerUid missing');
+  //     return;
+  //   }
+  //   this.store.buyEmployee(sessionName, uId);
+  //   console.log('buying employee with', sessionName, uId);
+  // }
 
-  onBuyPower() {
-    const sessionName = this.sessionInfo().sessionName;
-    const uId = this.store.playerUid();
-    if (!sessionName || !uId) {
-      console.error('Cannot buy power: sessionName or playerUid missing');
-      return;
-    }
-    this.store.buyPower(sessionName, uId);
-    console.log('buying power with', sessionName, uId);
-  }
+  // onBuyPower() {
+  //   const sessionName = this.sessionInfo().sessionName;
+  //   const uId = this.store.playerUid();
+  //   if (!sessionName || !uId) {
+  //     console.error('Cannot buy power: sessionName or playerUid missing');
+  //     return;
+  //   }
+  //   this.store.buyPower(sessionName, uId);
+  //   console.log('buying power with', sessionName, uId);
+  // }
 
   onBuyPower(){
     const sessionName = this.sessionInfo().sessionName;
-    const uid = this.playerInfo().uid;
+    const uid = this.playerInfo().uId;
     this.store.buyEmployee(sessionName, uid);
     console.log('buying train with', sessionName, uid);
   }
 
-  onBuyPower(){
+  onBuyEmployee(){
     const sessionName = this.sessionInfo().sessionName;
-    const uid = this.playerInfo().uid;
+    const uid = this.playerInfo().uId;
     this.store.buyPower(sessionName, uid);
     console.log("power bought");
   }

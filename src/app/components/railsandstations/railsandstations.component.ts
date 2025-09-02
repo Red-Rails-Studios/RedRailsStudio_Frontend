@@ -44,8 +44,8 @@ export class UpgradesComponent {
 
    onUpgradeRail(railNr: number) {  
     const sessionName = this.sessionInfo().sessionName;
-    const uid = this.playerInfo().uid;
-    const railId = this.store.resources().railDtos[railNr].uid;
+    const uid = this.playerInfo().uId;
+    const railId = this.store.resources().railDtos[railNr].uId;
     console.log(railId);
     this.store.upgradeTrain(sessionName, uid, railId);
   }
@@ -63,8 +63,8 @@ export class UpgradesComponent {
 
   onUpgradeStation(stationNr: number) {
     const sessionName = this.sessionInfo().sessionName;
-    const uid = this.playerInfo().uid;
-    const stationId = this.store.resources().stationDtos[stationNr].uid;
+    const uid = this.playerInfo().uId;
+    const stationId = this.store.resources().stationDtos[stationNr].uId;
     console.log(stationId);
     this.store.upgradeTrain(sessionName, uid, stationId);
   }
