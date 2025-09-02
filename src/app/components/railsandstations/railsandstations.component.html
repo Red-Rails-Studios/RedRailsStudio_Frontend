@@ -3,6 +3,7 @@
 
   <div class="rail-list">
     <div *ngFor="let rail of rails; let i = index" class="rail-block"> 
+      <img src="assets/minecraft-rail-transport-minecart-video-game-train-png-favpng-YMMvx3JVJ9fX03eUBMqWfHntV.jpg" class="rail-pic" alt="rail picture"> <!--bild von Rail-->
       Rail Nr. {{i+1}}
       level: {{rail.level}}
       <button class="upgrade-button" (click)="onUpgradeRail(i)">upgrade<br><!--{{upgrade cost}}-->db coins</button>
@@ -13,6 +14,7 @@
 
   <div class="station-list">
       <div *ngFor="let station of stations; let i = index" class="station-block">
+        <img src="assets/skdy5fapgu791.gif" class="station-pic"> <!--bild von Station-->
         Station Nr: {{i+1}}
         level: {{station.level}}
         <button class="upgrade-button" (click)="onUpgradeStation(i)">upgrade<br><!--{{upgrade cost}}-->db coins</button>

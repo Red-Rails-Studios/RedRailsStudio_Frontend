@@ -2,27 +2,21 @@
   background-color: gray;
 }
 
-.train-block {
-  background-color:white;
+.train-block{
   color: black;
-  width: 97%;
-  height: 100px;
-  margin: 8px 0;
-  display: flex;
-  text-align: center;
+  background-color: white;
   font-size: 1.2rem;
   border: 10px solid gray;
-  grid-template-columns: 1fr;
-  grid-template-rows: 0.3fr 0.4fr 0.3fr;
-  gap: 0;
-  grid-auto-flow: row;
-  grid-template-areas:
-    "map resources resources"
-    "map tabs tabs"
-    "map tabcontent tabcontent";
+  width: 97%;
+  height: 100px;
+  display: grid;
+  grid-template-rows: 3;
+  grid-template-columns: 1;
+  grid-template-areas: "train-pic content upgrade_button";
 }
 
 .train-pic {
+  grid-area: train-pic;
   width: 80px;
   height: 80px;
   display: flex;
@@ -50,16 +44,16 @@
 }
 
 .buy-button {
-  background-color:yellowgreen;
-  color: black;
-  width: 97%;
-  height: 70px;
-  margin: 8px 0;
-  display: block;
-  text-align: center;
-  font-size: 1.2rem;
-  border-color: 10px solid gray;
-  font-family:  "Silkscreen", sans-serif;
+  // background-color:yellowgreen;
+  // color: black;
+  // width: 97%;
+  // height: 10%;
+  // margin: 8px 0;
+  // display: block;
+  // text-align: center;
+  // font-size: 1.2rem;
+  // border-color: 10px solid gray;
+  // font-family:  "Silkscreen", sans-serif;
 
   background-color:yellowgreen;
   color: black;
@@ -74,9 +68,13 @@
 }
 
 .upgrade-button {
+  grid-area: upgrade_button;
   font-family:  "Silkscreen", sans-serif;
-  width: 20%;
+  text-align: left;
+  width: 70%;
   height: 50%;
   background-color: yellowgreen;
   padding: 10px;
+  margin-left: 35%;
+  margin-top: 25%;
 }
