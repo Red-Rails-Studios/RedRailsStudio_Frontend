@@ -1,4 +1,4 @@
 export interface PlayerOverview {
-    uId: string;
+    uid: string;
     name: string;
 }

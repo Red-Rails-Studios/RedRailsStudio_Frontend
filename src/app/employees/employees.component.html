@@ -1,11 +1,14 @@
 <div class="employee-block">
-<button (click)="onBuyEmployee()" class="buy-button">
-    Buy Employee</button>
-<button (click)="onBuyPower()" class="buy-button power-button">
-    Buy Power</button>
-<div class="employee-list">
-    <ul>
-        Du hast {{employee}} Mitarbeiter
-    </ul>
-</div>
+    <img src="/assets/Manpower_DB_Icon.png" alt="employee-pic" class="employee-Pic">
+    <button (click)="onBuyEmployee()" class="buy-button">
+        Buy Employee</button>
+    <div class="employee-list">
+        <ul>
+            Du hast {{employee}} Mitarbeiter
+        </ul>
+    </div>
+    <div class="power">
+        <button class="power-button" (click)="onBuyPower()">Buy Power</button>
+            Du hast {{power}}kw/h
+    </div>
 </div>

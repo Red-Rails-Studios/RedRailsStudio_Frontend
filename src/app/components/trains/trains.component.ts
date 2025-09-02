@@ -1,8 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { Train } from '../../models/train.model';
 import { CommonModule } from '@angular/common';
-import { NgFor } from '@angular/common';
+import { NgFor, NgIf } from '@angular/common';
 import { Store } from '../../services/store';
+import { Requirements } from '../../models/requierment.model';
 
 @Component({
   selector: 'app-trains',
@@ -14,6 +15,7 @@ export class TrainsComponent {
   trains: Train[] = [];
   playerInfo = inject(Store).playerInfo;
   sessionInfo = inject(Store).sessionInfo;
+  upgrades: Requirements[] | null = [];
 
   constructor(public store: Store) {}
 
@@ -52,7 +54,7 @@ export class TrainsComponent {
     this.store.buyTrain(sessionName, uId);
   }
 
-  onUpgradeTrain(trainNr: number) {  //TODO: need to fix upgrade see other branch
+  onUpgradeTrain(trainNr: number) {  
     const sessionName = this.sessionInfo().sessionName;
     const uId = this.playerInfo().uId;
     const trainId = this.store.resources().trainDtos[trainNr].uId;

@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Train } from '../models/train.model';
 import { SessionOverview } from '../models/sessionOverview.model';
+import { SessionOverview } from '../models/sessionOverview.model';
 import { Player } from '../models/player.model';
 import { GameState } from '../models/game-state.model';
 import { Map } from '../models/map.model';
@@ -24,12 +25,20 @@ export class APISService {
     return this.http.post<{ name: string; uid: string }>(`http://localhost:8080/session/${sessionName}/${playerName}`, null);
   }
 
+  removePlayer(sessionName : String, playerUid : String) {
+    return this.http.post(`http://localhost:8080/session/${sessionName}/${playerUid}/leave`, null);
+  }
+
+  getPlayerInfos(sessionName: string, playerUid: string): Observable<any> {
+    return this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid}/resource `);
+  }
+
   startSession(sessionName: string): Observable<any> {
     return this.http.patch(`http://localhost:8080/session/${sessionName}/start`, null); //startet  session
   }
 
   createSession(sessionName: string): Observable<any> {
-    return this.http.post(`http://localhost:8080/session/${sessionName}`, null,  { responseType: 'text'}); //creates session
+    return this.http.post(`http://localhost:8080/session/${sessionName}`, null, { responseType: 'text'}); //creates session
   }
 
   killSession(sessionName: string): Observable<any> {
@@ -52,12 +61,32 @@ export class APISService {
     return this.http.get<Resources>(`http://localhost:8080/session/${sessionName}/player/${playerUid}/resource`); //holt die resources
   }
 
+  getTrainInfo(sessionName: string, playerUid: string, trainUid: string): Observable<any> {
+    return this,this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid}/train/${trainUid}`, { responseType: 'text'}); // holt infos zu einem zug
+  }
+
   buyTrain(sessionName: string, playerUid: string) {
     return this.http.post(`http://localhost:8080/session/${sessionName}/player/${playerUid}/train`, null, { responseType: 'text'}); // kauft ein zug
   }
 
+  upgradeTrain(sessionName: string, playerUid: string, trainUid: string) {
+    return this.http.patch(`http://localhost:8080/session/${sessionName}/player/${playerUid}/train/${trainUid}/upgrade`, null, {responseType: 'text'})
+  }
+
+  getRailInfo(sessionName: string, playerUid: string, railUid: string): Observable<any> {
+    return this.http.get(`http://localhost:8080//session/${sessionName}/player/${playerUid}/rail/${railUid}`, { responseType: 'text'}); //holt infos zur gleise
+  }
+
   buyRail(sessionName: string, playerUid: string) {
     return this.http.post(`http://localhost:8080/session/${sessionName}/player/${playerUid}/rail`, null, { responseType: 'text'}); //kauft ein gleis
+  }
+
+  upgradeRail(sessionName: string, playerUid:string, railId: string) {
+    return this.http.patch(`http://localhost:8080/session/${sessionName}/player/${playerUid}/rail/${railId}/upgrade`, null, {responseType: 'text'})
+  }
+
+  getStationInfo(sessionName: string, playerUid: string, stationUid: string): Observable<any> {
+    return this.http.get(`http://localhost:8080//session/${sessionName}/player/${playerUid}/station/${stationUid}`, { responseType: 'text'}); //holt zur bahnhöfe
   }
 
   buyStation(sessionName: string, playerUid: string) {

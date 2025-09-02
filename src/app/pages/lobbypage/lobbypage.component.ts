@@ -5,7 +5,6 @@ import { Router } from '@angular/router';
 import { Store } from '../../services/store';
 import { APISService } from '../../services/apis.service';
 import { Player } from '../../models/player.model';
-import { inject } from '@angular/core/testing'
 
 @Component({
   selector: 'app-lobbypage',
@@ -16,28 +15,21 @@ import { inject } from '@angular/core/testing'
 export class LobbypageComponent {
   lobbyPlayers: Player[] = [];
 
-
-
   constructor(private router: Router, public store: Store, private apiService: APISService) {}
 
   ngOnInit() {
     this.fetchPlayers();
-    setInterval(() => this.fetchPlayers(), 5000 );
+    setInterval(() => this.fetchPlayers(), 5000);
   }  
 
-  // fetchPlayers (){
-  //   this.lobbyPlayers = this.store.sessionInfo().players;
-  // }
-
-   fetchPlayers () {
-     const sessionName = this.store.sessionName();
-     if (sessionName) {
-     // this.lobbyPlayers = this.store.sessionInfo().players;
-         this.apiService.getSessionPlayers(sessionName).subscribe(players => {
-           this.lobbyPlayers = players || [];
-        });
-     }
-   } 
+  fetchPlayers () {
+    const sessionName = this.store.sessionName();
+    if (sessionName) {
+      this.apiService.getSessionPlayers(sessionName).subscribe(players => {
+        this.lobbyPlayers = players || [];
+      });
+    }
+  } 
 
   onStartSession() {
     const sessionName = this.store.sessionInfo().sessionName;

@@ -9,8 +9,10 @@ import { Store } from '../services/store';
   templateUrl: './employees.component.html',
   styleUrl: './employees.component.scss'
 })
+
 export class EmployeesComponent {
   employee = 8;
+  power = 10;
   playerInfo = inject(Store).playerInfo;
   sessionInfo = inject(Store).sessionInfo;
 
@@ -23,8 +25,10 @@ export class EmployeesComponent {
       this.store.getPlayerInfos(sessionName, playerUId);
       setInterval(() => {
         this.employee = this.store.playerInfo().employees;
-      }, 5000);
-    } else {
+        this.power = this.playerInfo().power;
+      }, 1000);
+    }
+    else {
       console.error('Session name or player UID is missing!');
     }
   }
@@ -49,5 +53,19 @@ export class EmployeesComponent {
     }
     this.store.buyPower(sessionName, uId);
     console.log('buying power with', sessionName, uId);
+  }
+
+  onBuyPower(){
+    const sessionName = this.sessionInfo().sessionName;
+    const uid = this.playerInfo().uid;
+    this.store.buyEmployee(sessionName, uid);
+    console.log('buying train with', sessionName, uid);
+  }
+
+  onBuyPower(){
+    const sessionName = this.sessionInfo().sessionName;
+    const uid = this.playerInfo().uid;
+    this.store.buyPower(sessionName, uid);
+    console.log("power bought");
   }
 }

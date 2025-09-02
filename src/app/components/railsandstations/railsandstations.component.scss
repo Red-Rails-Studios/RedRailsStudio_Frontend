@@ -25,11 +25,25 @@
   width: 97%;
   height: 100px;
   margin: 8px 0;
-  display: block;
+  display: grid;
+  grid-template-rows: 3;
+  grid-template-columns: 1;
+  grid-template-areas: "rail-pic content upgrade_button";
   text-align: center;
   font-size: 1.2rem;
   border: 10px solid gray;
   font-family:  "Silkscreen", sans-serif;
+}
+
+.rail-pic {
+    grid-area: rail-pic;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 8px;
 }
 
 .station-block {
@@ -38,11 +52,25 @@
   width: 97%;
   height: 100px;
   margin: 8px 0;
-  display: block;
+  display: grid;
+  grid-template-rows: 3;
+  grid-template-columns: 1;
+  grid-template-areas: "station-pic content upgrade_button";
   text-align: center;
   font-size: 1.2rem;
   border: 10px solid gray;
   font-family:  "Silkscreen", sans-serif;
+}
+
+.station-pic {
+    grid-area: station-pic;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 8px;
 }
 
 .buy-image {
@@ -87,10 +115,15 @@
 }
 
 .upgrade-button {
-  width: 20%;
+  width: 70%;
   height: 50%;
   background-color: yellowgreen;
   font-family:  "Silkscreen", sans-serif;
+  grid-area: upgrade_button;
+  text-align: left;
+  padding: 10px;
+  margin-left: 35%;
+  margin-top: 25%;
 }
 
 .buy-button {
@@ -116,51 +149,3 @@
   border: 10px solid gray;
   font-family:  "Silkscreen", sans-serif;
 }
-
-
-
-
-
-// .upgrade-types {
-//   display: flex;
-//   justify-content: space-around;
-//   margin-bottom: 20px;
-//   gap: 10px;
-// }
-
-// .upgrades-list {
-//   .upgrade-item {
-//     display: grid;
-//     grid-template-columns: 64px 1fr 120px;
-//     gap: 15px;
-//     align-items: center;
-//     padding: 10px;
-//     margin-bottom: 10px;
-//     background-color: #ffffff;
-//     border: 4px solid #4a4a4a;
-    
-//     .upgrade-icon {
-//       width: 64px;
-//       height: 64px;
-//       border: 2px solid #9e9e9e;
-//     }
-    
-//     .upgrade-info {
-//       h3 {
-//         margin: 0 0 5px 0;
-//         font-size: 14px;
-//         color: #f01414;
-//       }
-      
-//       p {
-//         margin: 0;
-//         font-size: 10px;
-//         color: #1a1a1a;
-        
-//         &:nth-of-type(1) {
-//           color: #4a4a4a;
-//         }
-//       }
-//     }
-//   }
-// }
