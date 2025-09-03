@@ -9,9 +9,15 @@
             
            <!-- {{upgrades[i].requiredDbCoins}} -->
             <button (click)="onUpgradeTrain(i)" class="upgrade-button">
-                <div *ngIf="upgrades !== null">
+                <div *ngIf="trainDtos.requirements && trainDtos.requirements.length">
+                    Required DB Coins: {{ upgrades[0].requiredDbCoins }}
+                </div>
+                <div *ngIf="!trainDtos.requirements || !trainDtos.requirements.length">
+                    No requirements available.
+                </div>
+                <!--<div *ngIf="upgrades !== null">
                     {{ upgrades[i].requiredDbCoins }}
-                </div>/db
+                </div>/db-->
             </button>
         </div>
     </div>

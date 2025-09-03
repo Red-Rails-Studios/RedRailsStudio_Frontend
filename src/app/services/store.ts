@@ -47,14 +47,19 @@ export class Store {
         runtime: 0
     })
 
+    upgradeResourcesTrain = signal<Requirements[]>([{
+        uId: '',
+        requiredDbCoins: 0,
+        requiredEmployees: 0,
+        requiredPower: 0
+    }]);
+
     session = signal<SessionOverview | null>(null);
     apiService = inject(APISService)
     playerUid = signal<string | null>(null);
     sessionName = signal<string | null>(null);
     playerName = signal<string | null>(null);
-    upgradeResourcesTrain = signal<Requirements[] | null>(null);
-    upgradeResourcesRail = signal<Requirements[] | null>(null);
-    upgradeResourcesStation = signal<Requirements[] | null>(null);
+    //upgradeResourcesStation = signal<Requirements[]>(null);
 
     setPlayerUid(uid: string) {
         this.playerUid.set(uid);
@@ -99,9 +104,6 @@ export class Store {
             this.resources.set(resources);
             console.log('Resources updated:', this.resources());
         })
-        for (let i = 0; i <= this.resources().trainDtos.length; i++) {
-            this.apiService.upgradeRequirementsTrain(sessionName, playerUid, this.resources().trainDtos[i].uId)
-        }
     }
 
     joinPlayer(sessionName: string, playerName: string) {
@@ -189,6 +191,17 @@ export class Store {
                 console.error('Error upgrading train', err);
             }
         });
+    }
+
+    getUpgradeRequirementsTrain(sessionName: string, playerUid: string){
+        this.apiService.upgradeRequirementsTrain(sessionName, playerUid).subscribe({
+            next: (requirements: Requirements[]) => {
+            this.upgradeResourcesTrain.set(requirements);
+        },
+        error: (err) => {
+        console.error('Error fetching train upgrades:', err);
+        }   
+        });    
     }
 
     buyRail(sessionName: string, playerUid: string) {
