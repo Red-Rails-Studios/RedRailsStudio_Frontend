@@ -26,10 +26,12 @@ export class TrainsComponent {
 
     if (sessionName && playerUId) {
       this.store.getPlayerInfos(sessionName, playerUId);
+      this.store.getUpgradeRequirementsTrain(sessionName, playerUId);
 
       setInterval(() => {
         this.trains = this.store.resources().trainDtos;
         this.upgrades = this.store.upgradeResourcesTrain();
+        console.log('test', this.upgrades[0])
         //console.log("trains updated", this.trains)
       }, 500);
     }

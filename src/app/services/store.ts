@@ -197,6 +197,7 @@ export class Store {
         this.apiService.upgradeRequirementsTrain(sessionName, playerUid).subscribe({
             next: (requirements: Requirements[]) => {
             this.upgradeResourcesTrain.set(requirements);
+            console.log('got upgrade reqiirments', requirements)
         },
         error: (err) => {
         console.error('Error fetching train upgrades:', err);
