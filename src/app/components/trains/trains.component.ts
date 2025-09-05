@@ -31,7 +31,6 @@ export class TrainsComponent {
       setInterval(() => {
         this.trains = this.store.resources().trainDtos;
         this.upgrades = this.store.upgradeResourcesTrain();
-        console.log('test', this.upgrades[0])
         //console.log("trains updated", this.trains)
       }, 500);
     }

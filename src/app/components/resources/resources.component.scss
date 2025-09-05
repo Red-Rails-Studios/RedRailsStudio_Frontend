@@ -9,7 +9,7 @@
   position: relative;
   background: #e5e5e5;
   border: 4px solid #4a4a4a;
-  padding: 15px 15px 30px 15px;
+  padding: 15px 15px 40px 15px;
   min-width: 0;
   max-width: none;
   box-sizing: border-box;
@@ -22,24 +22,36 @@
 }
 
 .resource-header {
-  display: flex;
-  flex-direction: row;
+  // display: flex;
+  // flex-direction: row;
   align-items: center;
   margin-bottom: 10px;
   gap: 10px;
+  display: grid;
+  grid-template-rows: 2;
+  grid-template-columns: 1;
+  grid-template-areas: "icon-pic content";
+  grid-template-rows: 45% 55%;
 }
 
 .pixel-icon {
-  width: 30px;
-  height: 30px;
-  margin-right: 10px;
+  grid-area: icon-pic;
+  width: 40px;
+  height: 40px;
+  margin-right: 3px;
+  background-color: #f01414;
+  display: block;
+  object-fit: contain;
 }
 
 .resource-name {
+  grid-area: content;
   font-family:  "Silkscreen", sans-serif;
   color: #1a1a1a;
   font-size: 16px;
   font-weight: 400;
+  display: flex;
+  align-items: center;
 }
 
 .resource-counter {
