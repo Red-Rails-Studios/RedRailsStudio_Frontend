@@ -121,6 +121,13 @@ export class MapComponent implements OnInit, AfterViewInit {
     });
   }
 
+reloadMap() {
+    const sessionName = this.store.sessionName() || this.store.sessionInfo().sessionName;
+    if (sessionName) {
+      this.loadMap(sessionName);
+    }
+}
+
   @HostListener('window:resize')
   onWindowResize(): void {
     this.updateCanvasSize();
