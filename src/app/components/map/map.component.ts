@@ -226,4 +226,40 @@ reloadMap() {
       }
     }
   }
+
+  // helper: detect whether a station is owned/bought
+  private isStationBought(station: any): boolean {
+    if (!station) return false;
+
+    // common field names checked in order
+    if ('bought' in station) return !!station.bought;
+    if ('purchased' in station) return !!station.purchased;
+    if ('ownerId' in station) return station.ownerId !== null && station.ownerId !== undefined && station.ownerId !== 0;
+    if ('playerId' in station) return station.playerId !== null && station.playerId !== undefined;
+    if ('owner' in station && station.owner) {
+      const o = station.owner;
+      return !!(o.id || o.playerId || o.name);
+    }
+
+    return false;
+  }
+
+  // replace or update your station drawing routine to use isStationBought()
+  private drawStations(ctx: CanvasRenderingContext2D, stations: any[]) {
+    const radius = 6; // adjust to your existing radius variable if present
+    stations.forEach(station => {
+      const x = station.x ?? station.posX ?? station.cx; // fallback names if needed
+      const y = station.y ?? station.posY ?? station.cy;
+
+      const bought = this.isStationBought(station);
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fillStyle = bought ? '#2ecc71' : '#e74c3c'; // green if bought, red otherwise
+      ctx.fill();
+
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#222';
+      ctx.stroke();
+    });
+  }
 }
