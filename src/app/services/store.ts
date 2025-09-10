@@ -49,7 +49,7 @@ export class Store {
 
     upgradeResourcesTrain = signal<Requirements[]>([{
         uId: '',
-        requiredDbCoins: 0,
+        requiredDbCoin: 0,
         requiredEmployees: 0,
         requiredPower: 0
     }]);

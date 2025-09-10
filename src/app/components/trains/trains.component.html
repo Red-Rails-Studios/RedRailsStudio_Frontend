@@ -7,14 +7,8 @@
             train Nr. {{i+1}}
             level:{{trainDtos.level}}
             
-           {{upgrades[i].requiredDbCoins}}
-                       <button (click)="onUpgradeTrain(i)" class="upgrade-button">
-                <div *ngIf="upgrades[i]">
-                    <!-- Required DB Coins:--> {{upgrades[i].requiredDbCoins}} <!-- //TODO: it doesnt show-->
-                </div>
-                <div *ngIf="!upgrades[i]">
-                    No requirements available.
-                </div>
+            <button (click)="onUpgradeTrain(i)" class="upgrade-button">
+                {{upgrades[i].requiredDbCoin}}
             </button>
         </div>
     </div>
