@@ -13,7 +13,7 @@
   - Farben/Umrandungen hängen vom Location-Typ ab (z.B. STATION, RAIL, EMPTY).
   - Für Stationen wird zusätzlich ein kleiner roter Marker sowie optional ein Name (Text) gezeichnet.
 */
-import { Component, OnInit, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import type { Map as GameMap } from '../../models/map.model';
 import { APISService } from '../../services/apis.service';
@@ -24,7 +24,7 @@ import { Store } from '../../services/store';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './map.component.html',
-  styleUrl: './map.component.scss'
+  styleUrls: ['./map.component.scss']
 })
 export class MapComponent implements OnInit, AfterViewInit {
   public mapData: GameMap | null = null;
@@ -32,28 +32,34 @@ export class MapComponent implements OnInit, AfterViewInit {
   public errorMsg: string | null = null;
   private pollIntervalId: any = null;
 
-  // DE: Referenz auf das Canvas-Element im Template. Darüber erhalten wir den 2D-Zeichenkontext.
-  @ViewChild('mapCanvas', { static: false }) canvasRef!: ElementRef<HTMLCanvasElement>;
-  // DE: Kachelgröße (ehemals .cell Breite/Höhe). Bestimmt die gezeichnete Größe jedes Feldes.
-  tileSize = 24;
-  // DE: Lücke zwischen Kacheln (entsprach früher dem Grid-Gap). Wird in die Positionsberechnung einbezogen.
+  @ViewChild('mapCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
+
+  // logical map size (natural, before scaling)
+  private naturalWidth = 600;
+  private naturalHeight = 400;
+
+  // scale applied to fit parent
+  private scale = 1;
+
+  // tile layout (logical pixels)
+  tileSize = 32;
   gap = 2;
-  // DE: Effektive Canvas-Breite/-Höhe in Pixeln. Wird aus Zeilen/Spalten dynamisch berechnet.
-  canvasWidth = 0;
-  canvasHeight = 0;
+
+  // css size shown to user (in CSS pixels)
+  canvasWidth = 600;
+  canvasHeight = 400;
+
+  // if map loads before view init, request a later redraw
+  private pendingDraw = false;
 
   constructor(private apiService: APISService, public store: Store) {}
 
   ngOnInit(): void {
-    // DE: Initialisierung wie zuvor. Wir warten ggf. per Polling auf die Session, laden dann die Map-Daten.
     const sessionNameSignal = this.store.sessionName();
     const sessionOverviewName = this.store.sessionInfo().sessionName;
     const sessionName = sessionNameSignal || sessionOverviewName;
 
-    console.log('🗺️ MapComponent init. sessionName signal:', sessionNameSignal, 'sessionInfo:', sessionOverviewName);
-
     if (!sessionName) {
-      console.warn('MapComponent: no sessionName available yet, starting poll to wait for sessionName...');
       let attempts = 0;
       this.pollIntervalId = setInterval(() => {
         attempts++;
@@ -62,131 +68,155 @@ export class MapComponent implements OnInit, AfterViewInit {
           clearInterval(this.pollIntervalId);
           this.pollIntervalId = null;
           this.loadMap(sName);
-        } else if (attempts > 30) { // ~30 seconds
+        } else if (attempts > 30) {
           clearInterval(this.pollIntervalId);
           this.pollIntervalId = null;
-          console.warn('MapComponent: sessionName did not appear within timeout');
         }
       }, 1000);
       return;
     }
 
-    
     this.loadMap(sessionName);
+  }
+
+  ngAfterViewInit(): void {
+    // If map already loaded before view init, trigger sizing + draw now
+    this.updateCanvasSize();
+    if (this.pendingDraw) {
+      this.pendingDraw = false;
+      this.scheduleDraw();
+    } else {
+      this.drawMap();
+    }
   }
 
   loadMap(sessionName: string) {
     this.loading = true;
     this.errorMsg = null;
-    console.log('MapComponent: loading map for session:', sessionName);
     this.apiService.getMap(sessionName).subscribe({
       next: (m) => {
         this.mapData = m;
         this.loading = false;
-        // DE: Nach dem Laden die Canvas-Abmessungen anhand der Karten-Daten bestimmen
+
+        // compute natural size from data
+        if (this.mapData?.map?.length) {
+          const rows = this.mapData.map.length;
+          const cols = this.mapData.map[0]?.length || 0;
+          this.naturalWidth = Math.max(1, cols * (this.tileSize + this.gap));
+          this.naturalHeight = Math.max(1, rows * (this.tileSize + this.gap));
+        }
+
+        // update sizing and draw; if canvasRef isn't ready yet, defer draw
         this.updateCanvasSize();
-        // DE: Danach die Karte auf das Canvas zeichnen (asynchron, nach Render-Zyklus)
-        this.scheduleDraw();
-        console.log('Map loaded:', m);
+        if (this.canvasRef?.nativeElement) {
+          this.scheduleDraw();
+        } else {
+          this.pendingDraw = true;
+        }
       },
       error: (err) => {
         this.loading = false;
         this.errorMsg = `Failed to load map: ${err?.status || ''} ${err?.statusText || ''}`;
-        console.error('Failed to load map', err);
       }
     });
   }
 
-  
-  reloadMap() {
-    const sName = this.store.sessionName() || this.store.sessionInfo().sessionName;
-    if (!sName) {
-      this.errorMsg = 'No session name available to load map.';
-      console.warn('reloadMap: no session name');
-      return;
-    }
-    console.log('Manual reloadMap triggered for session:', sName);
-    this.loadMap(sName);
-  }
-
-  /**
-   * DE: Nach dem Initialisieren des View (Canvas existiert im DOM) einmal zeichnen,
-   * falls mapData bereits vorhanden ist. Andernfalls wird nach dem Laden gezeichnet.
-   */
-  ngAfterViewInit(): void {
-    // DE: Zeichnen einplanen; drawMap greift über canvasRef auf das Canvas zu.
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.updateCanvasSize();
     this.scheduleDraw();
   }
 
-  /**
-   * DE: Berechnet die effektive Canvas-Größe auf Basis der Karten-Dimensionen.
-   * Formel: Breite = cols * tileSize + (cols - 1) * gap (analog für Höhe mit rows)
-   */
   private updateCanvasSize(): void {
-    const rows = this.mapData?.map?.length || 0;
-    const cols = rows > 0 ? (this.mapData!.map[0]?.length || 0) : 0;
-    if (rows <= 0 || cols <= 0) {
-      this.canvasWidth = 0;
-      this.canvasHeight = 0;
-      return;
+    const canvas = this.canvasRef?.nativeElement;
+    // If canvas not available yet, we cannot size backing store; leave css size defaults
+    if (!canvas) return;
+
+    const dpr = window.devicePixelRatio || 1;
+
+    // Fit the natural map to the parent container while preserving aspect
+    const parent = canvas.parentElement!;
+    const rect = parent.getBoundingClientRect();
+    const sx = rect.width / this.naturalWidth;
+    const sy = rect.height / this.naturalHeight;
+    this.scale = Math.min(sx || 1, sy || 1, 1.5); // don't upscale too much
+
+    // css size visible to user
+    this.canvasWidth = Math.max(1, Math.floor(this.naturalWidth * this.scale));
+    this.canvasHeight = Math.max(1, Math.floor(this.naturalHeight * this.scale));
+
+    // backing store size in physical pixels (use css size * dpr)
+    const backingW = Math.max(1, Math.floor(this.canvasWidth * dpr));
+    const backingH = Math.max(1, Math.floor(this.canvasHeight * dpr));
+
+    canvas.width = backingW;
+    canvas.height = backingH;
+
+    // set CSS size (what user sees)
+    canvas.style.width = `${this.canvasWidth}px`;
+    canvas.style.height = `${this.canvasHeight}px`;
+
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      // scale drawing to device pixels; we will account for "scale" in drawing coordinates
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
-    this.canvasWidth = cols * this.tileSize + (cols - 1) * this.gap;   // DE: Kachelbreiten + Lücken
-    this.canvasHeight = rows * this.tileSize + (rows - 1) * this.gap; // DE: Kachelhöhen + Lücken
   }
 
-  /**
-   * DE: Zeichnen in den nächsten Tick verschieben, damit Angular DOM/Template aktualisiert hat
-   * und das Canvas-Element inklusive Abmessungen garantiert bereitsteht.
-   */
   private scheduleDraw(): void {
-    setTimeout(() => this.drawMap(), 0);
+    if (typeof requestAnimationFrame !== 'undefined') {
+      requestAnimationFrame(() => this.drawMap());
+    } else {
+      setTimeout(() => this.drawMap(), 0);
+    }
   }
 
-  /**
-   * DE: Zeichnet die gesamte Karte auf das Canvas.
-   * Ablauf:
-   * 1) 2D-Kontext holen und Canvas leeren
-   * 2) Über alle Zeilen/Spalten iterieren
-   * 3) Für jede Zelle Position (px, py) aus (tileSize + gap) berechnen
-   * 4) Füll-/Linienfarbe abhängig vom Location-Typ setzen
-   * 5) Kachel zeichnen (fillRect + strokeRect)
-   * 6) Optionalen Marker und Namen für Stationen rendern
-   */
   private drawMap(): void {
     const canvas = this.canvasRef?.nativeElement;
     if (!canvas || !this.mapData) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // DE: Canvas vollständig leeren, damit der neue Frame ohne Artefakte gezeichnet wird.
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // clear using CSS pixel size (we draw using scaled coordinates)
+    ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 
-    // DE: Dimensionen der Karte bestimmen
+    if (!this.mapData.map || !this.mapData.map.length) return;
+
     const rows = this.mapData.map.length;
     const cols = this.mapData.map[0]?.length || 0;
 
+    // scaled tile sizes in CSS pixels
+    const tilePx = (this.tileSize + this.gap) * this.scale;
+    const tileSizeScaled = this.tileSize * this.scale;
+    const gapScaled = this.gap * this.scale;
+
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
+        const px = x * tilePx;
+        const py = y * tilePx;
+
+        const cx = px + tileSizeScaled / 2;
+        const cy = py + tileSizeScaled / 2;
+        const r = Math.max(2, Math.floor(tileSizeScaled * 0.25));
+
         const field = this.mapData.map[y][x];
-        const locType = field?.location?.type || 'EMPTY';
 
-        // DE: Pixel-Position der Zelle: Index * (Kachelgröße + Lücke)
-        const px = x * (this.tileSize + this.gap);
-        const py = y * (this.tileSize + this.gap);
+        // robust station detection
+        const rawType = field?.location?.type;
+        const typeStr = rawType == null ? '' : String(rawType).toUpperCase();
+        const isStation = typeStr.includes('STATION') || !!field?.location?.station;
 
-        // Dot color: black for stations, grey for non-stations
-        ctx.fillStyle = locType === 'STATION' ? '#000000' : '#9e9e9e';
-        ctx.lineWidth = 0.5;
-
-        // Draw a circle/dot at the center of the tile
-        const cx = px + this.tileSize / 2;
-        const cy = py + this.tileSize / 2;
-        const r = Math.floor(this.tileSize * 0.35);
         ctx.beginPath();
-        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fillStyle = isStation ? '#d62828' : '#2e2e2e';
+        ctx.arc(cx, cy, isStation ? Math.max(4, Math.floor(tileSizeScaled * 0.18)) : r, 0, Math.PI * 2);
         ctx.fill();
 
-              }
+        if (isStation) {
+          ctx.lineWidth = 1;
+          ctx.strokeStyle = '#8b0000';
+          ctx.stroke();
+        }
+      }
     }
   }
 }

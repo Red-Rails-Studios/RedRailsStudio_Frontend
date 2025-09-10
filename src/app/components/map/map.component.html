@@ -1,13 +1,9 @@
 <div class="map-container">
   <div class="pixel-map" *ngIf="mapData as md">
-    <canvas #mapCanvas
-            class="map-canvas"
-            [attr.width]="canvasWidth"
-            [attr.height]="canvasHeight"
-            [style.width.px]="canvasWidth"
-            [style.height.px]="canvasHeight">
-    </canvas>
+    <!-- let TS manage backing store and CSS size; remove Angular width/height bindings -->
+    <canvas #mapCanvas class="map-canvas"></canvas>
   </div>
+
   <div class="pixel-map" *ngIf="!mapData">
     <div class="loading">{{ loading ? 'Loading map...' : 'Map not loaded' }}</div>
     <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
