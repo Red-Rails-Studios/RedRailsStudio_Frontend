@@ -52,7 +52,22 @@ export class Store {
         requiredDbCoin: 0,
         requiredEmployees: 0,
         requiredPower: 0
-    }]);
+    }])
+
+    upgradeResourcesRail = signal<Requirements[]>([{
+        uId: '',
+        requiredDbCoin: 0,
+        requiredEmployees: 0,
+        requiredPower: 0
+    }])
+
+    upgradeResourcesStation = signal<Requirements[]>([{
+        uId: '',
+        requiredDbCoin: 0,
+        requiredEmployees: 0,
+        requiredPower: 0
+    }])
+    
 
     session = signal<SessionOverview | null>(null);
     apiService = inject(APISService)
@@ -227,14 +242,17 @@ export class Store {
         });
     }
 
-    // upgradeRequirementsRail(sessionName: string, playerUid: string, railId: string) {
-    //     this.apiService.upgradeRequirementsRail(sessionName, playerUid, railId)
-    //       .subscribe((upgradeResourcesRail: Requirements[]) => {
-    //           this.upgradeResourcesRail.set(upgradeResourcesRail);
-    //       }, (err) => {
-    //           console.error('Error fetching rail requirements', err);
-    //       });
-    // }
+    getUpgradeRequirementsRail(sessionName: string, playerUid: string){
+        this.apiService.upgradeRequirementsRail(sessionName, playerUid).subscribe({
+            next: (requirements: Requirements[]) => {
+            this.upgradeResourcesRail.set(requirements);
+            console.log('got upgrade reqiirments', requirements)
+        },
+        error: (err) => {
+        console.error('Error fetching rail upgrades:', err);
+        }   
+        });    
+    }
 
     buyStation(sessionName: string, playerUid: string) {
         this.apiService.buyStation(sessionName, playerUid).subscribe({

@@ -4,11 +4,20 @@
     <div class="train-list">
         <div *ngFor="let trainDtos of trains; let i=index" class="train-block">
             <img class="train-pic" src="assets/retro-pixel-art-train-tracks-vibrant-detailed-digital-illustration_1292377-15709.avif" alt="button Image">
-            train Nr. {{i+1}}
-            level:{{trainDtos.level}}
+            
+            <div class="inhalt">
+                train Nr.{{i+1}}
+                level:{{trainDtos.level}}
+                <div class="requirements">
+                REQUIRMENTS: <br>
+                db coins:{{upgrades[i].requiredDbCoin}} <br>
+                power: {{upgrades[i].requiredPower}}<br>
+                employees: {{upgrades[i].requiredEmployees}}
+                </div>
+            </div>
             
             <button (click)="onUpgradeTrain(i)" class="upgrade-button">
-                {{upgrades[i].requiredDbCoin}}
+                Upgrade Train
             </button>
         </div>
     </div>

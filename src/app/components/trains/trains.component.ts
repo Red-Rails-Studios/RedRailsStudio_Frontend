@@ -33,7 +33,7 @@ export class TrainsComponent {
         this.upgrades = this.store.upgradeResourcesTrain();
         console.log(this.upgrades);
         //console.log("trains updated", this.trains)
-      }, 50000);
+      }, 5000);
     }
   }
 

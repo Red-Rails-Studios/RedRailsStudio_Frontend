@@ -58,6 +58,7 @@
 
 .upgrade-button {
   grid-area: upgrade_button;
+  color: white;
   font-family:  "Silkscreen", sans-serif;
   text-align: left;
   width: 70%;
@@ -66,4 +67,14 @@
   padding: 10px;
   // margin-left: 30%;
   // margin-top: 30%;
+}
+
+.inhalt {
+  grid-area: content;
+  font-size: 20px;
+}
+
+.requirements {
+  grid-area: content;
+  font-size: 11px;
 }

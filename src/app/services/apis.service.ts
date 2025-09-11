@@ -77,9 +77,9 @@ export class APISService {
     return this.http.patch(`http://localhost:8080/session/${sessionName}/player/${playerUid}/rail/${railId}/upgrade`, null, {responseType: 'text'})
   }
 
-  // upgradeRequirementsRail(sessionName: string, playerUid: string, railId: string){  //find URL
-  //   return this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid}/rail/${railId}/upgradeRequirements`);
-  // }
+  upgradeRequirementsRail(sessionName: string, playerUid: string): Observable<Requirements[]>{
+    return this.http.get<Requirements[]>(`http://localhost:8080/session/${sessionName}/player/${playerUid}/rails/getUpgradeRequirements`);
+  }
 
   getStationInfo(sessionName: string, playerUid: string, stationUid: string): Observable<any> {
     return this.http.get(`http://localhost:8080//session/${sessionName}/player/${playerUid}/station/${stationUid}`, { responseType: 'text'}); //holt zur bahnhöfe
@@ -93,9 +93,9 @@ export class APISService {
     return this.http.patch(`http://localhost:8080/session/${sessionName}/player/${playerUid}/Station/${stationUid}/upgrade`, null, {responseType: 'text'})
   }
 
-  // upgradeRequirementsStation(sessionName: string, playerUid: string, stationId: string){   //find URL
-  //   return this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid}/station/${stationId}/upgradeRequirements`);
-  // }
+  upgradeRequirementsStations(sessionName: string, playerUid: string): Observable<Requirements[]>{
+    return this.http.get<Requirements[]>(`http://localhost:8080/session/${sessionName}/player/${playerUid}/stations/getUpgradeRequirements`);
+  }
 
   getSessionInfo(sessionName: string): Observable<SessionOverview> {
     return this.http.get<SessionOverview>(`http://localhost:8080/session/${sessionName}`);
