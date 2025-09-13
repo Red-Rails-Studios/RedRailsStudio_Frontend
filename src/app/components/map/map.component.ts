@@ -52,6 +52,10 @@ export class MapComponent implements OnInit, AfterViewInit {
   // if map loads before view init, request a later redraw
   private pendingDraw = false;
 
+  // image for Germany background
+  private mapImage: HTMLImageElement | null = null;
+  private imageLoaded = false;
+
   constructor(private apiService: APISService, public store: Store) {}
 
   ngOnInit(): void {
@@ -80,6 +84,9 @@ export class MapComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    // load background image for the map
+    this.loadMapImage();
+
     // If map already loaded before view init, trigger sizing + draw now
     this.updateCanvasSize();
     if (this.pendingDraw) {
@@ -88,6 +95,22 @@ export class MapComponent implements OnInit, AfterViewInit {
     } else {
       this.drawMap();
     }
+  }
+
+  private loadMapImage(): void {
+    if (this.mapImage) return;
+    const img = new Image();
+    img.src = 'assets/Deutschland-umriss.svg';
+    img.onload = () => {
+      this.mapImage = img;
+      this.imageLoaded = true;
+      this.scheduleDraw();
+    };
+    img.onerror = (e) => {
+      console.warn('Failed to load map image', e);
+      this.mapImage = null;
+      this.imageLoaded = false;
+    };
   }
 
   loadMap(sessionName: string) {
@@ -192,20 +215,41 @@ reloadMap() {
     const rows = this.mapData.map.length;
     const cols = this.mapData.map[0]?.length || 0;
 
-    // scaled tile sizes in CSS pixels
-    const tilePx = (this.tileSize + this.gap) * this.scale;
-    const tileSizeScaled = this.tileSize * this.scale;
-    const gapScaled = this.gap * this.scale;
+    // If we have a background image, draw it centered preserving aspect ratio
+    let imgLeft = 0;
+    let imgTop = 0;
+    let drawW = this.canvasWidth;
+    let drawH = this.canvasHeight;
+
+    if (this.mapImage && this.imageLoaded) {
+      const img = this.mapImage;
+      // compute image draw size preserving aspect ratio
+      const imgAspect = (img.width || 1) / (img.height || 1);
+      const canvasAspect = this.canvasWidth / this.canvasHeight;
+      if (imgAspect > canvasAspect) {
+        drawW = this.canvasWidth;
+        drawH = this.canvasWidth / imgAspect;
+      } else {
+        drawH = this.canvasHeight;
+        drawW = this.canvasHeight * imgAspect;
+      }
+      imgLeft = Math.max(0, (this.canvasWidth - drawW) / 2);
+      imgTop = Math.max(0, (this.canvasHeight - drawH) / 2);
+
+      // draw the image as background
+      ctx.drawImage(img, imgLeft, imgTop, drawW, drawH);
+    } else {
+      // fallback: fill a subtle background so map dots remain visible
+      ctx.fillStyle = '#fafafa';
+      ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+    }
+
+    // compute cell size mapped into the image rectangle
+    const cellW = drawW / Math.max(1, cols);
+    const cellH = drawH / Math.max(1, rows);
 
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
-        const px = x * tilePx;
-        const py = y * tilePx;
-
-        const cx = px + tileSizeScaled / 2;
-        const cy = py + tileSizeScaled / 2;
-        const r = Math.max(2, Math.floor(tileSizeScaled * 0.25));
-
         const field = this.mapData.map[y][x];
 
         // robust station detection
@@ -213,16 +257,28 @@ reloadMap() {
         const typeStr = rawType == null ? '' : String(rawType).toUpperCase();
         const isStation = typeStr.includes('STATION') || !!field?.location?.station;
 
+        // Make non-station dots transparent by not drawing them
+        if (!isStation) {
+          continue;
+        }
+
+        // map cell center into the image rect
+        const cx = imgLeft + x * cellW + cellW / 2;
+        const cy = imgTop + y * cellH + cellH / 2;
+
+        // determine ownership and color stations accordingly
+        const stationObj = field?.location?.station ?? field?.location ?? field;
+        const bought = this.isStationBought(stationObj);
+
         ctx.beginPath();
-        ctx.fillStyle = isStation ? '#d62828' : '#2e2e2e';
-        ctx.arc(cx, cy, isStation ? Math.max(4, Math.floor(tileSizeScaled * 0.18)) : r, 0, Math.PI * 2);
+        const markerRadius = Math.max(4, Math.floor(Math.min(cellW, cellH) * 0.18));
+        ctx.arc(cx, cy, markerRadius, 0, Math.PI * 2);
+        ctx.fillStyle = bought ? '#2ecc71' /* green */ : '#d62828' /* red */;
         ctx.fill();
 
-        if (isStation) {
-          ctx.lineWidth = 1;
-          ctx.strokeStyle = '#8b0000';
-          ctx.stroke();
-        }
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = bought ? '#0b6623' /* darker green */ : '#8b0000' /* dark red */;
+        ctx.stroke();
       }
     }
   }
