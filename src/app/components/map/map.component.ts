@@ -55,6 +55,8 @@ export class MapComponent implements OnInit, AfterViewInit {
   // image for Germany background
   private mapImage: HTMLImageElement | null = null;
   private imageLoaded = false;
+  // bounding box of actual drawn content inside the image (image px coords)
+  private mapImageContentBounds: { left: number; top: number; width: number; height: number } | null = null;
 
   constructor(private apiService: APISService, public store: Store) {}
 
@@ -104,6 +106,8 @@ export class MapComponent implements OnInit, AfterViewInit {
     img.onload = () => {
       this.mapImage = img;
       this.imageLoaded = true;
+      // compute the content bounds on the rasterized image once
+      this.computeImageContentBounds(img);
       this.scheduleDraw();
     };
     img.onerror = (e) => {
@@ -111,6 +115,57 @@ export class MapComponent implements OnInit, AfterViewInit {
       this.mapImage = null;
       this.imageLoaded = false;
     };
+  }
+
+  // Rasterize the loaded image and detect non-transparent pixel bbox.
+  // Sampling is used to limit CPU for very large images.
+  private computeImageContentBounds(img: HTMLImageElement): void {
+    try {
+      const iw = img.naturalWidth || img.width || 600;
+      const ih = img.naturalHeight || img.height || 400;
+      const tmp = document.createElement('canvas') as HTMLCanvasElement;
+      tmp.width = iw;
+      tmp.height = ih;
+      const tctx = tmp.getContext('2d');
+      if (!tctx) return;
+      tctx.clearRect(0, 0, iw, ih);
+      tctx.drawImage(img, 0, 0, iw, ih);
+
+      // sample step: target ~800px max dimension for scanning
+      const maxScan = 800;
+      const step = Math.max(1, Math.floor(Math.max(iw, ih) / maxScan));
+
+      const data = tctx.getImageData(0, 0, iw, ih).data;
+      let minX = iw, minY = ih, maxX = 0, maxY = 0;
+      for (let yy = 0; yy < ih; yy += step) {
+        for (let xx = 0; xx < iw; xx += step) {
+          const idx = (yy * iw + xx) * 4;
+          const alpha = data[idx + 3];
+          if (alpha > 10) { // treat >10 as drawn
+            if (xx < minX) minX = xx;
+            if (xx > maxX) maxX = xx;
+            if (yy < minY) minY = yy;
+            if (yy > maxY) maxY = yy;
+          }
+        }
+      }
+
+      if (minX <= maxX && minY <= maxY) {
+        // expand bounds slightly to compensate for sampling
+        const padX = Math.min(10, Math.floor((maxX - minX) * 0.03));
+        const padY = Math.min(10, Math.floor((maxY - minY) * 0.03));
+        minX = Math.max(0, minX - padX);
+        minY = Math.max(0, minY - padY);
+        maxX = Math.min(iw - 1, maxX + padX);
+        maxY = Math.min(ih - 1, maxY + padY);
+        this.mapImageContentBounds = { left: minX, top: minY, width: maxX - minX + 1, height: maxY - minY + 1 };
+      } else {
+        this.mapImageContentBounds = null;
+      }
+    } catch (e) {
+      console.warn('computeImageContentBounds failed', e);
+      this.mapImageContentBounds = null;
+    }
   }
 
   loadMap(sessionName: string) {
@@ -244,9 +299,24 @@ reloadMap() {
       ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
     }
 
-    // compute cell size mapped into the image rectangle
-    const cellW = drawW / Math.max(1, cols);
-    const cellH = drawH / Math.max(1, rows);
+    // compute content rectangle inside the drawn image where actual map is painted
+    let contentLeft = imgLeft;
+    let contentTop = imgTop;
+    let contentW = drawW;
+    let contentH = drawH;
+    if (this.mapImageContentBounds && this.mapImage) {
+      const ib = this.mapImageContentBounds;
+      const scaleX = drawW / (this.mapImage.naturalWidth || this.mapImage.width || drawW);
+      const scaleY = drawH / (this.mapImage.naturalHeight || this.mapImage.height || drawH);
+      contentLeft = imgLeft + ib.left * scaleX;
+      contentTop = imgTop + ib.top * scaleY;
+      contentW = Math.max(1, ib.width * scaleX);
+      contentH = Math.max(1, ib.height * scaleY);
+    }
+
+    // compute cell size mapped into the content rectangle
+    const cellW = contentW / Math.max(1, cols);
+    const cellH = contentH / Math.max(1, rows);
 
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
@@ -262,9 +332,9 @@ reloadMap() {
           continue;
         }
 
-        // map cell center into the image rect
-        const cx = imgLeft + x * cellW + cellW / 2;
-        const cy = imgTop + y * cellH + cellH / 2;
+        // map cell center into the content rect
+        const cx = contentLeft + x * cellW + cellW / 2;
+        const cy = contentTop + y * cellH + cellH / 2;
 
         // determine ownership and color stations accordingly
         const stationObj = field?.location?.station ?? field?.location ?? field;
