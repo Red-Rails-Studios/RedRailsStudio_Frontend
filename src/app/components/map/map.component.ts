@@ -102,7 +102,7 @@ export class MapComponent implements OnInit, AfterViewInit {
   private loadMapImage(): void {
     if (this.mapImage) return;
     const img = new Image();
-    img.src = 'assets/Deutschland-umriss.svg';
+    img.src = 'assets/Deutschland.svg';
     img.onload = () => {
       this.mapImage = img;
       this.imageLoaded = true;
@@ -241,6 +241,9 @@ reloadMap() {
     canvas.style.width = `${this.canvasWidth}px`;
     canvas.style.height = `${this.canvasHeight}px`;
 
+    // ensure a visible CSS fallback border
+    canvas.style.border = '2px solid #000';
+
     const ctx = canvas.getContext('2d');
     if (ctx) {
       // scale drawing to device pixels; we will account for "scale" in drawing coordinates
@@ -313,6 +316,34 @@ reloadMap() {
       contentW = Math.max(1, ib.width * scaleX);
       contentH = Math.max(1, ib.height * scaleY);
     }
+
+    // draw a visible black border around the content rectangle
+    ctx.save();
+    // draw border as four stroked lines inset by half the stroke width
+    const borderWidth = Math.max(2, Math.round(2 * this.scale)); // scale slightly with zoom
+    const bw = Math.min(borderWidth, Math.floor(Math.min(contentW, contentH) / 2));
+    if (contentW > 0 && contentH > 0 && bw > 0) {
+      const inset = bw / 2;
+      // inset coordinates to keep stroke entirely inside the content rect
+      const leftI = Math.round(contentLeft + inset);
+      const topI = Math.round(contentTop + inset);
+      const rightI = Math.round(contentLeft + contentW - inset);
+      const bottomI = Math.round(contentTop + contentH - inset);
+
+      ctx.beginPath();
+      ctx.lineWidth = bw;
+      ctx.strokeStyle = '#000';
+      ctx.lineJoin = 'miter';
+      ctx.lineCap = 'butt';
+      // draw the four sides as one closed polyline
+      ctx.moveTo(leftI, topI);
+      ctx.lineTo(rightI, topI);      // top
+      ctx.lineTo(rightI, bottomI);   // right
+      ctx.lineTo(leftI, bottomI);    // bottom
+      ctx.lineTo(leftI, topI);       // left (close)
+      ctx.stroke();
+    }
+    ctx.restore();
 
     // compute cell size mapped into the content rectangle
     const cellW = contentW / Math.max(1, cols);
