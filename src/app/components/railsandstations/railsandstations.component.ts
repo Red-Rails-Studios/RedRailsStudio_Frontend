@@ -4,6 +4,7 @@ import { Rail } from '../../models/rail.model';
 import { Station } from '../../models/station.model';
 import { CommonModule } from '@angular/common';
 import { NgFor } from '@angular/common';
+import { Requirements } from '../../models/requierment.model';
 
 @Component({
   selector: 'app-upgrades',
@@ -14,6 +15,8 @@ import { NgFor } from '@angular/common';
 export class UpgradesComponent {
   rails: Rail[] = [];
   stations: Station[] = [];
+  upgradesRail: Requirements[] = [];
+  upgradesStation: Requirements[] = [];
   playerInfo = inject(Store).playerInfo;
   sessionInfo = inject(Store).sessionInfo;
 
@@ -28,6 +31,8 @@ export class UpgradesComponent {
       //console.log("rails updated", this.rails);
       this.stations = this.store.resources().stationDtos;
       //console.log("stations updated", this.stations)
+      this.upgradesRail = this.store.upgradeResourcesRail();
+      this.upgradesStation = this.store.upgradeResourcesStation();
     }, 1000);
   }
 

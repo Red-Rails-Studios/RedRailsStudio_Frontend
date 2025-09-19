@@ -6,6 +6,10 @@
       <img src="assets/minecraft-rail-transport-minecart-video-game-train-png-favpng-YMMvx3JVJ9fX03eUBMqWfHntV.jpg" class="rail-pic" alt="rail picture"> <!--bild von Rail-->
       Rail Nr. {{i+1}}
       level: {{rail.level}}
+      UPGRADE REQUIRMENTS: <br>
+      db coins:{{upgradesRail[i].requiredDbCoin}} <br>
+      power: {{upgradesRail[i].requiredPower}}<br>
+      employees: {{upgradesRail[i].requiredEmployees}}
       <button class="upgrade-button" (click)="onUpgradeRail(i)">upgrade<br><!--{{upgrade cost}}-->db coins</button>
     </div>
   </div>
@@ -17,6 +21,10 @@
         <img src="assets/skdy5fapgu791.gif" class="station-pic"> <!--bild von Station-->
         Station Nr: {{i+1}}
         level: {{station.level}}
+        UPGRADE REQUIRMENTS: <br>
+        db coins:{{upgradesStation[i].requiredDbCoin}} <br>
+        power: {{upgradesStation[i].requiredPower}}<br>
+        employees: {{upgradesStation[i].requiredEmployees}}
         <button class="upgrade-button" (click)="onUpgradeStation(i)">upgrade<br><!--{{upgrade cost}}-->db coins</button>
       </div>
   </div>

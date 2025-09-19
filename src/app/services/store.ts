@@ -193,6 +193,7 @@ export class Store {
             },
             error: (err) => {
                 console.error('Error buying train:', err);
+                alert("not enough resources");
             }
         });
     }
