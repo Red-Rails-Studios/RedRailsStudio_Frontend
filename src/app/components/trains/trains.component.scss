@@ -56,8 +56,14 @@
   font-family:  "Silkscreen", sans-serif;
 }
 
-.upgrade-button {
+.upgrade_button_area {
   grid-area: upgrade_button;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.upgrade-button {
   color: white;
   font-family:  "Silkscreen", sans-serif;
   text-align: left;
@@ -65,8 +71,6 @@
   height: 50%;
   background-color: yellowgreen;
   padding: 10px;
-  // margin-left: 30%;
-  // margin-top: 30%;
 }
 
 .inhalt {

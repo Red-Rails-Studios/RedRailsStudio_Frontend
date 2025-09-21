@@ -228,6 +228,7 @@ export class Store {
             },
             error: (err) => {
                 console.error('Error buying station:', err);
+                alert("not enough resources");
             }
         });
     }
@@ -262,6 +263,7 @@ export class Store {
             },
             error: (err) => {
                 console.error('Error buying station:', err);
+                alert("not enough resources");
             }
         });
     }
