@@ -279,14 +279,14 @@ export class Store {
         });
     }
 
-    // upgradeRequirementsStation(sessionName: string, playerUid: string, stationId: string) {
-    //    this.apiService.upgradeRequirementsStation(sessionName, playerUid, stationId)
-    //       .subscribe((upgradeResourcesStation: Requirements[]) => {
-    //           this.upgradeResourcesStation.set(upgradeResourcesStation);
-    //       }, (err) => {
-    //           console.error('Error fetching station requirements', err);
-    //       });
-    // }
+    upgradeRequirementsStation(sessionName: string, playerUid: string) {
+        this.apiService.upgradeRequirementsStation(sessionName, playerUid)
+            .subscribe((upgradeResourcesStation: Requirements[]) => {
+               this.upgradeResourcesStation.set(upgradeResourcesStation);
+            }, (err) => {
+               console.error('Error fetching station requirements', err);
+            });
+    }
 
     buyEmployee(sessionName: string, playerUid: string) {
         this.apiService.buyEmployee(sessionName, playerUid).subscribe({

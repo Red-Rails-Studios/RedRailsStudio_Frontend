@@ -93,7 +93,7 @@ export class APISService {
     return this.http.patch(`http://localhost:8080/session/${sessionName}/player/${playerUid}/Station/${stationUid}/upgrade`, null, {responseType: 'text'})
   }
 
-  upgradeRequirementsStations(sessionName: string, playerUid: string): Observable<Requirements[]>{
+  upgradeRequirementsStation(sessionName: string, playerUid: string): Observable<Requirements[]>{
     return this.http.get<Requirements[]>(`http://localhost:8080/session/${sessionName}/player/${playerUid}/stations/getUpgradeRequirements`);
   }
 

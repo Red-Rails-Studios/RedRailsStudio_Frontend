@@ -33,6 +33,8 @@ export class UpgradesComponent {
       //console.log("stations updated", this.stations)
       this.upgradesRail = this.store.upgradeResourcesRail();
       this.upgradesStation = this.store.upgradeResourcesStation();
+      console.log(this.upgradesStation);
+      console.log(this.store.upgradeResourcesStation);
     }, 1000);
   }
 
@@ -44,6 +46,7 @@ export class UpgradesComponent {
       return;
     }
     this.store.buyRail(sessionName, uId);
+    this.upgradesRail = this.store.upgradeResourcesRail();
     //console.log('buying Rail with', sessionName, uid);
   }
 
@@ -53,6 +56,7 @@ export class UpgradesComponent {
     const railId = this.store.resources().railDtos[railNr].uId;
     console.log(railId);
     this.store.upgradeTrain(sessionName, uid, railId);
+    this.upgradesRail = this.store.upgradeResourcesRail();
   }
 
   onBuyStation() {
@@ -63,6 +67,7 @@ export class UpgradesComponent {
       return;
     }
     this.store.buyStation(sessionName, uId);
+    this.upgradesStation = this.store.upgradeResourcesStation();
     //console.log('buying Rail with', sessionName, uid);
   }
 
@@ -72,6 +77,7 @@ export class UpgradesComponent {
     const stationId = this.store.resources().stationDtos[stationNr].uId;
     console.log(stationId);
     this.store.upgradeTrain(sessionName, uid, stationId);
+    this.upgradesStation = this.store.upgradeResourcesStation();
   }
 
 }
