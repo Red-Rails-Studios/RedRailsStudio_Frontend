@@ -13,7 +13,7 @@
   - Farben/Umrandungen hängen vom Location-Typ ab (z.B. STATION, RAIL, EMPTY).
   - Für Stationen wird zusätzlich ein kleiner roter Marker sowie optional ein Name (Text) gezeichnet.
 */
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, HostListener } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, HostListener, WritableSignal, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import type { Map as GameMap } from '../../models/map.model';
 import { APISService } from '../../services/apis.service';
@@ -27,7 +27,7 @@ import { Store } from '../../services/store';
   styleUrls: ['./map.component.scss']
 })
 export class MapComponent implements OnInit, AfterViewInit {
-  public mapData: GameMap | null = null;
+  public mapData: WritableSignal<GameMap | null> = signal(null);
   public loading = false;
   public errorMsg: string | null = null;
   private pollIntervalId: any = null;
@@ -173,13 +173,13 @@ export class MapComponent implements OnInit, AfterViewInit {
     this.errorMsg = null;
     this.apiService.getMap(sessionName).subscribe({
       next: (m) => {
-        this.mapData = m;
+        this.mapData.set(m);
         this.loading = false;
 
         // compute natural size from data
-        if (this.mapData?.map?.length) {
-          const rows = this.mapData.map.length;
-          const cols = this.mapData.map[0]?.length || 0;
+        if (this.mapData()?.map?.length) {
+          const rows = this.mapData()?.map.length || 0;
+          const cols = this.mapData()?.map[0]?.length || 0;
           this.naturalWidth = Math.max(1, cols * (this.tileSize + this.gap));
           this.naturalHeight = Math.max(1, rows * (this.tileSize + this.gap));
         }
@@ -268,10 +268,10 @@ reloadMap() {
     // clear using CSS pixel size (we draw using scaled coordinates)
     ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 
-    if (!this.mapData.map || !this.mapData.map.length) return;
+    if (!this.mapData()?.map || !this.mapData()?.map.length) return;
 
-    const rows = this.mapData.map.length;
-    const cols = this.mapData.map[0]?.length || 0;
+    const rows = this.mapData()?.map.length || 0;
+    const cols = this.mapData()?.map[0]?.length || 0;
 
     // If we have a background image, draw it centered preserving aspect ratio
     let imgLeft = 0;
@@ -351,7 +351,7 @@ reloadMap() {
 
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
-        const field = this.mapData.map[y][x];
+        const field = this.mapData()?.map[y][x];
 
         // robust station detection
         const rawType = field?.location?.type;
