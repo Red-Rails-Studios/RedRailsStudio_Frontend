@@ -1,17 +1,5 @@
 /*
   DE: Umstellung der Map-Komponente von einer CSS-Grid-Darstellung auf ein HTML-Canvas.
-
-  Was hat sich geändert?
-  - Template: Statt eines <div class="grid"> mit zahlreichen .cell-Divs wird jetzt ein einzelnes <canvas #mapCanvas> verwendet.
-  - Styles: Grid-/Cell-bezogene CSS-Regeln werden nicht mehr benötigt; das visuelle Rendering (Farben, Rahmen, Marker, Labels) passiert vollständig im Canvas.
-  - Logik: Nach dem Laden der Map-Daten (mapData) werden die Canvas-Abmessungen berechnet (updateCanvasSize) und die Karte einmal gezeichnet (scheduleDraw/drawMap).
-
-  Wie funktioniert das Rendering?
-  - Jede Karte besteht weiterhin aus Zeilen/Spalten. Für jede Zelle (Tile) wird im Canvas ein Rechteck gezeichnet.
-  - tileSize (24px) entspricht der früheren .cell-Größe; gap (2px) entspricht der früheren Grid-Lücke.
-  - Die Position einer Zelle im Canvas ergibt sich aus: x * (tileSize + gap) bzw. y * (tileSize + gap).
-  - Farben/Umrandungen hängen vom Location-Typ ab (z.B. STATION, RAIL, EMPTY).
-  - Für Stationen wird zusätzlich ein kleiner roter Marker sowie optional ein Name (Text) gezeichnet.
 */
 import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, HostListener, WritableSignal, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -114,6 +102,8 @@ export class MapComponent implements OnInit, AfterViewInit {
       console.warn('Failed to load map image', e);
       this.mapImage = null;
       this.imageLoaded = false;
+      // still schedule draw to display fallback or hide when error exists
+      this.scheduleDraw();
     };
   }
 
@@ -163,6 +153,8 @@ export class MapComponent implements OnInit, AfterViewInit {
         this.mapImageContentBounds = null;
       }
     } catch (e) {
+      // getImageData can throw if the image taints the canvas (CORS / SVG with external resources).
+      // We tolerate that and simply skip content bounds detection.
       console.warn('computeImageContentBounds failed', e);
       this.mapImageContentBounds = null;
     }
@@ -175,6 +167,7 @@ export class MapComponent implements OnInit, AfterViewInit {
       next: (m) => {
         this.mapData.set(m);
         this.loading = false;
+        this.errorMsg = null;
 
         // compute natural size from data
         if (this.mapData()?.map?.length) {
@@ -183,6 +176,9 @@ export class MapComponent implements OnInit, AfterViewInit {
           this.naturalWidth = Math.max(1, cols * (this.tileSize + this.gap));
           this.naturalHeight = Math.max(1, rows * (this.tileSize + this.gap));
         }
+
+        // ensure canvas visible on successful load
+        this.setCanvasVisibility(true);
 
         // update sizing and draw; if canvasRef isn't ready yet, defer draw
         this.updateCanvasSize();
@@ -195,16 +191,20 @@ export class MapComponent implements OnInit, AfterViewInit {
       error: (err) => {
         this.loading = false;
         this.errorMsg = `Failed to load map: ${err?.status || ''} ${err?.statusText || ''}`;
+        // clear map data and hide canvas
+        this.mapData.set(null);
+        this.setCanvasVisibility(false);
+        this.scheduleDraw();
       }
     });
   }
 
-reloadMap() {
+  reloadMap() {
     const sessionName = this.store.sessionName() || this.store.sessionInfo().sessionName;
     if (sessionName) {
       this.loadMap(sessionName);
     }
-}
+  }
 
   @HostListener('window:resize')
   onWindowResize(): void {
@@ -259,21 +259,33 @@ reloadMap() {
     }
   }
 
+  private setCanvasVisibility(visible: boolean): void {
+    const canvas = this.canvasRef?.nativeElement;
+    if (!canvas) return;
+    canvas.style.display = visible ? 'block' : 'none';
+  }
+
   private drawMap(): void {
     const canvas = this.canvasRef?.nativeElement;
-    if (!canvas || !this.mapData) return;
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    // If there was a load error and no map data, ensure canvas is hidden and cleared.
+    const map = this.mapData?.();
+    if (this.errorMsg && (!map?.map || !map.map.length)) {
+      this.setCanvasVisibility(false);
+      ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+      return;
+    } else {
+      // ensure visible unless explicitly hidden by error
+      this.setCanvasVisibility(true);
+    }
 
     // clear using CSS pixel size (we draw using scaled coordinates)
     ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 
-    if (!this.mapData()?.map || !this.mapData()?.map.length) return;
-
-    const rows = this.mapData()?.map.length || 0;
-    const cols = this.mapData()?.map[0]?.length || 0;
-
-    // If we have a background image, draw it centered preserving aspect ratio
+    // Draw background image (or fallback) immediately so the canvas is never blank
     let imgLeft = 0;
     let imgTop = 0;
     let drawW = this.canvasWidth;
@@ -295,11 +307,39 @@ reloadMap() {
       imgTop = Math.max(0, (this.canvasHeight - drawH) / 2);
 
       // draw the image as background
-      ctx.drawImage(img, imgLeft, imgTop, drawW, drawH);
+      try {
+        ctx.drawImage(this.mapImage as HTMLImageElement, imgLeft, imgTop, drawW, drawH);
+      } catch (e) {
+        // drawImage can throw if the image taints the canvas for getImageData;
+        // ignore and fall back to fill background.
+        ctx.fillStyle = '#fafafa';
+        ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+      }
     } else {
       // fallback: fill a subtle background so map dots remain visible
       ctx.fillStyle = '#fafafa';
       ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+    }
+
+    // If map data is not present, render an overlay message and stop.
+    if (!map?.map || !map.map.length) {
+      ctx.save();
+      // a slight translucent panel for readability
+      ctx.fillStyle = 'rgba(255,255,255,0.8)';
+      const pad = 8;
+      const msg = this.loading ? 'Loading map...' : (this.errorMsg || 'Map not loaded');
+      const textWidth = Math.min(300, ctx.measureText ? ctx.measureText(msg).width : 200);
+      const boxW = textWidth + pad * 2;
+      const boxH = 28;
+      const bx = Math.max(10, Math.round((this.canvasWidth - boxW) / 2));
+      const by = Math.max(10, Math.round((this.canvasHeight - boxH) / 2));
+      ctx.fillRect(bx, by, boxW, boxH);
+      ctx.fillStyle = '#000';
+      ctx.font = '14px sans-serif';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(msg, bx + pad, by + boxH / 2);
+      ctx.restore();
+      return;
     }
 
     // compute content rectangle inside the drawn image where actual map is painted
@@ -345,13 +385,17 @@ reloadMap() {
     }
     ctx.restore();
 
+    // draw station markers on top
+    const rows = map.map.length || 0;
+    const cols = map.map[0]?.length || 0;
+
     // compute cell size mapped into the content rectangle
     const cellW = contentW / Math.max(1, cols);
     const cellH = contentH / Math.max(1, rows);
 
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
-        const field = this.mapData()?.map[y][x];
+        const field = map.map[y][x];
 
         // robust station detection
         const rawType = field?.location?.type;
