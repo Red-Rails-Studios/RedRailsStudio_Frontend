@@ -2,12 +2,12 @@
   <button (click)="onBuyRail()" class="buy-button">Buy Rail</button>
 
   <div class="rail-list">
-    <div *ngFor="let rail of rails; let i = index" class="rail-block"> 
+    <div *ngFor="let railDtos of rails; let i = index" class="rail-block"> 
       <img src="assets/minecraft-rail-transport-minecart-video-game-train-png-favpng-YMMvx3JVJ9fX03eUBMqWfHntV.jpg" class="rail-pic" alt="rail picture"> <!--bild von Rail-->
       
       <div class="inhalt">
       Rail Nr. {{i+1}}
-      level: {{rail.level}}
+      level: {{railDtos.level}}
 
         <div class="requirements">
         UPGRADE REQUIRMENTS: <br>
@@ -45,3 +45,4 @@
       </div>
   </div>
 </div>
+ 

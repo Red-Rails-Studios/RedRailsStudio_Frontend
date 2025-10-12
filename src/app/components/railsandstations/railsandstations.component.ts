@@ -25,16 +25,18 @@ export class UpgradesComponent {
   ngOnInit(): void {
     const sessionName = this.sessionInfo().sessionName;
     const playerUid = this.playerInfo().uId;
+    this.store.getUpgradeRequirementsRail(sessionName, playerUid);
+    this.store.getUpgradeRequirementsStation(sessionName, playerUid);
 
     setInterval(() => {
-    this.rails = this.store.resources().railDtos;
-      //console.log("rails updated", this.rails);
+      this.store.getUpgradeRequirementsRail(sessionName, playerUid);
+      this.store.getUpgradeRequirementsStation(sessionName, playerUid);
+      this.rails = this.store.resources().railDtos;
       this.stations = this.store.resources().stationDtos;
-      //console.log("stations updated", this.stations)
       this.upgradesRail = this.store.upgradeResourcesRail();
       this.upgradesStation = this.store.upgradeResourcesStation();
-      console.log(this.upgradesStation);
-      console.log(this.store.upgradeResourcesStation);
+      console.log("1.", this.upgradesStation);
+      console.log("2.", this.store.upgradeResourcesRail());
     }, 1000);
   }
 

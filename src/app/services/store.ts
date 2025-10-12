@@ -213,7 +213,7 @@ export class Store {
         this.apiService.upgradeRequirementsTrain(sessionName, playerUid).subscribe({
             next: (requirements: Requirements[]) => {
             this.upgradeResourcesTrain.set(requirements);
-            console.log('got upgrade reqiirments', requirements)
+            console.log('got upgrade reqiirments train', requirements)
         },
         error: (err) => {
         console.error('Error fetching train upgrades:', err);
@@ -248,7 +248,7 @@ export class Store {
         this.apiService.upgradeRequirementsRail(sessionName, playerUid).subscribe({
             next: (requirements: Requirements[]) => {
             this.upgradeResourcesRail.set(requirements);
-            console.log('got upgrade reqiirments', requirements)
+            console.log('got upgrade reqirments rail', requirements)
         },
         error: (err) => {
         console.error('Error fetching rail upgrades:', err);
@@ -279,7 +279,7 @@ export class Store {
         });
     }
 
-    upgradeRequirementsStation(sessionName: string, playerUid: string) {
+    getUpgradeRequirementsStation(sessionName: string, playerUid: string) {
         this.apiService.upgradeRequirementsStation(sessionName, playerUid)
             .subscribe((upgradeResourcesStation: Requirements[]) => {
                this.upgradeResourcesStation.set(upgradeResourcesStation);

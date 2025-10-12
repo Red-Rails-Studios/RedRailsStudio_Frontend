@@ -20,7 +20,7 @@ export class TrainsComponent {
 
   constructor(public store: Store) {}
 
-  ngOnInit(): void {
+  ngOnInit(): void { 
     const sessionName = this.sessionInfo().sessionName;
     const playerUId = this.store.playerUid();
 
@@ -29,6 +29,7 @@ export class TrainsComponent {
       this.store.getUpgradeRequirementsTrain(sessionName, playerUId);
 
       setInterval(() => {
+        this.store.getUpgradeRequirementsTrain(sessionName, playerUId);
         this.trains = this.store.resources().trainDtos;
         this.upgrades = this.store.upgradeResourcesTrain();
         console.log(this.upgrades);
