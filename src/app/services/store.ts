@@ -94,7 +94,9 @@ export class Store {
     getPlayerInfos(sessionName: string, playerUid: string) {
         this.apiService.getPlayerInfos(sessionName, playerUid).subscribe((playerInfo: Player) => {
             this.playerInfo.set(playerInfo);
-            console.log('PlayerInfos set', this.playerInfo().name, this.playerInfo().uId, this.playerInfo().trains);
+            this.setPlayerUid(playerUid);
+            this.setSessionName(sessionName);
+            console.log('PlayerInfos set', this.playerName, this.playerUid);
         });
     }
 
