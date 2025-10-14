@@ -1,9 +1,11 @@
 /*
   DE: Umstellung der Map-Komponente von einer CSS-Grid-Darstellung auf ein HTML-Canvas.
 */
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, HostListener, WritableSignal, signal } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, HostListener, WritableSignal, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import type { Map as GameMap } from '../../models/map.model';
+// alias the exported map model to avoid colliding with the builtin Map type
+import type { Map as MapModel } from '../../models/map.model';
+import type { Station } from '../../models/station.model';
 import { APISService } from '../../services/apis.service';
 import { Store } from '../../services/store';
 
@@ -14,11 +16,16 @@ import { Store } from '../../services/store';
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.scss']
 })
-export class MapComponent implements OnInit, AfterViewInit {
-  public mapData: WritableSignal<GameMap | null> = signal(null);
+export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
+  // use the aliased MapModel from your frontend models
+  public mapData: WritableSignal<MapModel | null> = signal(null);
   public loading = false;
   public errorMsg: string | null = null;
-  private pollIntervalId: any = null;
+  // legend entries exposed to template
+  public legendEntries: { key: string; name: string; color: string }[] = [];
+
+  // controls visibility: reload button shows until a successful load completes
+  public showReloadButton = true;
 
   @ViewChild('mapCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
 
@@ -46,7 +53,64 @@ export class MapComponent implements OnInit, AfterViewInit {
   // bounding box of actual drawn content inside the image (image px coords)
   private mapImageContentBounds: { left: number; top: number; width: number; height: number } | null = null;
 
-  constructor(private apiService: APISService, public store: Store) {}
+  // cache / config for owner colors
+  // keep keys as strings consistently
+  private ownerColorMap: Map<string, string> = new Map<string, string>([
+    // optional known presets
+    // ['1', '#1f77b4'],
+  ]);
+
+  // default color for unbought or unknown owner
+  private readonly unownedColor = '#d62828'; // red
+
+  // realtime / polling helpers (declared so methods using them compile)
+  private pollIntervalId: any = null;
+  private eventSource: EventSource | null = null;
+  private pollMs = 3000;
+  private lastMapHash: string | null = null;
+  private realtimeStarted = false;
+
+  constructor(private apiService: APISService, private store: Store) {}
+
+  // deterministic color generator for unknown owners (returns css color)
+  private colorForKey(key: string | number | null | undefined): string {
+    if (key == null) return this.unownedColor;
+    const k = String(key);
+    const existing = this.ownerColorMap.get(k);
+    if (existing) return existing;
+
+    // simple deterministic hash -> hue
+    let h = 0;
+    for (let i = 0; i < k.length; i++) h = (h << 5) - h + k.charCodeAt(i);
+    h = Math.abs(h);
+    const hue = h % 360;
+    const color = `hsl(${hue} 72% 45%)`;
+    this.ownerColorMap.set(k, color);
+    return color;
+  }
+
+  // resolve an owner key from station object (adjust to your model)
+  private ownerKeyFromStation(station: Station | any): string | number | null {
+    if (!station) return null;
+    // prefer explicit ownerId / playerId fields
+    if ('ownerId' in station && station.ownerId != null) return station.ownerId;
+    if ('playerId' in station && station.playerId != null) return station.playerId;
+    // older code used boughtBy / purchasedBy
+    if ('boughtBy' in station && station.boughtBy != null) return station.boughtBy;
+    if ('purchasedBy' in station && station.purchasedBy != null) return station.purchasedBy;
+    // nested owner object
+    if ('owner' in station && station.owner) {
+      const o = station.owner;
+      if (typeof o === 'object') {
+        if ('id' in o && o.id != null) return o.id;
+        if ('playerId' in o && o.playerId != null) return o.playerId;
+        if ('name' in o && o.name) return o.name;
+      }
+      // owner might be a scalar (string)
+      if (typeof o === 'string') return o;
+    }
+    return null;
+  }
 
   ngOnInit(): void {
     const sessionNameSignal = this.store.sessionName();
@@ -84,6 +148,110 @@ export class MapComponent implements OnInit, AfterViewInit {
       this.scheduleDraw();
     } else {
       this.drawMap();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.stopRealtime();
+  }
+
+  // start SSE, fallback to polling if SSE fails or not available
+  private startRealtime(sessionName: string): void {
+    if (this.realtimeStarted) return;
+    this.realtimeStarted = true;
+
+    // try SSE first (change endpoint to your backend path if different)
+    try {
+      const url = `/api/sessions/${encodeURIComponent(sessionName)}/map/stream`;
+      this.eventSource = new EventSource(url);
+      this.eventSource.onmessage = (ev) => {
+        try {
+          const data = JSON.parse(ev.data);
+          this.applyMapIfChanged(data);
+        } catch (e) {
+          // ignore parse errors
+        }
+      };
+      this.eventSource.onerror = (_err) => {
+        // SSE failed: close and fall back to polling
+        this.stopEventSource();
+        this.startPolling();
+      };
+      // if connection doesn't open within a short time, start polling as fallback
+      const sseTimeout = setTimeout(() => {
+        if (!this.eventSource || this.eventSource.readyState === EventSource.CLOSED) {
+          this.stopEventSource();
+          this.startPolling();
+        }
+        clearTimeout(sseTimeout);
+      }, 2500);
+      return;
+    } catch (e) {
+      // fall through to polling
+    }
+
+    // SSE not available — start polling
+    this.startPolling();
+  }
+
+  private stopEventSource(): void {
+    if (this.eventSource) {
+      try { this.eventSource.close(); } catch {}
+      this.eventSource = null;
+    }
+  }
+
+  private startPolling(): void {
+    if (this.pollIntervalId) return;
+    this.pollIntervalId = setInterval(() => {
+      const sessionName = this.store.sessionName() || this.store.sessionInfo().sessionName;
+      if (!sessionName) return;
+      // use apiService.getMap to fetch latest map
+      this.apiService.getMap(sessionName).subscribe({
+        next: (m) => this.applyMapIfChanged(m),
+        error: () => { /* ignore transient errors */ }
+      });
+    }, this.pollMs);
+  }
+
+  private stopPolling(): void {
+    if (this.pollIntervalId) {
+      clearInterval(this.pollIntervalId);
+      this.pollIntervalId = null;
+    }
+  }
+
+  private stopRealtime(): void {
+    this.stopEventSource();
+    this.stopPolling();
+    this.realtimeStarted = false;
+  }
+
+  // update map only when changed (cheap JSON-hash)
+  private applyMapIfChanged(newMap: any): void {
+    try {
+      const json = JSON.stringify(newMap || {});
+      if (json === this.lastMapHash) {
+        return; // no change
+      }
+      this.lastMapHash = json;
+      this.mapData.set(newMap);
+      // recompute natural size if necessary (same logic as loadMap)
+      if (newMap?.map?.length) {
+        const rows = newMap.map.length || 0;
+        const cols = newMap.map[0]?.length || 0;
+        this.naturalWidth = Math.max(1, cols * (this.tileSize + this.gap));
+        this.naturalHeight = Math.max(1, rows * (this.tileSize + this.gap));
+        this.updateCanvasSize();
+      }
+      this.scheduleDraw();
+      // update legend from new map
+      this.updateLegend();
+    } catch (e) {
+      // on any error, still set and draw
+      this.mapData.set(newMap);
+      this.scheduleDraw();
+      this.updateLegend();
     }
   }
 
@@ -163,6 +331,8 @@ export class MapComponent implements OnInit, AfterViewInit {
   loadMap(sessionName: string) {
     this.loading = true;
     this.errorMsg = null;
+    // showReloadButton remains as-is except when explicitly set by reload action;
+    // when the request completes successfully we hide it below.
     this.apiService.getMap(sessionName).subscribe({
       next: (m) => {
         this.mapData.set(m);
@@ -187,6 +357,15 @@ export class MapComponent implements OnInit, AfterViewInit {
         } else {
           this.pendingDraw = true;
         }
+
+        // update legend now that map is loaded
+        this.updateLegend();
+
+        // hide reload button after successful load
+        this.showReloadButton = false;
+
+        // start realtime updates for this session (SSE with polling fallback)
+        this.startRealtime(sessionName);
       },
       error: (err) => {
         this.loading = false;
@@ -195,15 +374,24 @@ export class MapComponent implements OnInit, AfterViewInit {
         this.mapData.set(null);
         this.setCanvasVisibility(false);
         this.scheduleDraw();
+        // show reload button so the user can retry
+        this.showReloadButton = true;
       }
     });
   }
 
-  reloadMap() {
+  // called by the UI when the user clicks reload
+  triggerReload(): void {
+    this.showReloadButton = true;
     const sessionName = this.store.sessionName() || this.store.sessionInfo().sessionName;
     if (sessionName) {
       this.loadMap(sessionName);
     }
+  }
+
+  // kept for compatibility if other code calls reloadMap directly
+  reloadMap() {
+    this.triggerReload();
   }
 
   @HostListener('window:resize')
@@ -264,6 +452,93 @@ export class MapComponent implements OnInit, AfterViewInit {
     if (!canvas) return;
     canvas.style.display = visible ? 'block' : 'none';
   }
+
+  // helper: detect whether a station is owned/bought
+  private isStationBought(station: any): boolean {
+    if (!station) return false;
+
+    // common field names checked in order
+    if ('bought' in station) return !!station.bought;
+    if ('purchased' in station) return !!station.purchased;
+    if ('ownerId' in station) return station.ownerId !== null && station.ownerId !== undefined && station.ownerId !== 0;
+    if ('playerId' in station) return station.playerId !== null && station.playerId !== undefined;
+    if ('owner' in station && station.owner) {
+      const o = station.owner;
+      return !!(o.id || o.playerId || o.name);
+    }
+
+    return false;
+  }
+
+  // build legend entries from current map data (prefer players metadata if present)
+  private updateLegend(): void {
+    const map = this.mapData?.();
+    if (!map) {
+      this.legendEntries = [];
+      return;
+    }
+
+    // first try canonical players list if backend provides it in the map payload
+    // try a few common property names to be resilient
+    const playersList = (map as any).players ?? (map as any).playerList ?? (map as any).playersInfo ?? null;
+
+    const entries: { key: string; name: string; color: string }[] = [];
+
+    if (Array.isArray(playersList) && playersList.length) {
+      for (const p of playersList) {
+        const id = p?.id ?? p?.playerId ?? p?.name ?? p?.userId ?? null;
+        if (id == null) continue;
+        const key = String(id);
+        // use player provided color if available, else deterministic
+        const color = (p?.color && String(p.color)) || this.colorForKey(key);
+        const name = p?.displayName ?? p?.name ?? p?.playerName ?? String(id);
+        // cache color to ensure drawMap uses same color
+        this.ownerColorMap.set(key, color);
+        entries.push({ key, name, color });
+      }
+      // sort stable by name
+      entries.sort((a, b) => a.name.localeCompare(b.name));
+      this.legendEntries = entries;
+      return;
+    }
+
+    // fallback: scan stations for owners and build legend
+    const owners = new Map<string, { key: string; name: string }>();
+    const rows = map.map?.length || 0;
+    const cols = map.map?.[0]?.length || 0;
+
+    // small debug: print one station sample on first load to help identify model fields
+    if (rows && cols) {
+      const sample = map.map[0][0];
+      if (sample) console.debug('map first-cell sample:', sample);
+    }
+
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        const field = map.map[y][x];
+        const stationObj = field?.location?.station ?? field?.location ?? field;
+        const keyRaw = this.ownerKeyFromStation(stationObj);
+        if (keyRaw == null) continue;
+        const k = String(keyRaw);
+        if (owners.has(k)) continue;
+        let display = k;
+        if (stationObj?.owner && typeof stationObj.owner === 'object') {
+          if (stationObj.owner.name) display = stationObj.owner.name;
+        owners.set(k, { key: k, name: display });
+      }
+    }
+
+    owners.forEach((v, k) => {
+      const color = this.colorForKey(k);
+      // ensure cache contains the color for later use
+      this.ownerColorMap.set(k, color);
+      entries.push({ key: k, name: v.name, color });
+    });
+
+    entries.sort((a, b) => a.name.localeCompare(b.name));
+    this.legendEntries = entries;
+  }
+ }
 
   private drawMap(): void {
     const canvas = this.canvasRef?.nativeElement;
@@ -414,53 +689,21 @@ export class MapComponent implements OnInit, AfterViewInit {
         // determine ownership and color stations accordingly
         const stationObj = field?.location?.station ?? field?.location ?? field;
         const bought = this.isStationBought(stationObj);
+        // choose color: if bought -> owner color, otherwise unownedColor
+        const ownerKey = this.ownerKeyFromStation(stationObj);
+        const ownerKeyStr = ownerKey == null ? null : String(ownerKey);
+        const fillColor = bought ? (ownerKeyStr ? (this.ownerColorMap.get(ownerKeyStr) ?? this.colorForKey(ownerKeyStr)) : this.colorForKey('unknown')) : this.unownedColor;
 
         ctx.beginPath();
         const markerRadius = Math.max(4, Math.floor(Math.min(cellW, cellH) * 0.18));
         ctx.arc(cx, cy, markerRadius, 0, Math.PI * 2);
-        ctx.fillStyle = bought ? '#2ecc71' /* green */ : '#d62828' /* red */;
+        ctx.fillStyle = fillColor;
         ctx.fill();
-
         ctx.lineWidth = 1;
-        ctx.strokeStyle = bought ? '#0b6623' /* darker green */ : '#8b0000' /* dark red */;
+        ctx.strokeStyle = 'rgba(0,0,0,0.5)';
         ctx.stroke();
       }
     }
   }
-
-  // helper: detect whether a station is owned/bought
-  private isStationBought(station: any): boolean {
-    if (!station) return false;
-
-    // common field names checked in order
-    if ('bought' in station) return !!station.bought;
-    if ('purchased' in station) return !!station.purchased;
-    if ('ownerId' in station) return station.ownerId !== null && station.ownerId !== undefined && station.ownerId !== 0;
-    if ('playerId' in station) return station.playerId !== null && station.playerId !== undefined;
-    if ('owner' in station && station.owner) {
-      const o = station.owner;
-      return !!(o.id || o.playerId || o.name);
-    }
-
-    return false;
-  }
-
-  // replace or update your station drawing routine to use isStationBought()
-  private drawStations(ctx: CanvasRenderingContext2D, stations: any[]) {
-    const radius = 6; // adjust to your existing radius variable if present
-    stations.forEach(station => {
-      const x = station.x ?? station.posX ?? station.cx; // fallback names if needed
-      const y = station.y ?? station.posY ?? station.cy;
-
-      const bought = this.isStationBought(station);
-      ctx.beginPath();
-      ctx.arc(x, y, radius, 0, Math.PI * 2);
-      ctx.fillStyle = bought ? '#2ecc71' : '#e74c3c'; // green if bought, red otherwise
-      ctx.fill();
-
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = '#222';
-      ctx.stroke();
-    });
-  }
 }
+

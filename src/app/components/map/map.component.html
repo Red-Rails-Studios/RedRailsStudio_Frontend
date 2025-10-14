@@ -6,6 +6,20 @@
   <div class="controls">
     <div class="loading" *ngIf="loading">Loading map...</div>
     <div class="error" *ngIf="errorMsg">{{ errorMsg }}</div>
-    <button (click)="reloadMap()">Reload Map</button>
+
+    <!-- Legend moved to where the reload button used to be.
+         The reload button is only shown when showReloadButton is true
+         (e.g. before successful load or after an error). -->
+    <div class="map-legend" *ngIf="legendEntries?.length">
+      <div class="legend-title">Players</div>
+      <div class="legend-list">
+        <div *ngFor="let e of legendEntries" class="legend-item">
+          <span class="legend-swatch" [style.background]="e.color"></span>
+          <span class="legend-name">{{ e.name }}</span>
+        </div>
+      </div>
+    </div>
+
+    <button *ngIf="showReloadButton" (click)="triggerReload()">Reload Map</button>
   </div>
 </div>
