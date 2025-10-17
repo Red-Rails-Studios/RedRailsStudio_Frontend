@@ -37,6 +37,7 @@ export class Store {
     playerInfo = signal<Player>({ 
         uId: '',
         name: '',
+        color: '',
         trains: [] as Train[],
         rails: [] as Rail[],
         stations: [] as Station[],
