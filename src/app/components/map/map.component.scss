@@ -11,9 +11,10 @@
   height: 100%;
   gap: 8px;
   box-sizing: border-box;
+  border: 2px solid #333;
+  border-radius: 6px;
 }
 
-/* The wrap provides a flexible region for the canvas so updateCanvasSize can measure a non-zero parent rect */
 .canvas-wrap {
   flex: 1 1 auto;
   min-height: 220px; /* ensures reasonable initial height */
@@ -22,14 +23,12 @@
   display: block;
 }
 
-/* Canvas fills the wrap's CSS box (backing store sizing is handled in TS) */
 .map-canvas {
   width: 100%;
   height: 100%;
   display: block;
   box-sizing: border-box;
-  border: 2px solid #000; /* visible border that matches backing drawing */
-  background: #fafafa;
+  background: transparent;
 }
 
 /* Controls are below the map and won't overlap it */

@@ -1,10 +1,10 @@
 /*
-  DE: Map-Komponente (Canvas). Updated to use player.masterUid and player.color.
+  DE: Map-Komponente (Canvas). Restored missing functions and removed signal usage,
+  using plain properties so it only relies on existing project symbols.
 */
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, HostListener, WritableSignal, signal, OnDestroy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import type { Map as MapModel } from '../../models/map.model';
-import type { Station } from '../../models/station.model';
 import { APISService } from '../../services/apis.service';
 import { Store } from '../../services/store';
 
@@ -16,10 +16,10 @@ import { Store } from '../../services/store';
   styleUrls: ['./map.component.scss']
 })
 export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
-  public mapData: WritableSignal<MapModel | null> = signal(null);
+  // use plain property instead of Angular signals so we only use existing project things
+  public mapData: MapModel | null = null;
   public loading = false;
   public errorMsg: string | null = null;
-  public legendEntries: { uid: string; name: string; color: string }[] = [];
   public showReloadButton = true;
 
   @ViewChild('mapCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
@@ -161,7 +161,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       const json = JSON.stringify(newMap || {});
       if (json === this.lastMapHash) return;
       this.lastMapHash = json;
-      this.mapData.set(newMap);
+      this.mapData = newMap;
       if (newMap?.map?.length) {
         const rows = newMap.map.length || 0;
         const cols = newMap.map[0]?.length || 0;
@@ -169,11 +169,11 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         this.naturalHeight = Math.max(1, rows * (this.tileSize + this.gap));
         this.updateCanvasSize();
       }
-      // update players map & legend then draw
+      // update players map then draw
       this.updatePlayersFromMap(newMap);
       this.scheduleDraw();
     } catch (e) {
-      this.mapData.set(newMap);
+      this.mapData = newMap;
       this.updatePlayersFromMap(newMap);
       this.scheduleDraw();
     }
@@ -246,13 +246,13 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.errorMsg = null;
     this.apiService.getMap(sessionName).subscribe({
       next: (m) => {
-        this.mapData.set(m);
+        this.mapData = m;
         this.loading = false;
         this.errorMsg = null;
 
-        if (this.mapData()?.map?.length) {
-          const rows = this.mapData()?.map.length || 0;
-          const cols = this.mapData()?.map[0]?.length || 0;
+        if (this.mapData?.map?.length) {
+          const rows = this.mapData?.map.length || 0;
+          const cols = this.mapData?.map[0]?.length || 0;
           this.naturalWidth = Math.max(1, cols * (this.tileSize + this.gap));
           this.naturalHeight = Math.max(1, rows * (this.tileSize + this.gap));
         }
@@ -262,9 +262,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         if (this.canvasRef?.nativeElement) this.scheduleDraw();
         else this.pendingDraw = true;
 
-        // populate player mapping and legend from payload
+        // populate player mapping from payload
         this.updatePlayersFromMap(m);
-        this.updateLegend();
 
         this.showReloadButton = false;
         this.startRealtime(sessionName);
@@ -272,12 +271,11 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       error: (err) => {
         this.loading = false;
         this.errorMsg = `Failed to load map: ${err?.status || ''} ${err?.statusText || ''}`;
-        this.mapData.set(null);
+        this.mapData = null;
         this.setCanvasVisibility(false);
         this.scheduleDraw();
         this.showReloadButton = true;
         this.playersByUid.clear();
-        this.legendEntries = [];
       }
     });
   }
@@ -330,17 +328,84 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     else setTimeout(() => this.drawMap(), 0);
   }
 
-  private setCanvasVisibility(visible: boolean): void {
+  // draw the map and dots (stations colored by owner, others grey)
+  private drawMap(): void {
     const canvas = this.canvasRef?.nativeElement;
-    if (!canvas) return;
-    canvas.style.display = visible ? 'block' : 'none';
+    const mapVal = this.mapData;
+    if (!canvas || !mapVal) {
+      // if canvas exists but no data, clear it
+      if (canvas) {
+        const ctxEmpty = canvas.getContext('2d');
+        if (ctxEmpty) ctxEmpty.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+      }
+      return;
+    }
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // clear the visible area (css pixels)
+    ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+
+    if (!mapVal.map || !mapVal.map.length) return;
+
+    const rows = mapVal.map.length;
+    const cols = mapVal.map[0]?.length || 0;
+
+    // scaled tile sizes in CSS pixels
+    const tilePx = (this.tileSize + this.gap) * this.scale;
+    const tileSizeScaled = this.tileSize * this.scale;
+
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        const px = x * tilePx;
+        const py = y * tilePx;
+
+        const cx = px + tileSizeScaled / 2;
+        const cy = py + tileSizeScaled / 2;
+        const r = Math.max(2, Math.floor(tileSizeScaled * 0.25));
+
+        const field = mapVal.map[y][x];
+
+        // robust station detection and owner lookup
+        const rawType = field?.location?.type;
+        const typeStr = rawType == null ? '' : String(rawType).toUpperCase();
+        const isStation = typeStr.includes('STATION') || !!field?.location?.station? || !!field?.location?.station?.uId?;
+
+        // determine owner uid from common fields
+        const ownerUid = field?.location?.station?.masterUID; 
+
+        let fillColor = this.unownedColor;
+        if (isStation && ownerUid != null) {
+          const owner = this.playersByUid.get(String(ownerUid));
+          fillColor = owner?.color ?? this.colorForFallback(String(ownerUid));
+        } else if (isStation) {
+          // station but no owner -> use distinct color (dark red fallback)
+          fillColor = '#d62828';
+        } else {
+          // non-station tiles - neutral dark grey
+          fillColor = '#2e2e2e';
+        }
+
+        ctx.beginPath();
+        ctx.fillStyle = fillColor;
+        const dotRadius = isStation ? Math.max(4, Math.floor(tileSizeScaled * 0.18)) : r;
+        ctx.arc(cx, cy, dotRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (isStation) {
+          ctx.lineWidth = 1;
+          ctx.strokeStyle = '#8b0000';
+          ctx.stroke();
+        }
+      }
+    }
   }
 
   // Build playersByUid map from incoming map payload (called on load and updates)
   private updatePlayersFromMap(mapPayload: any): void {
     this.playersByUid.clear();
     if (!mapPayload) {
-      this.legendEntries = [];
       return;
     }
 
@@ -375,9 +440,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
     }
-
-    // rebuild legend entries to reflect current playersByUid
-    this.updateLegend();
   }
 
   // deterministic fallback color for players without explicit color
@@ -385,155 +447,19 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     if (key == null) return this.unownedColor;
     const s = String(key);
     let h = 0;
-    for (let i = 0; i < s.length; i++) h = (h << 5) - h + s.charCodeAt(i);
-    h = Math.abs(h);
-    const hue = h % 360;
+    for (let i = 0; i < s.length; i++) {
+      h = (h << 5) - h + s.charCodeAt(i);
+      h = h & h;
+    }
+    const hue = Math.abs(h) % 360;
     return `hsl(${hue} 65% 45%)`;
   }
 
-  private updateLegend(): void {
-    const entries: { uid: string; name: string; color: string }[] = [];
-    for (const [uid, info] of this.playersByUid.entries()) {
-      entries.push({ uid, name: info.name, color: info.color });
-    }
-    entries.sort((a, b) => a.name.localeCompare(b.name));
-    this.legendEntries = entries;
-  }
-
-  private drawMap(): void {
+  // re-added helper used elsewhere to hide/show the canvas safely
+  private setCanvasVisibility(visible: boolean): void {
     const canvas = this.canvasRef?.nativeElement;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const map = this.mapData?.();
-    if (this.errorMsg && (!map?.map || !map.map.length)) {
-      this.setCanvasVisibility(false);
-      ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-      return;
-    } else {
-      this.setCanvasVisibility(true);
-    }
-
-    ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-
-    let imgLeft = 0;
-    let imgTop = 0;
-    let drawW = this.canvasWidth;
-    let drawH = this.canvasHeight;
-
-    if (this.mapImage && this.imageLoaded) {
-      const img = this.mapImage;
-      const imgAspect = (img.width || 1) / (img.height || 1);
-      const canvasAspect = this.canvasWidth / this.canvasHeight;
-      if (imgAspect > canvasAspect) {
-        drawW = this.canvasWidth;
-        drawH = this.canvasWidth / imgAspect;
-      } else {
-        drawH = this.canvasHeight;
-        drawW = this.canvasHeight * imgAspect;
-      }
-      imgLeft = Math.max(0, (this.canvasWidth - drawW) / 2);
-      imgTop = Math.max(0, (this.canvasHeight - drawH) / 2);
-
-      try {
-        ctx.drawImage(this.mapImage as HTMLImageElement, imgLeft, imgTop, drawW, drawH);
-      } catch {
-        ctx.fillStyle = '#fafafa';
-        ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
-      }
-    } else {
-      ctx.fillStyle = '#fafafa';
-      ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
-    }
-
-    if (!map?.map || !map.map.length) {
-      ctx.save();
-      ctx.fillStyle = 'rgba(255,255,255,0.9)';
-      const pad = 8;
-      const msg = this.loading ? 'Loading map...' : (this.errorMsg || 'Map not loaded');
-      ctx.font = '14px sans-serif';
-      const textWidth = Math.min(300, ctx.measureText ? ctx.measureText(msg).width : 200);
-      const boxW = textWidth + pad * 2;
-      const boxH = 28;
-      const bx = Math.max(10, Math.round((this.canvasWidth - boxW) / 2));
-      const by = Math.max(10, Math.round((this.canvasHeight - boxH) / 2));
-      ctx.fillRect(bx, by, boxW, boxH);
-      ctx.fillStyle = '#000';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(msg, bx + pad, by + boxH / 2);
-      ctx.restore();
-      return;
-    }
-
-    // content rectangle where map image sits (used to position stations)
-    let contentLeft = imgLeft;
-    let contentTop = imgTop;
-    let contentW = drawW;
-    let contentH = drawH;
-    if (this.mapImageContentBounds && this.mapImage) {
-      const ib = this.mapImageContentBounds;
-      const scaleX = drawW / (this.mapImage.naturalWidth || this.mapImage.width || drawW);
-      const scaleY = drawH / (this.mapImage.naturalHeight || this.mapImage.height || drawH);
-      contentLeft = imgLeft + ib.left * scaleX;
-      contentTop = imgTop + ib.top * scaleY;
-      contentW = Math.max(1, ib.width * scaleX);
-      contentH = Math.max(1, ib.height * scaleY);
-    }
-
-    ctx.save();
-    const borderWidth = Math.max(2, Math.round(2 * this.scale));
-    const bw = Math.min(borderWidth, Math.floor(Math.min(contentW, contentH) / 2));
-    if (contentW > 0 && contentH > 0 && bw > 0) {
-      const inset = bw / 2;
-      const leftI = Math.round(contentLeft + inset);
-      const topI = Math.round(contentTop + inset);
-      const rightI = Math.round(contentLeft + contentW - inset);
-      const bottomI = Math.round(contentTop + contentH - inset);
-      ctx.beginPath();
-      ctx.lineWidth = bw;
-      ctx.strokeStyle = '#000';
-      ctx.moveTo(leftI, topI);
-      ctx.lineTo(rightI, topI);
-      ctx.lineTo(rightI, bottomI);
-      ctx.lineTo(leftI, bottomI);
-      ctx.lineTo(leftI, topI);
-      ctx.stroke();
-    }
-    ctx.restore();
-
-    const rows = map.map.length || 0;
-    const cols = map.map[0]?.length || 0;
-    const cellW = contentW / Math.max(1, cols);
-    const cellH = contentH / Math.max(1, rows);
-
-    for (let y = 0; y < rows; y++) {
-      for (let x = 0; x < cols; x++) {
-        const field = map.map[y][x];
-        const rawType = field?.location?.type;
-        const typeStr = rawType == null ? '' : String(rawType).toUpperCase();
-        const isStation = typeStr.includes('STATION') || !!field?.location?.station;
-
-        if (!isStation) continue;
-
-        const stationObj: Station | any = field?.location?.station ?? field?.location ?? field;
-        // ownership is now signaled by station.masterUid (string) per your update
-        const masterUid = stationObj?.masterUid ?? stationObj?.ownerUid ?? stationObj?.playerUid ?? null;
-        const ownerInfo = masterUid ? this.playersByUid.get(String(masterUid)) : null;
-        const fillColor = ownerInfo?.color ?? this.unownedColor;
-
-        const cx = contentLeft + x * cellW + cellW / 2;
-        const cy = contentTop + y * cellH + cellH / 2;
-        ctx.beginPath();
-        const markerRadius = Math.max(4, Math.floor(Math.min(cellW, cellH) * 0.18));
-        ctx.arc(cx, cy, markerRadius, 0, Math.PI * 2);
-        ctx.fillStyle = fillColor;
-        ctx.fill();
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = 'rgba(0,0,0,0.45)';
-        ctx.stroke();
-      }
-    }
+    canvas.style.display = visible ? 'block' : 'none';
   }
 }
 
