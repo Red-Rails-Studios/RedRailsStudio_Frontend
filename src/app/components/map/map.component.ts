@@ -16,11 +16,12 @@ import { Store } from '../../services/store';
   styleUrls: ['./map.component.scss']
 })
 export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
-  // use plain property instead of Angular signals so we only use existing project things
+  // plain properties
   public mapData: MapModel | null = null;
   public loading = false;
   public errorMsg: string | null = null;
   public showReloadButton = true;
+  public legendEntries: { uid: string; name: string; color: string }[] = [];
 
   @ViewChild('mapCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
 
@@ -276,6 +277,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         this.scheduleDraw();
         this.showReloadButton = true;
         this.playersByUid.clear();
+        this.updateLegend();
       }
     });
   }
@@ -333,7 +335,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     const canvas = this.canvasRef?.nativeElement;
     const mapVal = this.mapData;
     if (!canvas || !mapVal) {
-      // if canvas exists but no data, clear it
       if (canvas) {
         const ctxEmpty = canvas.getContext('2d');
         if (ctxEmpty) ctxEmpty.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
@@ -370,18 +371,19 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         // robust station detection and owner lookup
         const rawType = field?.location?.type;
         const typeStr = rawType == null ? '' : String(rawType).toUpperCase();
-        const isStation = typeStr.includes('STATION') || !!field?.location?.station? || !!field?.location?.station?.uId?;
+        const stationObj = field?.location?.station ?? field?.location ?? field;
+        const isStation = typeStr.includes('STATION') || !!stationObj?.masterUid || !!stationObj?.uId || !!field?.location?.station;
 
-        // determine owner uid from common fields
-        const ownerUid = field?.location?.station?.masterUID; 
+        // determine owner uid from common fields (handle multiple possible names)
+        const ownerUid = stationObj?.masterUid ?? null;
 
         let fillColor = this.unownedColor;
         if (isStation && ownerUid != null) {
           const owner = this.playersByUid.get(String(ownerUid));
           fillColor = owner?.color ?? this.colorForFallback(String(ownerUid));
         } else if (isStation) {
-          // station but no owner -> use distinct color (dark red fallback)
-          fillColor = '#d62828';
+          // station but no owner -> use default unowned grey
+          fillColor = this.unownedColor;
         } else {
           // non-station tiles - neutral dark grey
           fillColor = '#2e2e2e';
@@ -395,7 +397,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
         if (isStation) {
           ctx.lineWidth = 1;
-          ctx.strokeStyle = '#8b0000';
+          ctx.strokeStyle = 'rgba(0,0,0,0.45)';
           ctx.stroke();
         }
       }
@@ -406,6 +408,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   private updatePlayersFromMap(mapPayload: any): void {
     this.playersByUid.clear();
     if (!mapPayload) {
+      this.updateLegend();
       return;
     }
 
@@ -419,7 +422,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         const key = String(uid);
         const color = (typeof p?.color === 'string' && p.color) ? p.color : undefined;
         const name = p?.displayName ?? p?.name ?? p?.playerName ?? key;
-        // store only when color exists, otherwise will fallback to deterministic color
         this.playersByUid.set(key, { name: String(name), color: color ?? this.colorForFallback(key) });
       }
     } else {
@@ -430,16 +432,17 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         for (let x = 0; x < cols; x++) {
           const cell = mapPayload.map[y][x];
           const stationObj = cell?.location?.station ?? cell?.location ?? cell;
-          const masterUid = stationObj?.masterUid ?? stationObj?.ownerUid ?? stationObj?.playerUid ?? null;
+          const masterUid = stationObj?.masterUid ?? stationObj?.ownerUid ?? stationObj?.playerUid ?? stationObj?.uId ?? null;
           if (!masterUid) continue;
           const k = String(masterUid);
           if (!this.playersByUid.has(k)) {
-            // unknown owner - name set to uid, color set by fallback generator
             this.playersByUid.set(k, { name: k, color: this.colorForFallback(k) });
           }
         }
       }
     }
+
+    this.updateLegend();
   }
 
   // deterministic fallback color for players without explicit color
@@ -449,10 +452,19 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     let h = 0;
     for (let i = 0; i < s.length; i++) {
       h = (h << 5) - h + s.charCodeAt(i);
-      h = h & h;
+      h |= 0;
     }
     const hue = Math.abs(h) % 360;
     return `hsl(${hue} 65% 45%)`;
+  }
+
+  private updateLegend(): void {
+    const entries: { uid: string; name: string; color: string }[] = [];
+    for (const [uid, info] of this.playersByUid.entries()) {
+      entries.push({ uid, name: info.name, color: info.color });
+    }
+    entries.sort((a, b) => a.name.localeCompare(b.name));
+    this.legendEntries = entries;
   }
 
   // re-added helper used elsewhere to hide/show the canvas safely

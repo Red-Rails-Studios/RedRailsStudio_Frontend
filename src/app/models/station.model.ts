@@ -1,6 +1,6 @@
 export interface Station {
   uId: string;
   level: number;
-  masterUID: string;
+  masterUid: string;
 }
   
