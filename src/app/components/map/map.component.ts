@@ -26,7 +26,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild('mapCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
 
-  // logical map size (used to compute layout if needed)
+  // logical map size
   private naturalWidth = 600;
   private naturalHeight = 400;
 
@@ -44,7 +44,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   private imageLoaded = false;
   private mapImageContentBounds: { left: number; top: number; width: number; height: number } | null = null;
 
-  // players map: playerUid -> { name, color(hex) }
+  // players map: normalizedUid -> { name, color }
   private playersByUid: Map<string, { name: string; color: string }> = new Map();
 
   // unowned station color (grey)
@@ -60,10 +60,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(private apiService: APISService, public store: Store) {}
 
   ngOnInit(): void {
-    const sessionNameSignal = this.store.sessionName();
-    const sessionOverviewName = this.store.sessionInfo().sessionName;
-    const sessionName = sessionNameSignal || sessionOverviewName;
-
+    const sessionName = this.store.sessionName() || this.store.sessionInfo().sessionName;
     if (!sessionName) {
       let attempts = 0;
       this.pollIntervalId = setInterval(() => {
@@ -80,14 +77,12 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       }, 1000);
       return;
     }
-
     this.loadMap(sessionName);
   }
 
   ngAfterViewInit(): void {
     this.loadMapImage();
     this.updateCanvasSize();
-    // if map loaded already schedule draw, else draw now
     if (this.mapData) this.scheduleDraw();
     else this.drawMap();
   }
@@ -96,6 +91,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.stopRealtime();
   }
 
+  // ----- loading / realtime / polling -----
   loadMap(sessionName: string) {
     this.loading = true;
     this.errorMsg = null;
@@ -105,7 +101,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         this.loading = false;
         this.errorMsg = null;
 
-        // compute logical natural size from grid if available
         if (this.mapData?.map?.length) {
           const rows = this.mapData.map.length || 0;
           const cols = this.mapData.map[0]?.length || 0;
@@ -117,17 +112,12 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         this.updateCanvasSize();
         this.scheduleDraw();
 
-        // populate players map (and legend)
         this.updatePlayersFromMap(m);
         this.updateLegend();
 
-        // hide reload button after successful load
         this.showReloadButton = false;
 
-        // start realtime (SSE with fallback)
-        this.startRealtime(this.store.sessionName() || this.store.sessionInfo().sessionName || '');
-
-        // always start polling as a heartbeat/update mechanism so map updates periodically
+        this.startRealtime(sessionName);
         this.startPolling();
       },
       error: (err) => {
@@ -137,12 +127,10 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         this.setCanvasVisibility(false);
         this.scheduleDraw();
 
-        // show reload so user can retry
         this.showReloadButton = true;
         this.playersByUid.clear();
         this.updateLegend();
 
-        // stop polling if load failed
         this.stopPolling();
       }
     });
@@ -183,7 +171,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         clearTimeout(sseTimeout);
       }, 2500);
       return;
-    } catch (e) {
+    } catch {
       // fallthrough to polling
     }
 
@@ -199,19 +187,13 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // start polling (periodic map refresh)
   private startPolling(): void {
-    // reuse existing pollIntervalId guard
     if (this.pollIntervalId) return;
     const sessionName = this.store.sessionName() || (this.store.sessionInfo && this.store.sessionInfo().sessionName) || null;
     if (!sessionName) return;
     this.pollIntervalId = setInterval(() => {
       this.apiService.getMap(sessionName!).subscribe({
-        next: (m) => {
-          // apply and redraw if changed
-          this.applyMapIfChanged(m);
-        },
-        error: () => {
-          // ignore single errors, but do not flood console
-        }
+        next: (m) => this.applyMapIfChanged(m),
+        error: () => {}
       });
     }, this.pollMs);
   }
@@ -245,7 +227,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.updatePlayersFromMap(newMap);
       this.updateLegend();
       this.scheduleDraw();
-    } catch (e) {
+    } catch {
       this.mapData = newMap;
       this.updatePlayersFromMap(newMap);
       this.updateLegend();
@@ -253,6 +235,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  // ----- canvas sizing / image loading -----
   @HostListener('window:resize')
   onWindowResize(): void {
     this.updateCanvasSize();
@@ -264,7 +247,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!canvas) return;
 
     const dpr = window.devicePixelRatio || 1;
-    // Fit natural map to parent while preserving aspect
     const parent = canvas.parentElement!;
     const rect = parent.getBoundingClientRect();
     const sx = rect.width / this.naturalWidth;
@@ -281,15 +263,10 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     canvas.height = backingH;
     canvas.style.width = `${this.canvasWidth}px`;
     canvas.style.height = `${this.canvasHeight}px`;
-
-    // ensure white background at the CSS level (fallback)
     canvas.style.backgroundColor = '#ffffff';
 
     const ctx = canvas.getContext('2d');
-    if (ctx) {
-      // reset and scale to device pixels so we draw in CSS pixels
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
+    if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
   private scheduleDraw(): void {
@@ -315,7 +292,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     };
   }
 
-  // detect content bounding box of the SVG when rasterized (best-effort)
   private computeImageContentBounds(img: HTMLImageElement): void {
     try {
       const iw = img.naturalWidth || img.width || 600;
@@ -356,25 +332,155 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       } else {
         this.mapImageContentBounds = null;
       }
-    } catch (e) {
-      // ignore errors (CORS/tainted canvas) and leave bounds null
+    } catch {
       this.mapImageContentBounds = null;
     }
   }
 
-  // main rendering: non-station = transparent (skip), unbought station = grey, bought = player's color
+  // ----- helpers for players/colors -----
+  private normalizeUid(u: any): string | null {
+    if (u == null) return null;
+    try { return String(u).trim().toLowerCase(); } catch { return null; }
+  }
+
+  private resolvePlayerColor(masterUid: any, mapPayload?: any): string | null {
+    const key = this.normalizeUid(masterUid);
+    if (!key) return null;
+
+    const cached = this.playersByUid.get(key);
+    if (cached && cached.color) return cached.color;
+
+    const payload = mapPayload ?? this.mapData;
+    const playersList = payload?.players ?? payload?.playerList ?? null;
+    if (Array.isArray(playersList)) {
+      const p = playersList.find((pp: any) => this.normalizeUid(pp?.uid ?? pp?.playerUid ?? pp?.playerId ?? pp?.id) === key);
+      if (p && typeof p?.color === 'string' && p.color) return p.color;
+    }
+
+    try {
+      const sessionInfo: any = this.store?.sessionInfo?.() ?? this.store?.sessionInfo ?? null;
+      const sessionPlayers = sessionInfo?.players ?? sessionInfo?.playerList ?? null;
+      if (Array.isArray(sessionPlayers)) {
+        const sp = sessionPlayers.find((pp: any) => this.normalizeUid(pp?.uid ?? pp?.playerUid ?? pp?.playerId ?? pp?.id) === key);
+        if (sp && typeof sp?.color === 'string' && sp.color) return sp.color;
+      }
+    } catch {}
+
+    return null;
+  }
+
+  private updatePlayersFromMap(mapPayload: any): void {
+    this.playersByUid.clear();
+    if (!mapPayload) {
+      const sessionInfo: any = this.store?.sessionInfo?.() ?? this.store?.sessionInfo ?? null;
+      const sessionPlayers = sessionInfo?.players ?? sessionInfo?.playerList ?? null;
+      if (Array.isArray(sessionPlayers)) {
+        for (const p of sessionPlayers) {
+          const uidRaw = p?.uid ?? p?.playerUid ?? p?.playerId ?? p?.id ?? null;
+          const key = this.normalizeUid(uidRaw);
+          if (!key) continue;
+          const color = (typeof p?.color === 'string' && p.color) ? p.color : this.colorForFallback(key);
+          const name = p?.displayName ?? p?.name ?? p?.playerName ?? key;
+          this.playersByUid.set(key, { name: String(name), color });
+        }
+      }
+      this.updateLegend();
+      return;
+    }
+
+    const playersList = mapPayload.players ?? mapPayload.playerList ?? mapPayload.playersInfo ?? mapPayload.playersData ?? null;
+    const sessionInfo: any = this.store?.sessionInfo?.() ?? this.store?.sessionInfo ?? null;
+    const sessionPlayers = sessionInfo?.players ?? sessionInfo?.playerList ?? null;
+
+    if (Array.isArray(playersList) && playersList.length) {
+      for (const p of playersList) {
+        const uidRaw = p?.uid ?? p?.playerUid ?? p?.playerId ?? p?.id ?? null;
+        const key = this.normalizeUid(uidRaw);
+        if (!key) continue;
+        let color = (typeof p?.color === 'string' && p.color) ? p.color : undefined;
+        if (!color && Array.isArray(sessionPlayers)) {
+          const sp = sessionPlayers.find((s: any) => this.normalizeUid(s?.uid ?? s?.playerUid ?? s?.playerId ?? s?.id) === key);
+          if (sp && typeof sp?.color === 'string' && sp.color) color = sp.color;
+        }
+        const name = p?.displayName ?? p?.name ?? p?.playerName ?? key;
+        this.playersByUid.set(key, { name: String(name), color: color ?? this.colorForFallback(key) });
+      }
+    } else if (Array.isArray(sessionPlayers) && sessionPlayers.length) {
+      for (const p of sessionPlayers) {
+        const uidRaw = p?.uid ?? p?.playerUid ?? p?.playerId ?? p?.id ?? null;
+        const key = this.normalizeUid(uidRaw);
+        if (!key) continue;
+        const color = (typeof p?.color === 'string' && p.color) ? p.color : this.colorForFallback(key);
+        const name = p?.displayName ?? p?.name ?? p?.playerName ?? key;
+        this.playersByUid.set(key, { name: String(name), color });
+      }
+    } else {
+      const rows = mapPayload.map?.length || 0;
+      const cols = mapPayload.map?.[0]?.length || 0;
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          const cell = mapPayload.map[y][x];
+          const stationObj = cell?.location?.station ?? cell?.location ?? cell;
+          const masterUid = stationObj?.masterUid ?? stationObj?.ownerUid ?? stationObj?.playerUid ?? stationObj?.uId ?? null;
+          const k = this.normalizeUid(masterUid);
+          if (!k) continue;
+          if (!this.playersByUid.has(k)) {
+            let color = null;
+            if (Array.isArray(sessionPlayers)) {
+              const sp = sessionPlayers.find((s: any) => this.normalizeUid(s?.uid ?? s?.playerUid ?? s?.playerId ?? s?.id) === k);
+              if (sp && typeof sp?.color === 'string' && sp.color) color = sp.color;
+            }
+            this.playersByUid.set(k, { name: k, color: color ?? this.colorForFallback(k) });
+          }
+        }
+      }
+    }
+
+    this.updateLegend();
+  }
+
+  private updateLegend(): void {
+    const entries: { uid: string; name: string; color: string }[] = [];
+    for (const [uid, info] of this.playersByUid.entries()) entries.push({ uid, name: info.name, color: info.color });
+    entries.sort((a, b) => a.name.localeCompare(b.name));
+    this.legendEntries = entries;
+  }
+
+  // deterministic fallback color for player uid
+  private colorForFallback(key: string | number | null | undefined): string {
+    if (key == null) return this.unownedColor;
+    const s = String(key);
+    let h = 0;
+    for (let i = 0; i < s.length; i++) {
+      h = (h << 5) - h + s.charCodeAt(i);
+      h |= 0;
+    }
+    const hue = Math.abs(h) % 360;
+    return `hsl(${hue} 65% 45%)`;
+  }
+
+  // helper: safely show/hide canvas element used in this component
+  private setCanvasVisibility(visible: boolean): void {
+    try {
+      const canvas = this.canvasRef?.nativeElement;
+      if (!canvas) return;
+      canvas.style.display = visible ? 'block' : 'none';
+    } catch {}
+  }
+
+  // ----- rendering -----
   private drawMap(): void {
     const canvas = this.canvasRef?.nativeElement;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // clear drawing area (CSS pixels) and ensure white background
+    // clear and white background
     ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
 
-    // draw background image (if available)
+    // draw background image (Deutschland.svg) centered, keep aspect
     let imgLeft = 0;
     let imgTop = 0;
     let drawW = this.canvasWidth;
@@ -393,37 +499,22 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       imgLeft = Math.max(0, (this.canvasWidth - drawW) / 2);
       imgTop = Math.max(0, (this.canvasHeight - drawH) / 2);
-      try {
-        ctx.drawImage(img, imgLeft, imgTop, drawW, drawH);
-      } catch {
-        // drawing failed -> keep white background
-      }
-    } else {
-      // no image: keep white background
+      try { ctx.drawImage(img, imgLeft, imgTop, drawW, drawH); } catch {}
     }
 
-    // draw a black border around the rendered SVG area (the map image rectangle)
-    // Use border width proportional to current scale but >= 2 px for visibility
+    // black border around the svg area
     const borderWidth = Math.max(2, Math.round(2 * this.scale));
     const inset = borderWidth / 2;
     ctx.save();
     ctx.lineWidth = borderWidth;
-    ctx.strokeStyle = '#000000';
-    // keep stroke inside the image rectangle by insetting
-    const bx = imgLeft + inset;
-    const by = imgTop + inset;
-    const bw = Math.max(0, drawW - inset * 2);
-    const bh = Math.max(0, drawH - inset * 2);
-    ctx.strokeRect(bx, by, bw, bh);
+    ctx.strokeStyle = '#000';
+    ctx.strokeRect(imgLeft + inset, imgTop + inset, Math.max(0, drawW - inset * 2), Math.max(0, drawH - inset * 2));
     ctx.restore();
 
     const map = this.mapData;
-    if (!map?.map || !map.map.length) {
-      // nothing to draw (no grid) -> stop
-      return;
-    }
+    if (!map?.map || !map.map.length) return;
 
-    // compute content box where stations should be positioned (use content bounds if available)
+    // compute content box for stations
     let contentLeft = imgLeft;
     let contentTop = imgTop;
     let contentW = drawW;
@@ -438,7 +529,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       contentH = Math.max(1, ib.height * scaleY);
     }
 
-    // compute rows/cols and cell sizes
     const rows = map.map.length || 0;
     const cols = map.map[0]?.length || 0;
     const cellW = contentW / Math.max(1, cols);
@@ -450,141 +540,26 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         const rawType = field?.location?.type;
         const typeStr = rawType == null ? '' : String(rawType).toUpperCase();
         const stationObj: Station | any = field?.location?.station ?? field?.location ?? field;
-
-        // detect station robustly (type includes STATION or explicit station object)
         const isStation = typeStr.includes('STATION') || !!field?.location?.station || !!stationObj?.masterUid;
 
-        if (!isStation) {
-          // non-station: transparent => skip drawing
-          continue;
-        }
+        if (!isStation) continue; // transparent
 
-        // compute center of cell in content rect
         const cx = contentLeft + rx * cellW + cellW / 2;
         const cy = contentTop + ry * cellH + cellH / 2;
 
-        // determine owner: backend now uses station.masterUid
         const masterUid = stationObj?.masterUid ?? stationObj?.ownerUid ?? stationObj?.playerUid ?? stationObj?.uId ?? null;
-        const ownerInfo = masterUid ? this.playersByUid.get(String(masterUid)) : null;
-        const fillColor = ownerInfo?.color ?? this.unownedColor;
+        const resolvedColor = this.resolvePlayerColor(masterUid, this.mapData);
+        const fillColor = resolvedColor ?? this.unownedColor;
 
         ctx.beginPath();
         const radius = Math.max(4, Math.floor(Math.min(cellW, cellH) * 0.18));
         ctx.arc(cx, cy, radius, 0, Math.PI * 2);
         ctx.fillStyle = fillColor;
         ctx.fill();
-
         ctx.lineWidth = 1;
         ctx.strokeStyle = 'rgba(0,0,0,0.45)';
         ctx.stroke();
       }
-    }
-  }
-
-  // Build playersByUid map from incoming map payload (called on load and updates)
-  private updatePlayersFromMap(mapPayload: any): void {
-    this.playersByUid.clear();
-    if (!mapPayload) {
-      // try to populate from store session info as fallback
-      const sessionInfo: any = this.store?.sessionInfo?.() ?? this.store?.sessionInfo ?? null;
-      const sessionPlayers = sessionInfo?.players ?? sessionInfo?.playerList ?? null;
-      if (Array.isArray(sessionPlayers)) {
-        for (const p of sessionPlayers) {
-          const uid = p?.uid ?? p?.playerUid ?? p?.playerId ?? p?.id ?? null;
-          if (uid == null) continue;
-          const key = String(uid);
-          const color = (typeof p?.color === 'string' && p.color) ? p.color : this.colorForFallback(key);
-          const name = p?.displayName ?? p?.name ?? p?.playerName ?? key;
-          this.playersByUid.set(key, { name: String(name), color });
-        }
-      }
-      this.updateLegend();
-      return;
-    }
-
-    // backend may provide players array under different names
-    const playersList = mapPayload.players ?? mapPayload.playerList ?? mapPayload.playersInfo ?? mapPayload.playersData ?? null;
-
-    // as additional fallback check store session info for players (keeps colors in sync)
-    const sessionInfo: any = this.store?.sessionInfo?.() ?? this.store?.sessionInfo ?? null;
-    const sessionPlayers = sessionInfo?.players ?? sessionInfo?.playerList ?? null;
-
-    if (Array.isArray(playersList) && playersList.length) {
-      for (const p of playersList) {
-        const uid = p?.uid ?? p?.playerUid ?? p?.playerId ?? p?.id ?? null;
-        if (uid == null) continue;
-        const key = String(uid);
-        // prefer explicit color from payload; otherwise check sessionPlayers for color; else fallback
-        let color = (typeof p?.color === 'string' && p.color) ? p.color : undefined;
-        if (!color && Array.isArray(sessionPlayers)) {
-          const sp = sessionPlayers.find((s: any) => String(s?.uid ?? s?.playerUid ?? s?.playerId ?? s?.id) === key);
-          if (sp && typeof sp?.color === 'string' && sp.color) color = sp.color;
-        }
-        const name = p?.displayName ?? p?.name ?? p?.playerName ?? key;
-        this.playersByUid.set(key, { name: String(name), color: color ?? this.colorForFallback(key) });
-      }
-    } else if (Array.isArray(sessionPlayers) && sessionPlayers.length) {
-      // no players in payload but session info has them
-      for (const p of sessionPlayers) {
-        const uid = p?.uid ?? p?.playerUid ?? p?.playerId ?? p?.id ?? null;
-        if (uid == null) continue;
-        const key = String(uid);
-        const color = (typeof p?.color === 'string' && p.color) ? p.color : this.colorForFallback(key);
-        const name = p?.displayName ?? p?.name ?? p?.playerName ?? key;
-        this.playersByUid.set(key, { name: String(name), color });
-      }
-    } else {
-      // infer players from stations (best-effort)
-      const rows = mapPayload.map?.length || 0;
-      const cols = mapPayload.map?.[0]?.length || 0;
-      for (let y = 0; y < rows; y++) {
-        for (let x = 0; x < cols; x++) {
-          const cell = mapPayload.map[y][x];
-          const stationObj = cell?.location?.station ?? cell?.location ?? cell;
-          const masterUid = stationObj?.masterUid ?? stationObj?.ownerUid ?? stationObj?.playerUid ?? stationObj?.uId ?? null;
-          if (!masterUid) continue;
-          const k = String(masterUid);
-          if (!this.playersByUid.has(k)) {
-            this.playersByUid.set(k, { name: k, color: this.colorForFallback(k) });
-          }
-        }
-      }
-    }
-
-    this.updateLegend();
-  }
-
-  private updateLegend(): void {
-    const entries: { uid: string; name: string; color: string }[] = [];
-    for (const [uid, info] of this.playersByUid.entries()) {
-      entries.push({ uid, name: info.name, color: info.color });
-    }
-    entries.sort((a, b) => a.name.localeCompare(b.name));
-    this.legendEntries = entries;
-  }
-
-  // deterministic fallback color for player uid
-  private colorForFallback(key: string | number | null | undefined): string {
-    if (key == null) return this.unownedColor;
-    const s = String(key);
-    let h = 0;
-    for (let i = 0; i < s.length; i++) {
-      h = (h << 5) - h + s.charCodeAt(i);
-      h |= 0;
-    }
-    const hue = Math.abs(h) % 360;
-    // return as modern CSS color with spaces for better cross-browser HSL support
-    return `hsl(${hue} 65% 45%)`;
-  }
-
-  // helper: safely show/hide canvas element used in this component
-  private setCanvasVisibility(visible: boolean): void {
-    try {
-      const canvas = this.canvasRef?.nativeElement;
-      if (!canvas) return;
-      canvas.style.display = visible ? 'block' : 'none';
-    } catch {
-      // view may not be ready — ignore
     }
   }
 }
