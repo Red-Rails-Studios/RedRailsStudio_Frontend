@@ -13,7 +13,7 @@ import { Player } from '../../models/player.model';
   styleUrls: ['./lobbypage.component.scss']
 })
 export class LobbypageComponent {
-  lobbyPlayers: Player[] = [];
+  lobbyPlayers: any[] = [];
 
   constructor(private router: Router, public store: Store, private apiService: APISService) {}
 
@@ -57,5 +57,17 @@ export class LobbypageComponent {
     } else {
       this.router.navigate(['home']);
     }
+  }
+
+  // deterministic color generator - same logic as map component fallback
+  colorForUid(player: any): string {
+    const uid = player?.uid ?? player?.playerUid ?? player?.uId ?? player?.id ?? player?.UId ?? null;
+    if (!uid) return '#9e9e9e';
+    const s = String(uid);
+    let h = 0;
+    for (let i = 0; i < s.length; i++) h = (h << 5) - h + s.charCodeAt(i);
+    h = Math.abs(h);
+    const hue = h % 360;
+    return `hsl(${hue} 65% 45%)`;
   }
 }

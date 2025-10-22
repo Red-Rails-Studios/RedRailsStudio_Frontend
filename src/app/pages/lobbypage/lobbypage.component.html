@@ -10,6 +10,7 @@
         <h3 class="lobby-text">Players in Lobby ({{ lobbyPlayers.length }}/4):</h3>
         <ul>
             <li class="lobby-text" *ngFor="let player of lobbyPlayers">
+                <span class="player-swatch" [style.background]="colorForUid(player)"></span>
                 {{ player.name }}
             </li>
         </ul>

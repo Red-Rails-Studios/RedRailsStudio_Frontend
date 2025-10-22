@@ -1,18 +1,12 @@
 <div class="map-container">
-  <div class="pixel-map" *ngIf="mapData as md">
-    <canvas #mapCanvas
-            class="map-canvas"
-            [attr.width]="canvasWidth"
-            [attr.height]="canvasHeight"
-            [style.width.px]="canvasWidth"
-            [style.height.px]="canvasHeight">
-    </canvas>
+  <div class="canvas-wrap">
+    <canvas #mapCanvas class="map-canvas"></canvas>
   </div>
-  <div class="pixel-map" *ngIf="!mapData">
-    <div class="loading">{{ loading ? 'Loading map...' : 'Map not loaded' }}</div>
-    <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
-    <div style="margin-top:8px;">
-      <button (click)="reloadMap()">Reload Map</button>
-    </div>
+
+  <div class="controls">
+    <div class="loading" *ngIf="loading">Loading map...</div>
+    <div class="error" *ngIf="errorMsg">{{ errorMsg }}</div>
+
+    <button *ngIf="showReloadButton" (click)="triggerReload()">Reload Map</button>
   </div>
 </div>

@@ -6,6 +6,7 @@ import { Requirements } from "./requierment.model";
 export interface Player {
   uId: string;
   name: string;
+  color: string;
 
   dbCoin: number;
   employees: number;
