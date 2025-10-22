@@ -67,6 +67,13 @@ export class Store {
         requiredEmployees: 0,
         requiredPower: 0
     }])
+
+    elementBuyRequirements = signal<Requirements[]>([{
+        requiredEmployees: 0,
+        uId: '',
+        requiredPower: 0,
+        requiredDbCoin: 0
+    }])
     
 
     session = signal<SessionOverview | null>(null);
@@ -167,9 +174,18 @@ export class Store {
         });
     }
 
-    buyRequirements(sessionName: string, playerUid: string) {
-        this.apiService.buyRequirements(sessionName, playerUid);
-    }
+    // buyRequirements(sessionName: string, playerUid: string) {
+    //     this.apiService.buyRequirements(sessionName, playerUid).subscribe({
+    //     next: (requirements: Requirements[]) => {
+    //         this.elementBuyRequirements.set(requirements);
+    //         console.log('got buy requirements:', requirements);
+    //     },
+    //     error: (err) => {
+    //         console.error('Error fetching buy requirements:', err);
+    //     }
+    //     });
+    // }
+    
 
     getTrain (sessionName: string, playerName: string, trainUid: string) {
         this.apiService.getTrainInfo(sessionName, playerName, trainUid).subscribe((res: Player) => {

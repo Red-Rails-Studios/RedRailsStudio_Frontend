@@ -17,6 +17,7 @@ export class TrainsComponent {
   sessionInfo = inject(Store).sessionInfo;
   requirements = inject(Store).upgradeResourcesTrain;
   upgrades: Requirements[] = [];
+  buy: Requirements | undefined;
 
   constructor(public store: Store) {}
 
@@ -32,6 +33,7 @@ export class TrainsComponent {
         this.store.getUpgradeRequirementsTrain(sessionName, playerUId);
         this.trains = this.store.resources().trainDtos;
         this.upgrades = this.store.upgradeResourcesTrain();
+        // this.store.buyRequirements(sessionName, playerUId);
         console.log('upgrade requirements train',this.upgrades, playerUId);
         //console.log("trains updated", this.trains)
       }, 500);
@@ -58,6 +60,8 @@ export class TrainsComponent {
 
     this.store.buyTrain(sessionName, uId);
     this.store.getUpgradeRequirementsTrain(sessionName, uId);
+
+    this.buy = this.store.elementBuyRequirements()[0];
   }
 
   onUpgradeTrain(trainNr: number) {  

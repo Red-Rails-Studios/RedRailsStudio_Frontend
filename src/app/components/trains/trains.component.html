@@ -1,6 +1,12 @@
 <div class="train-set">
     <button (click)="onBuyTrain()" class="buy-button">
-        Buy Train</button>
+        Buy Train 
+        <div class="requirements">
+            Db coins:{{store.elementBuyRequirements()[0].requiredDbCoin}}
+            power:{{store.elementBuyRequirements()[0].requiredPower}}
+            employee:{{store.elementBuyRequirements()[0].requiredEmployees}}
+        </div>
+    </button>
     <div class="train-list">
         <div *ngFor="let trainDtos of trains; let i=index" class="train-block">
             <img class="train-pic" src="assets/retro-pixel-art-train-tracks-vibrant-detailed-digital-illustration_1292377-15709.avif" alt="button Image">
