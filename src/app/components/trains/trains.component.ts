@@ -33,7 +33,7 @@ export class TrainsComponent {
         this.store.getUpgradeRequirementsTrain(sessionName, playerUId);
         this.trains = this.store.resources().trainDtos;
         this.upgrades = this.store.upgradeResourcesTrain();
-        // this.store.buyRequirements(sessionName, playerUId);
+        this.store.getBuyRequirements(sessionName, playerUId);
         console.log('upgrade requirements train',this.upgrades, playerUId);
         //console.log("trains updated", this.trains)
       }, 500);

@@ -1,5 +1,12 @@
 <div class="railandstation-list">
-  <button (click)="onBuyRail()" class="buy-button">Buy Rail</button>
+  <button (click)="onBuyRail()" class="buy-button">
+    Buy Rail
+    <div class="requirements">
+            Db coins: {{store.elementBuyRequirements()[2].requiredDbCoin}}
+            power: {{store.elementBuyRequirements()[2].requiredPower}}
+            employee: {{store.elementBuyRequirements()[2].requiredEmployees}}
+    </div>
+  </button>
 
   <div class="rail-list">
     <div *ngFor="let railDtos of rails; let i = index" class="rail-block"> 
@@ -23,7 +30,14 @@
     </div>
   </div>
 
-  <button (click)="onBuyStation()" class="buy-button">Buy Station</button>
+  <button (click)="onBuyStation()" class="buy-button">
+    Buy Station
+    <div class="requirements">
+            Db coins:{{store.elementBuyRequirements()[1].requiredDbCoin}}
+            power:{{store.elementBuyRequirements()[1].requiredPower}}
+            employee:{{store.elementBuyRequirements()[1].requiredEmployees}}
+        </div>
+  </button>
 
   <div class="station-list">
       <div *ngFor="let station of stations; let i = index" class="station-block">

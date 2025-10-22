@@ -3,7 +3,7 @@ import { Resources } from "../models/resources.model";
 import { APISService } from "./apis.service";
 import { Train } from "../models/train.model";
 import { SessionOverview } from "../models/sessionOverview.model";
-import { concat, concatMap } from "rxjs";
+import { concatMap } from "rxjs";
 import { Rail } from "../models/rail.model";
 import { Station } from "../models/station.model";
 import { GameState } from "../models/game-state.model";
@@ -175,17 +175,17 @@ export class Store {
         });
     }
 
-    // buyRequirements(sessionName: string, playerUid: string) {
-    //     this.apiService.buyRequirements(sessionName, playerUid).subscribe({
-    //     next: (requirements: Requirements[]) => {
-    //         this.elementBuyRequirements.set(requirements);
-    //         console.log('got buy requirements:', requirements);
-    //     },
-    //     error: (err) => {
-    //         console.error('Error fetching buy requirements:', err);
-    //     }
-    //     });
-    // }
+    getBuyRequirements(sessionName: string, playerUid: string){
+        this.apiService.buyRequirements(sessionName, playerUid).subscribe({
+            next: (requirements: Requirements[]) => {
+            this.elementBuyRequirements.set(requirements);
+            console.log('got upgrade reqiirments train', requirements)
+        },
+        error: (err) => {
+        console.error('Error fetching train upgrades:', err);
+        }   
+        });    
+    }
     
 
     getTrain (sessionName: string, playerName: string, trainUid: string) {

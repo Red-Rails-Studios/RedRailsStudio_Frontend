@@ -113,8 +113,8 @@ export class APISService {
     return this.http.post(`http://localhost:8080/session/${sessionName}/player/${playerUid}/power`, null, { responseType: 'text'});
   }
 
-  buyRequirements(sessionName: string, playerUid: string){
-   return this.http.get(`http://localhost:8080/session/${sessionName}/player/${playerUid}/buy/getRequirements`)
+  buyRequirements(sessionName: string, playerUid: string): Observable<any[]>{
+   return this.http.get<Requirements[]>(`http://localhost:8080/session/${sessionName}/player/${playerUid}/buy/getRequirements`)
   }
 
   getMap(sessionName: string) {
