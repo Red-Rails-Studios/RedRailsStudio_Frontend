@@ -127,7 +127,7 @@ export class Store {
     setResources(sessionName: string, playerUid: string) {
         this.apiService.getResources(sessionName, playerUid).subscribe((resources: Resources) => {
             this.resources.set(resources);
-            console.log('Resources updated:', this.resources());
+            //console.log('Resources updated:', this.resources());
         })
     }
 
@@ -179,7 +179,7 @@ export class Store {
         this.apiService.buyRequirements(sessionName, playerUid).subscribe({
             next: (requirements: Requirements[]) => {
             this.elementBuyRequirements.set(requirements);
-            console.log('got upgrade reqiirments train', requirements)
+            //console.log('got upgrade reqiirments train', requirements)
         },
         error: (err) => {
         console.error('Error fetching train upgrades:', err);

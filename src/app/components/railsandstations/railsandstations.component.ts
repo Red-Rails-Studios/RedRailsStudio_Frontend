@@ -70,7 +70,6 @@ export class UpgradesComponent {
     }
     this.store.buyStation(sessionName, uId);
     this.upgradesStation = this.store.upgradeResourcesStation();
-    //console.log('buying Rail with', sessionName, uid);
   }
 
   onUpgradeStation(stationNr: number) {
