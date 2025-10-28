@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { Store } from '../../services/store';
 import { APISService } from '../../services/apis.service';
 import { Player } from '../../models/player.model';
+import { normalizeColorRaw } from '../../utils/color.util';
 
 @Component({
   selector: 'app-lobbypage',
@@ -14,6 +15,9 @@ import { Player } from '../../models/player.model';
 })
 export class LobbypageComponent {
   lobbyPlayers: any[] = [];
+
+  // make helper available in template
+  public normalizeColor = normalizeColorRaw;
 
   constructor(private router: Router, public store: Store, private apiService: APISService) {}
 
@@ -59,15 +63,22 @@ export class LobbypageComponent {
     }
   }
 
-  // deterministic color generator - same logic as map component fallback
-  colorForUid(player: any): string {
-    const uid = player?.uid ?? player?.playerUid ?? player?.uId ?? player?.id ?? player?.UId ?? null;
-    if (!uid) return '#9e9e9e';
-    const s = String(uid);
-    let h = 0;
-    for (let i = 0; i < s.length; i++) h = (h << 5) - h + s.charCodeAt(i);
-    h = Math.abs(h);
-    const hue = h % 360;
-    return `hsl(${hue} 65% 45%)`;
+  colorForUid(player: Player): string {
+    for (let index = 0; index < this.lobbyPlayers.length; index++) {
+      if(this.lobbyPlayers[index].uId == player.uId) {
+        switch(this.lobbyPlayers[index].color) {
+          case '#FF0000':
+            return '#FF0000';
+          case '#00FF00':
+            return '#00FF00';
+          case '#0000FF':
+            return '#0000FF';
+          case '#FFFF00':
+            return '#FFFF00';
+        }
+      }
+    }
+
+    return '#000000';
   }
 }

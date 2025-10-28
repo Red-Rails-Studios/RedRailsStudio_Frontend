@@ -9,6 +9,7 @@ import type { Map as MapModel } from '../../models/map.model';
 import type { Station } from '../../models/station.model';
 import { APISService } from '../../services/apis.service';
 import { Store } from '../../services/store';
+import { normalizeColorRaw } from '../../utils/color.util';
 
 @Component({
   selector: 'app-map',
@@ -46,6 +47,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // players map: normalizedUid -> { name, color }
   private playersByUid: Map<string, { name: string; color: string }> = new Map();
+  private ownerColorMap: Map<string, string> = new Map();
 
   // unowned station color (grey)
   private readonly unownedColor = '#b0b0b0';
@@ -440,10 +442,49 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private updateLegend(): void {
-    const entries: { uid: string; name: string; color: string }[] = [];
-    for (const [uid, info] of this.playersByUid.entries()) entries.push({ uid, name: info.name, color: info.color });
-    entries.sort((a, b) => a.name.localeCompare(b.name));
-    this.legendEntries = entries;
+    const map = this.mapData?.();
+    if (!map) { this.legendEntries = []; return; }
+
+    const playersList = (map as any).players ?? (map as any).playerList ?? (map as any).playersInfo ?? null;
+    const entries: { key: string; name: string; color: string }[] = [];
+
+    if (Array.isArray(playersList) && playersList.length) {
+      for (const p of playersList) {
+        const id = p?.id ?? p?.playerId ?? p?.userId ?? p?.name ?? null;
+        if (id == null) continue;
+        const key = String(id);
+        const rawColor = p?.color ?? p?.colorHex ?? p?.hex ?? p?.playerColor ?? null;
+        const color = normalizeColorRaw(rawColor) ?? this.colorForKey(key);
+        const name = p?.displayName ?? p?.name ?? p?.playerName ?? key;
+        this.ownerColorMap.set(key, color);
+        entries.push({ key, name, color });
+      }
+      entries.sort((a, b) => a.name.localeCompare(b.name));
+      this.legendEntries = entries;
+      return;
+    }
+
+    // fallback: scan stations and normalize any color fields found there
+    const rows = map.map?.length || 0;
+    const cols = map.map?.[0]?.length || 0;
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        const cell = map.map[y][x];
+        const stationObj = cell?.location?.station ?? cell?.location ?? cell;
+        const rawColor = stationObj?.color ?? stationObj?.colorHex ?? stationObj?.playerColor ?? null;
+        if (rawColor) {
+          const normalized = normalizeColorRaw(rawColor);
+          if (normalized) {
+            const key = this.ownerKeyFromStation(stationObj);
+            if (key) this.ownerColorMap.set(String(key), normalized);
+          }
+        }
+      }
+    }
+
+    this.legendEntries = Array.from(this.ownerColorMap.entries()).map(([key, color]) => {
+      return { uid: key, name: key, color };
+    });
   }
 
   // deterministic fallback color for player uid
@@ -519,48 +560,57 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     let contentTop = imgTop;
     let contentW = drawW;
     let contentH = drawH;
-    if (this.mapImageContentBounds && this.mapImage) {
-      const ib = this.mapImageContentBounds;
-      const scaleX = drawW / (this.mapImage.naturalWidth || this.mapImage.width || drawW);
-      const scaleY = drawH / (this.mapImage.naturalHeight || this.mapImage.height || drawH);
-      contentLeft = imgLeft + ib.left * scaleX;
-      contentTop = imgTop + ib.top * scaleY;
-      contentW = Math.max(1, ib.width * scaleX);
-      contentH = Math.max(1, ib.height * scaleY);
+    if (this.mapImageContentBounds) {
+      const b = this.mapImageContentBounds;
+      contentLeft = imgLeft + (b.left * this.scale);
+      contentTop = imgTop + (b.top * this.scale);
+      contentW = Math.max(0, b.width * this.scale);
+      contentH = Math.max(0, b.height * this.scale);
     }
 
-    const rows = map.map.length || 0;
+    // draw stations
+    const rows = map.map.length;
     const cols = map.map[0]?.length || 0;
-    const cellW = contentW / Math.max(1, cols);
-    const cellH = contentH / Math.max(1, rows);
-
-    for (let ry = 0; ry < rows; ry++) {
-      for (let rx = 0; rx < cols; rx++) {
-        const field = map.map[ry][rx];
-        const rawType = field?.location?.type;
-        const typeStr = rawType == null ? '' : String(rawType).toUpperCase();
-        const stationObj: Station | any = field?.location?.station ?? field?.location ?? field;
-        const isStation = typeStr.includes('STATION') || !!field?.location?.station || !!stationObj?.masterUid;
-
-        if (!isStation) continue; // transparent
-
-        const cx = contentLeft + rx * cellW + cellW / 2;
-        const cy = contentTop + ry * cellH + cellH / 2;
-
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        const cell = map.map[y][x];
+        const stationObj = cell?.location?.station ?? cell?.location ?? cell;
         const masterUid = stationObj?.masterUid ?? stationObj?.ownerUid ?? stationObj?.playerUid ?? stationObj?.uId ?? null;
-        const resolvedColor = this.resolvePlayerColor(masterUid, this.mapData);
-        const fillColor = resolvedColor ?? this.unownedColor;
+        const uid = this.normalizeUid(masterUid);
+        let fillColor: string;
 
-        ctx.beginPath();
-        const radius = Math.max(4, Math.floor(Math.min(cellW, cellH) * 0.18));
-        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        if (cell?.bought) {
+          const cachedColor = uid ? this.ownerColorMap.get(uid) : undefined;
+          if (cachedColor) {
+            fillColor = cachedColor;
+          } else {
+            const stationRawColor = stationObj.color ?? stationObj.colorHex ?? stationObj.playerColor ?? null;
+            const normalizedColor = normalizeColorRaw(stationRawColor);
+            fillColor = normalizedColor ?? (uid ? this.colorForKey(uid) : this.colorForKey('unknown'));
+            if (uid) this.ownerColorMap.set(uid, fillColor);
+          }
+        } else {
+          fillColor = this.unownedColor;
+        }
+
+        const drawX = Math.floor(x * (this.tileSize + this.gap) * this.scale + contentLeft);
+        const drawY = Math.floor(y * (this.tileSize + this.gap) * this.scale + contentTop);
+        const drawSize = Math.ceil(this.tileSize * this.scale);
+
         ctx.fillStyle = fillColor;
-        ctx.fill();
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = 'rgba(0,0,0,0.45)';
-        ctx.stroke();
+        ctx.fillRect(drawX, drawY, drawSize, drawSize);
       }
     }
+  }
+
+  private ownerKeyFromStation(station: any): string | null {
+    // Logic to determine the owner key from the station object
+    return station.ownerId ?? station.playerId ?? null;
+  }
+
+  private colorForKey(key: string): string {
+    // Logic to generate a deterministic color based on the key
+    return '#' + ((parseInt(key, 36) % 16777215) | 0).toString(16).padStart(6, '0');
   }
 }
 
