@@ -127,7 +127,7 @@ export class Store {
     setResources(sessionName: string, playerUid: string) {
         this.apiService.getResources(sessionName, playerUid).subscribe((resources: Resources) => {
             this.resources.set(resources);
-            //console.log('Resources updated:', this.resources());
+            console.log('Resources updated:', this.resources());
         })
     }
 
@@ -190,12 +190,12 @@ export class Store {
 
     getTrain (sessionName: string, playerName: string, trainUid: string) {
         this.apiService.getTrainInfo(sessionName, playerName, trainUid).subscribe((res: Player) => {
-            console.log('');
+            
         })
     }
 
     buyTrain(sessionName: string, playerUid: string) {
-        console.log('Store.buyTrain called with', { sessionName, playerUid });
+        //console.log('Store.buyTrain called with', { sessionName, playerUid });
         if (!sessionName) {
             console.error('buyTrain aborted: sessionName is undefined');
             return;
@@ -232,7 +232,7 @@ export class Store {
         this.apiService.upgradeRequirementsTrain(sessionName, playerUid).subscribe({
             next: (requirements: Requirements[]) => {
             this.upgradeResourcesTrain.set(requirements);
-            console.log('got upgrade reqiirments train', requirements)
+            //console.log('got upgrade reqiirments train', requirements)
         },
         error: (err) => {
         console.error('Error fetching train upgrades:', err);
@@ -267,7 +267,7 @@ export class Store {
         this.apiService.upgradeRequirementsRail(sessionName, playerUid).subscribe({
             next: (requirements: Requirements[]) => {
             this.upgradeResourcesRail.set(requirements);
-            console.log('got upgrade reqirments rail', requirements)
+            //console.log('got upgrade reqirments rail', requirements)
         },
         error: (err) => {
         console.error('Error fetching rail upgrades:', err);
@@ -308,6 +308,10 @@ export class Store {
     }
 
     buyEmployee(sessionName: string, playerUid: string) {
+        if (!sessionName || !playerUid) {
+            console.error('buyEmployee aborted: sessionName or playerUid missing');
+            return;
+        }
         this.apiService.buyEmployee(sessionName, playerUid).subscribe({
             next: () => {
                 this.getPlayerInfos(sessionName, playerUid);

@@ -34,7 +34,7 @@ export class TrainsComponent {
         this.trains = this.store.resources().trainDtos;
         this.upgrades = this.store.upgradeResourcesTrain();
         this.store.getBuyRequirements(sessionName, playerUId);
-        console.log('upgrade requirements train',this.upgrades, playerUId);
+        //console.log('upgrade requirements train',this.upgrades, playerUId);
       }, 500);
     }
   }
@@ -68,7 +68,7 @@ export class TrainsComponent {
     const uId = this.playerInfo().uId;
     const trainId = this.store.resources().trainDtos[trainNr].uId;
     //const trainId = this.trains[trainNr].id;
-    console.log(trainId);
+    //console.log(trainId);
     this.store.upgradeTrain(sessionName, uId, trainId);
     this.store.getUpgradeRequirementsTrain(sessionName, uId);
   }

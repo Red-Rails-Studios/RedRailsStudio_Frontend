@@ -56,7 +56,7 @@ export class UpgradesComponent {
     const sessionName = this.sessionInfo().sessionName;
     const uid = this.playerInfo().uId;
     const railId = this.store.resources().railDtos[railNr].uId;
-    console.log(railId);
+    //console.log(railId);
     this.store.upgradeTrain(sessionName, uid, railId);
     this.upgradesRail = this.store.upgradeResourcesRail();
   }
@@ -76,7 +76,7 @@ export class UpgradesComponent {
     const sessionName = this.sessionInfo().sessionName;
     const uid = this.playerInfo().uId;
     const stationId = this.store.resources().stationDtos[stationNr].uId;
-    console.log(stationId);
+    //console.log(stationId);
     this.store.upgradeTrain(sessionName, uid, stationId);
     this.upgradesStation = this.store.upgradeResourcesStation();
   }

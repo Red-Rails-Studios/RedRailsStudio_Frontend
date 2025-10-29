@@ -15,6 +15,8 @@ export class ResourcesComponent implements OnInit {
   playerInfo = inject(Store).playerInfo;
   sessionInfo = inject(Store).sessionInfo;
   currentAmount: number = 0;
+  deltaAmount: number = 0;
+  ausgabeAmount: number = 0;
 
   constructor(public store: Store) {}
 
@@ -24,16 +26,18 @@ export class ResourcesComponent implements OnInit {
   
   if (sessionName && playerUid) {
     this.store.getPlayerInfos(sessionName, playerUid);
-    //let deltaAmount = 0;
+    let deltaAmount = 0;
     setInterval(() => {
+      this.currentAmount = this.store.resources().dbCoin as number;
       this.store.setResources(sessionName, playerUid);
-     // deltaAmount = this.store.resources().dbCoin as number - this.currentAmount;
+      this.deltaAmount = (this.store.resources().dbCoin as number - this.currentAmount) /4;
       // this.countToLastCoinAmount(currentAmount, this.store.resources().dbCoin as number);
+      for (let i = 0; i<4; i++){
+      setTimeout(() => {
+          this.ausgabeAmount = this.currentAmount + deltaAmount;
+      }, 250)
+    }
     }, 1000);
-    // setInterval(() => {
-    //   //if (this.currentAmount !== this.store.resources().dbCoin as number)
-    //     this.currentAmount += deltaAmount / 5;
-    // }, 1000)
   } 
   else {
     console.error('Session name or player UID is missing!');
