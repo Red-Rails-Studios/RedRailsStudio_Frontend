@@ -10,6 +10,7 @@ import type { Station } from '../../models/station.model';
 import { APISService } from '../../services/apis.service';
 import { Store } from '../../services/store';
 import { normalizeColorRaw } from '../../utils/color.util';
+import { Player } from '../../models/player.model';
 
 @Component({
   selector: 'app-map',
@@ -62,12 +63,12 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(private apiService: APISService, public store: Store) {}
 
   ngOnInit(): void {
-    const sessionName = this.store.sessionName() || this.store.sessionInfo().sessionName;
+    const sessionName = this.store.sessionName();
     if (!sessionName) {
       let attempts = 0;
       this.pollIntervalId = setInterval(() => {
         attempts++;
-        const sName = this.store.sessionName() || this.store.sessionInfo().sessionName;
+        const sName = this.store.sessionName();
         if (sName) {
           clearInterval(this.pollIntervalId);
           this.pollIntervalId = null;
@@ -114,9 +115,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         this.updateCanvasSize();
         this.scheduleDraw();
 
-        this.updatePlayersFromMap(m);
-        this.updateLegend();
-
         this.showReloadButton = false;
 
         this.startRealtime(sessionName);
@@ -131,7 +129,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
         this.showReloadButton = true;
         this.playersByUid.clear();
-        this.updateLegend();
 
         this.stopPolling();
       }
@@ -140,7 +137,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   triggerReload(): void {
     this.showReloadButton = true;
-    const sessionName = this.store.sessionName() || this.store.sessionInfo().sessionName;
+    const sessionName = this.store.sessionName();
     if (sessionName) this.loadMap(sessionName);
   }
 
@@ -190,7 +187,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   // start polling (periodic map refresh)
   private startPolling(): void {
     if (this.pollIntervalId) return;
-    const sessionName = this.store.sessionName() || (this.store.sessionInfo && this.store.sessionInfo().sessionName) || null;
+    const sessionName = this.store.sessionName();
     if (!sessionName) return;
     this.pollIntervalId = setInterval(() => {
       this.apiService.getMap(sessionName!).subscribe({
@@ -226,13 +223,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         this.naturalHeight = Math.max(1, rows * (this.tileSize + this.gap));
         this.updateCanvasSize();
       }
-      this.updatePlayersFromMap(newMap);
-      this.updateLegend();
       this.scheduleDraw();
     } catch {
-      this.mapData = newMap;
-      this.updatePlayersFromMap(newMap);
-      this.updateLegend();
       this.scheduleDraw();
     }
   }
@@ -339,166 +331,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  // ----- helpers for players/colors -----
-  private normalizeUid(u: any): string | null {
-    if (u == null) return null;
-    try { return String(u).trim().toLowerCase(); } catch { return null; }
-  }
-
-  private resolvePlayerColor(masterUid: any, mapPayload?: any): string | null {
-    const key = this.normalizeUid(masterUid);
-    if (!key) return null;
-
-    const cached = this.playersByUid.get(key);
-    if (cached && cached.color) return cached.color;
-
-    const payload = mapPayload ?? this.mapData;
-    const playersList = payload?.players ?? payload?.playerList ?? null;
-    if (Array.isArray(playersList)) {
-      const p = playersList.find((pp: any) => this.normalizeUid(pp?.uid ?? pp?.playerUid ?? pp?.playerId ?? pp?.id) === key);
-      if (p && typeof p?.color === 'string' && p.color) return p.color;
-    }
-
-    try {
-      const sessionInfo: any = this.store?.sessionInfo?.() ?? this.store?.sessionInfo ?? null;
-      const sessionPlayers = sessionInfo?.players ?? sessionInfo?.playerList ?? null;
-      if (Array.isArray(sessionPlayers)) {
-        const sp = sessionPlayers.find((pp: any) => this.normalizeUid(pp?.uid ?? pp?.playerUid ?? pp?.playerId ?? pp?.id) === key);
-        if (sp && typeof sp?.color === 'string' && sp.color) return sp.color;
-      }
-    } catch {}
-
-    return null;
-  }
-
-  private updatePlayersFromMap(mapPayload: any): void {
-    this.playersByUid.clear();
-    if (!mapPayload) {
-      const sessionInfo: any = this.store?.sessionInfo?.() ?? this.store?.sessionInfo ?? null;
-      const sessionPlayers = sessionInfo?.players ?? sessionInfo?.playerList ?? null;
-      if (Array.isArray(sessionPlayers)) {
-        for (const p of sessionPlayers) {
-          const uidRaw = p?.uid ?? p?.playerUid ?? p?.playerId ?? p?.id ?? null;
-          const key = this.normalizeUid(uidRaw);
-          if (!key) continue;
-          const color = (typeof p?.color === 'string' && p.color) ? p.color : this.colorForFallback(key);
-          const name = p?.displayName ?? p?.name ?? p?.playerName ?? key;
-          this.playersByUid.set(key, { name: String(name), color });
-        }
-      }
-      this.updateLegend();
-      return;
-    }
-
-    const playersList = mapPayload.players ?? mapPayload.playerList ?? mapPayload.playersInfo ?? mapPayload.playersData ?? null;
-    const sessionInfo: any = this.store?.sessionInfo?.() ?? this.store?.sessionInfo ?? null;
-    const sessionPlayers = sessionInfo?.players ?? sessionInfo?.playerList ?? null;
-
-    if (Array.isArray(playersList) && playersList.length) {
-      for (const p of playersList) {
-        const uidRaw = p?.uid ?? p?.playerUid ?? p?.playerId ?? p?.id ?? null;
-        const key = this.normalizeUid(uidRaw);
-        if (!key) continue;
-        let color = (typeof p?.color === 'string' && p.color) ? p.color : undefined;
-        if (!color && Array.isArray(sessionPlayers)) {
-          const sp = sessionPlayers.find((s: any) => this.normalizeUid(s?.uid ?? s?.playerUid ?? s?.playerId ?? s?.id) === key);
-          if (sp && typeof sp?.color === 'string' && sp.color) color = sp.color;
-        }
-        const name = p?.displayName ?? p?.name ?? p?.playerName ?? key;
-        this.playersByUid.set(key, { name: String(name), color: color ?? this.colorForFallback(key) });
-      }
-    } else if (Array.isArray(sessionPlayers) && sessionPlayers.length) {
-      for (const p of sessionPlayers) {
-        const uidRaw = p?.uid ?? p?.playerUid ?? p?.playerId ?? p?.id ?? null;
-        const key = this.normalizeUid(uidRaw);
-        if (!key) continue;
-        const color = (typeof p?.color === 'string' && p.color) ? p.color : this.colorForFallback(key);
-        const name = p?.displayName ?? p?.name ?? p?.playerName ?? key;
-        this.playersByUid.set(key, { name: String(name), color });
-      }
-    } else {
-      const rows = mapPayload.map?.length || 0;
-      const cols = mapPayload.map?.[0]?.length || 0;
-      for (let y = 0; y < rows; y++) {
-        for (let x = 0; x < cols; x++) {
-          const cell = mapPayload.map[y][x];
-          const stationObj = cell?.location?.station ?? cell?.location ?? cell;
-          const masterUid = stationObj?.masterUid ?? stationObj?.ownerUid ?? stationObj?.playerUid ?? stationObj?.uId ?? null;
-          const k = this.normalizeUid(masterUid);
-          if (!k) continue;
-          if (!this.playersByUid.has(k)) {
-            let color = null;
-            if (Array.isArray(sessionPlayers)) {
-              const sp = sessionPlayers.find((s: any) => this.normalizeUid(s?.uid ?? s?.playerUid ?? s?.playerId ?? s?.id) === k);
-              if (sp && typeof sp?.color === 'string' && sp.color) color = sp.color;
-            }
-            this.playersByUid.set(k, { name: k, color: color ?? this.colorForFallback(k) });
-          }
-        }
-      }
-    }
-
-    this.updateLegend();
-  }
-
-  private updateLegend(): void {
-    const map = this.mapData?.();
-    if (!map) { this.legendEntries = []; return; }
-
-    const playersList = (map as any).players ?? (map as any).playerList ?? (map as any).playersInfo ?? null;
-    const entries: { key: string; name: string; color: string }[] = [];
-
-    if (Array.isArray(playersList) && playersList.length) {
-      for (const p of playersList) {
-        const id = p?.id ?? p?.playerId ?? p?.userId ?? p?.name ?? null;
-        if (id == null) continue;
-        const key = String(id);
-        const rawColor = p?.color ?? p?.colorHex ?? p?.hex ?? p?.playerColor ?? null;
-        const color = normalizeColorRaw(rawColor) ?? this.colorForKey(key);
-        const name = p?.displayName ?? p?.name ?? p?.playerName ?? key;
-        this.ownerColorMap.set(key, color);
-        entries.push({ key, name, color });
-      }
-      entries.sort((a, b) => a.name.localeCompare(b.name));
-      this.legendEntries = entries;
-      return;
-    }
-
-    // fallback: scan stations and normalize any color fields found there
-    const rows = map.map?.length || 0;
-    const cols = map.map?.[0]?.length || 0;
-    for (let y = 0; y < rows; y++) {
-      for (let x = 0; x < cols; x++) {
-        const cell = map.map[y][x];
-        const stationObj = cell?.location?.station ?? cell?.location ?? cell;
-        const rawColor = stationObj?.color ?? stationObj?.colorHex ?? stationObj?.playerColor ?? null;
-        if (rawColor) {
-          const normalized = normalizeColorRaw(rawColor);
-          if (normalized) {
-            const key = this.ownerKeyFromStation(stationObj);
-            if (key) this.ownerColorMap.set(String(key), normalized);
-          }
-        }
-      }
-    }
-
-    this.legendEntries = Array.from(this.ownerColorMap.entries()).map(([key, color]) => {
-      return { uid: key, name: key, color };
-    });
-  }
-
   // deterministic fallback color for player uid
-  private colorForFallback(key: string | number | null | undefined): string {
-    if (key == null) return this.unownedColor;
-    const s = String(key);
-    let h = 0;
-    for (let i = 0; i < s.length; i++) {
-      h = (h << 5) - h + s.charCodeAt(i);
-      h |= 0;
-    }
-    const hue = Math.abs(h) % 360;
-    return `hsl(${hue} 65% 45%)`;
-  }
 
   // helper: safely show/hide canvas element used in this component
   private setCanvasVisibility(visible: boolean): void {
@@ -574,43 +407,27 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
         const cell = map.map[y][x];
-        const stationObj = cell?.location?.station ?? cell?.location ?? cell;
-        const masterUid = stationObj?.masterUid ?? stationObj?.ownerUid ?? stationObj?.playerUid ?? stationObj?.uId ?? null;
-        const uid = this.normalizeUid(masterUid);
-        let fillColor: string;
 
-        if (cell?.bought) {
-          const cachedColor = uid ? this.ownerColorMap.get(uid) : undefined;
-          if (cachedColor) {
-            fillColor = cachedColor;
-          } else {
-            const stationRawColor = stationObj.color ?? stationObj.colorHex ?? stationObj.playerColor ?? null;
-            const normalizedColor = normalizeColorRaw(stationRawColor);
-            fillColor = normalizedColor ?? (uid ? this.colorForKey(uid) : this.colorForKey('unknown'));
-            if (uid) this.ownerColorMap.set(uid, fillColor);
-          }
-        } else {
-          fillColor = this.unownedColor;
-        }
+        const location = cell.location;
+        if(location === null) continue;
 
-        const drawX = Math.floor(x * (this.tileSize + this.gap) * this.scale + contentLeft);
-        const drawY = Math.floor(y * (this.tileSize + this.gap) * this.scale + contentTop);
-        const drawSize = Math.ceil(this.tileSize * this.scale);
+        const station = location.station;
+        if(station === null) continue;
+        
+        const masterUid = station.masterUid;
+        if(!masterUid) continue;
 
-        ctx.fillStyle = fillColor;
-        ctx.fillRect(drawX, drawY, drawSize, drawSize);
+        const player = this.store.sessionInfo().players.find((player : Player) => player.uId === masterUid);
+        if(!player) continue;
+
+        const playerColor = player.color; 
+        if(!playerColor) continue;
+
+        ctx.beginPath();
+        ctx.arc(location.x, location.y, 5, 0, 360);
+        ctx.fillStyle = playerColor;
+        ctx.fill();
       }
     }
   }
-
-  private ownerKeyFromStation(station: any): string | null {
-    // Logic to determine the owner key from the station object
-    return station.ownerId ?? station.playerId ?? null;
-  }
-
-  private colorForKey(key: string): string {
-    // Logic to generate a deterministic color based on the key
-    return '#' + ((parseInt(key, 36) % 16777215) | 0).toString(16).padStart(6, '0');
-  }
 }
-
