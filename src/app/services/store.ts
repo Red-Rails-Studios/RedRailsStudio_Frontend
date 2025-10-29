@@ -31,7 +31,7 @@ export class Store {
         sessionEnded: ''
     })
 
-    playerInfo = signal<Player>({ 
+    playerInfo = signal<Player>({
         uId: '',
         name: '',
         color: '',
@@ -75,7 +75,7 @@ export class Store {
         requiredPower: 0,
         requiredDbCoin: 0
     }])
-    
+
 
     session = signal<SessionOverview | null>(null);
     apiService = inject(APISService)
@@ -183,10 +183,10 @@ export class Store {
         },
         error: (err) => {
         console.error('Error fetching train upgrades:', err);
-        }   
-        });    
+        }
+        });
     }
-    
+
 
     getTrain (sessionName: string, playerName: string, trainUid: string) {
         this.apiService.getTrainInfo(sessionName, playerName, trainUid).subscribe((res: Player) => {
@@ -236,8 +236,8 @@ export class Store {
         },
         error: (err) => {
         console.error('Error fetching train upgrades:', err);
-        }   
-        });    
+        }
+        });
     }
 
     buyRail(sessionName: string, playerUid: string) {
@@ -271,8 +271,8 @@ export class Store {
         },
         error: (err) => {
         console.error('Error fetching rail upgrades:', err);
-        }   
-        });    
+        }
+        });
     }
 
     buyStation(sessionName: string, playerUid: string) {
