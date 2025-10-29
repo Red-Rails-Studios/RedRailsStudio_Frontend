@@ -8,12 +8,12 @@
         </div>
     </button>
     <div class="train-list">
-        <div *ngFor="let trainDtos of trains; let i=index" class="train-block">
+        <div *ngFor="let train of trains; let i=index" class="train-block">
             <img class="train-pic" src="assets/retro-pixel-art-train-tracks-vibrant-detailed-digital-illustration_1292377-15709.avif" alt="button Image">
             
             <div class="inhalt">
                 train Nr.{{i+1}} 
-                level:{{trainDtos.level}}
+                level:{{train.level}}
                 <div class="requirements">
                 UPGRADE REQUIRMENTS: <br>
                 db coins:{{upgrades[i].requiredDbCoin}} <br>

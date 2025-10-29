@@ -9,6 +9,7 @@ import type { Map as MapModel } from '../../models/map.model';
 import type { Station } from '../../models/station.model';
 import { APISService } from '../../services/apis.service';
 import { Store } from '../../services/store';
+import { Player } from '../../models/player.model';
 
 @Component({
   selector: 'app-map',
@@ -537,28 +538,27 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     for (let ry = 0; ry < rows; ry++) {
       for (let rx = 0; rx < cols; rx++) {
         const field = map.map[ry][rx];
-        const rawType = field?.location?.type;
-        const typeStr = rawType == null ? '' : String(rawType).toUpperCase();
-        const stationObj: Station | any = field?.location?.station ?? field?.location ?? field;
-        const isStation = typeStr.includes('STATION') || !!field?.location?.station || !!stationObj?.masterUid;
 
-        if (!isStation) continue; // transparent
+        const location = field.location;
+        if (location === null) continue;
 
-        const cx = contentLeft + rx * cellW + cellW / 2;
-        const cy = contentTop + ry * cellH + cellH / 2;
+        const station = location.station;
+        if (station === null) continue; 
 
-        const masterUid = stationObj?.masterUid ?? stationObj?.ownerUid ?? stationObj?.playerUid ?? stationObj?.uId ?? null;
-        const resolvedColor = this.resolvePlayerColor(masterUid, this.mapData);
-        const fillColor = resolvedColor ?? this.unownedColor;
+        const masterUid = station.masterUid;
+        if (!masterUid) continue;
 
+        const player =  this.store.sessionInfo().players.find((player: Player) => player.uId === masterUid);  
+        if (!player) continue;
+
+        const playerColor = player.color;
+        if (!playerColor) continue;
+        
         ctx.beginPath();
-        const radius = Math.max(4, Math.floor(Math.min(cellW, cellH) * 0.18));
-        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-        ctx.fillStyle = fillColor;
+        ctx.arc(location.x, location.y, 5, 0, 360);
+        ctx.fillStyle = playerColor;
         ctx.fill();
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = 'rgba(0,0,0,0.45)';
-        ctx.stroke();
+        console.log("color: ", playerColor);
       }
     }
   }

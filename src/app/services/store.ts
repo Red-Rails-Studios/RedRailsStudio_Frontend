@@ -212,7 +212,7 @@ export class Store {
             },
             error: (err) => {
                 console.error('Error buying train:', err);
-                alert("not enough resources");
+                //alert("not enough resources");
             }
         });
     }
@@ -247,7 +247,7 @@ export class Store {
             },
             error: (err) => {
                 console.error('Error buying station:', err);
-                alert("not enough resources");
+                //alert("not enough resources");
             }
         });
     }
@@ -282,7 +282,7 @@ export class Store {
             },
             error: (err) => {
                 console.error('Error buying station:', err);
-                alert("not enough resources");
+                //alert("not enough resources");
             }
         });
     }
