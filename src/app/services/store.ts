@@ -78,11 +78,12 @@ export class Store {
 
 
     session = signal<SessionOverview | null>(null);
-    apiService = inject(APISService)
+    apiService = inject(APISService);
     playerUid = signal<string | null>(null);
     sessionName = signal<string | null>(null);
     playerName = signal<string | null>(null);
-    //upgradeResourcesStation = signal<Requirements[]>(null);
+    freePower = signal<number | null>(null);
+    freeEmployee = signal<number | null>(null);
 
     setPlayerUid(uid: string) {
         this.playerUid.set(uid);
@@ -322,6 +323,17 @@ export class Store {
         });
     }
 
+    updateEmployee(sessionName: string, playerUid: string){
+        this.apiService.getEmployee(sessionName, playerUid).subscribe({
+        next: (employees: number) => {
+            this.freeEmployee.set(employees);
+        },
+        error: (err) => {
+            console.error('Error getting employee count:', err);
+            //this.freeEmployee.set(0); 
+        }});
+    }
+
     buyPower(sessionName: string, playerUid: string) {
         if (!sessionName || !playerUid) {
             console.error('buyPower aborted: sessionName or playerUid missing');
@@ -335,5 +347,16 @@ export class Store {
                 console.error('Error buying power:', err);
             }
         });
+    }
+
+    updatePower(sessionName: string, playerUid: string){
+        this.apiService.getPower(sessionName, playerUid).subscribe({
+        next: (power: number) => {
+            this.freePower.set(power);
+        },
+        error: (err) => {
+            console.error('Error getting power count:', err);
+            //this.freePower.set(0); 
+        }});
     }
 }
