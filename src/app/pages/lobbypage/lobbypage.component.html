@@ -23,7 +23,7 @@
 
 <div *ngFor="let p of lobbyPlayers">
   <span class="player-color"
-        [style.background]="normalizeColor(p.color) || '#000'"
-        [title]="p.displayName || p.name"></span>
-  <span class="player-name">{{ p.displayName || p.name }}</span>
+        [style.background]= colorForUid(p)
+        [title]="p.name"></span>
+  <span class="player-name">{{p.name }}</span>
 </div>

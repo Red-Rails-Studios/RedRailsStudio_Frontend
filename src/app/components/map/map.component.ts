@@ -9,7 +9,6 @@ import type { Map as MapModel } from '../../models/map.model';
 import type { Station } from '../../models/station.model';
 import { APISService } from '../../services/apis.service';
 import { Store } from '../../services/store';
-import { normalizeColorRaw } from '../../utils/color.util';
 import { Player } from '../../models/player.model';
 
 @Component({

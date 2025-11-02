@@ -5,7 +5,6 @@ import { Router } from '@angular/router';
 import { Store } from '../../services/store';
 import { APISService } from '../../services/apis.service';
 import { Player } from '../../models/player.model';
-import { normalizeColorRaw } from '../../utils/color.util';
 
 @Component({
   selector: 'app-lobbypage',
@@ -14,10 +13,7 @@ import { normalizeColorRaw } from '../../utils/color.util';
   styleUrls: ['./lobbypage.component.scss']
 })
 export class LobbypageComponent {
-  lobbyPlayers: any[] = [];
-
-  // make helper available in template
-  public normalizeColor = normalizeColorRaw;
+  lobbyPlayers: Player[] = [];
 
   constructor(private router: Router, public store: Store, private apiService: APISService) {}
 
