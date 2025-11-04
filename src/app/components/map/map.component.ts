@@ -270,19 +270,25 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   private loadMapImage(): void {
     if (this.mapImage) return;
     const img = new Image();
-    img.src = 'assets/Deutschland.svg';
+    // allow drawing + reading pixels if server CORS erlaubt
+    img.crossOrigin = 'anonymous';
+    const src = '/assets/Deutschland.svg'; // use absolute assets path
+
     img.onload = () => {
       this.mapImage = img;
       this.imageLoaded = true;
       this.computeImageContentBounds(img);
       this.scheduleDraw();
     };
-    img.onerror = () => {
+    img.onerror = (ev) => {
+      console.error('Map image load failed:', src, ev);
       this.mapImage = null;
       this.imageLoaded = false;
       this.mapImageContentBounds = null;
       this.scheduleDraw();
     };
+
+    img.src = src;
   }
 
   private computeImageContentBounds(img: HTMLImageElement): void {
@@ -390,19 +396,26 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     // compute content box for stations
     let contentLeft = imgLeft;
     let contentTop = imgTop;
-    let contentW = drawW;
-    let contentH = drawH;
-    if (this.mapImageContentBounds) {
+    let contentWidth = drawW;
+    let contentHeight = drawH;
+    if (this.mapImageContentBounds && this.mapImage) {
       const b = this.mapImageContentBounds;
-      contentLeft = imgLeft + (b.left * this.scale);
-      contentTop = imgTop + (b.top * this.scale);
-      contentW = Math.max(0, b.width * this.scale);
-      contentH = Math.max(0, b.height * this.scale);
+      const img = this.mapImage;
+      const imgNaturalW = img.naturalWidth || img.width || drawW;
+      const imgNaturalH = img.naturalHeight || img.height || drawH;
+      const scaleX = drawW / imgNaturalW;
+      const scaleY = drawH / imgNaturalH;
+      contentLeft = imgLeft + (b.left * scaleX);
+      contentTop = imgTop + (b.top * scaleY);
+      contentWidth = Math.max(0, b.width * scaleX);
+      contentHeight = Math.max(0, b.height * scaleY);
     }
 
     // draw stations
     const rows = map.map.length;
     const cols = map.map[0]?.length || 0;
+    const cellWidth = contentWidth / Math.max(1, cols);
+    const cellHeight = contentHeight / Math.max(1, rows);
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
         const cell = map.map[y][x];
@@ -422,8 +435,12 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         const playerColor = player.color; 
         if(!playerColor) continue;
 
+        const centerX = contentLeft + x * cellWidth + cellWidth / 2;
+        const centerY = contentTop + y * cellHeight + cellHeight / 2;
+
         ctx.beginPath();
-        ctx.arc(location.x, location.y, 5, 0, 360);
+        const radius = Math.max(4, Math.floor(Math.min(cellWidth, cellHeight) * 0.18));
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
         ctx.fillStyle = playerColor;
         ctx.fill();
       }
