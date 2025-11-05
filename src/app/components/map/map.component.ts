@@ -548,7 +548,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         const station = location?.station;
         if (station === null) continue;
  
-        const masterUid = station?.masterUid;
+        const masterUid = station?.masterUID;
         if (!masterUid) {
           ctx.beginPath();
           ctx.arc((location?.x || -10) * locationCordinatFactor + Math.floor(Math.random() * 10), (location?.y || -10) * locationCordinatFactor + Math.floor(Math.random() * 10), 5, 0, 2 * Math.PI);
