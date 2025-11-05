@@ -10,7 +10,7 @@ import type { Station } from '../../models/station.model';
 import { APISService } from '../../services/apis.service';
 import { Store } from '../../services/store';
 import { Player } from '../../models/player.model';
-
+ 
 @Component({
   selector: 'app-map',
   standalone: true,
@@ -24,42 +24,42 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   public errorMsg: string | null = null;
   public legendEntries: { uid: string; name: string; color: string }[] = [];
   public showReloadButton = true;
-
+ 
   @ViewChild('mapCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
-
+ 
   // logical map size
   private naturalWidth = 600;
   private naturalHeight = 400;
-
+ 
   // visual config
   tileSize = 32;
   gap = 2;
   private scale = 1;
-
+ 
   // CSS size visible to user
   canvasWidth = 600;
   canvasHeight = 400;
-
+ 
   // image background
   private mapImage: HTMLImageElement | null = null;
   private imageLoaded = false;
   private mapImageContentBounds: { left: number; top: number; width: number; height: number } | null = null;
-
+ 
   // players map: normalizedUid -> { name, color }
   private playersByUid: Map<string, { name: string; color: string }> = new Map();
-
+ 
   // unowned station color (grey)
   private readonly unownedColor = '#b0b0b0';
-
+ 
   // realtime / polling
   private eventSource: EventSource | null = null;
   private pollIntervalId: any = null;
   private pollMs = 3000;
   private lastMapHash: string | null = null;
   private realtimeStarted = false;
-
+ 
   constructor(private apiService: APISService, public store: Store) {}
-
+ 
   ngOnInit(): void {
     const sessionName = this.store.sessionName() || this.store.sessionInfo().sessionName;
     if (!sessionName) {
@@ -80,18 +80,18 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.loadMap(sessionName);
   }
-
+ 
   ngAfterViewInit(): void {
     this.loadMapImage();
     this.updateCanvasSize();
     if (this.mapData) this.scheduleDraw();
     else this.drawMap();
   }
-
+ 
   ngOnDestroy(): void {
     this.stopRealtime();
   }
-
+ 
   // ----- loading / realtime / polling -----
   loadMap(sessionName: string) {
     this.loading = true;
@@ -101,23 +101,23 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         this.mapData = m;
         this.loading = false;
         this.errorMsg = null;
-
+ 
         if (this.mapData?.map?.length) {
           const rows = this.mapData.map.length || 0;
           const cols = this.mapData.map[0]?.length || 0;
           this.naturalWidth = Math.max(1, cols * (this.tileSize + this.gap));
           this.naturalHeight = Math.max(1, rows * (this.tileSize + this.gap));
         }
-
+ 
         this.setCanvasVisibility(true);
         this.updateCanvasSize();
         this.scheduleDraw();
-
+ 
         this.updatePlayersFromMap(m);
         this.updateLegend();
-
+ 
         this.showReloadButton = false;
-
+ 
         this.startRealtime(sessionName);
         this.startPolling();
       },
@@ -127,30 +127,30 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         this.mapData = null;
         this.setCanvasVisibility(false);
         this.scheduleDraw();
-
+ 
         this.showReloadButton = true;
         this.playersByUid.clear();
         this.updateLegend();
-
+ 
         this.stopPolling();
       }
     });
   }
-
+ 
   triggerReload(): void {
     this.showReloadButton = true;
     const sessionName = this.store.sessionName() || this.store.sessionInfo().sessionName;
     if (sessionName) this.loadMap(sessionName);
   }
-
+ 
   reloadMap() {
     this.triggerReload();
   }
-
+ 
   private startRealtime(sessionName: string): void {
     if (this.realtimeStarted) return;
     this.realtimeStarted = true;
-
+ 
     try {
       const url = `/api/sessions/${encodeURIComponent(sessionName)}/map/stream`;
       this.eventSource = new EventSource(url);
@@ -175,17 +175,17 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     } catch {
       // fallthrough to polling
     }
-
+ 
     this.startPolling();
   }
-
+ 
   private stopEventSource(): void {
     if (this.eventSource) {
       try { this.eventSource.close(); } catch {}
       this.eventSource = null;
     }
   }
-
+ 
   // start polling (periodic map refresh)
   private startPolling(): void {
     if (this.pollIntervalId) return;
@@ -198,20 +198,20 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       });
     }, this.pollMs);
   }
-
+ 
   private stopPolling(): void {
     if (this.pollIntervalId) {
       clearInterval(this.pollIntervalId);
       this.pollIntervalId = null;
     }
   }
-
+ 
   private stopRealtime(): void {
     this.stopEventSource();
     this.stopPolling();
     this.realtimeStarted = false;
   }
-
+ 
   private applyMapIfChanged(newMap: any): void {
     try {
       const json = JSON.stringify(newMap || {});
@@ -235,46 +235,47 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.scheduleDraw();
     }
   }
-
+ 
   // ----- canvas sizing / image loading -----
   @HostListener('window:resize')
   onWindowResize(): void {
     this.updateCanvasSize();
     this.scheduleDraw();
   }
-
+ 
   private updateCanvasSize(): void {
     const canvas = this.canvasRef?.nativeElement;
     if (!canvas) return;
-
+ 
     const dpr = window.devicePixelRatio || 1;
     const parent = canvas.parentElement!;
     const rect = parent.getBoundingClientRect();
     const sx = rect.width / this.naturalWidth;
     const sy = rect.height / this.naturalHeight;
     this.scale = Math.min(sx || 1, sy || 1, 1.5);
-
+ 
     this.canvasWidth = Math.max(1, Math.floor(this.naturalWidth * this.scale));
     this.canvasHeight = Math.max(1, Math.floor(this.naturalHeight * this.scale));
-
+ 
     const backingW = Math.max(1, Math.floor(this.canvasWidth * dpr));
     const backingH = Math.max(1, Math.floor(this.canvasHeight * dpr));
-
+ 
     canvas.width = backingW;
     canvas.height = backingH;
     canvas.style.width = `${this.canvasWidth}px`;
     canvas.style.height = `${this.canvasHeight}px`;
     canvas.style.backgroundColor = '#ffffff';
-
+ 
     const ctx = canvas.getContext('2d');
     if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
-
+ 
   private scheduleDraw(): void {
+    console.log('BEGIN SCHEDULE DRAW');
     if (typeof requestAnimationFrame !== 'undefined') requestAnimationFrame(() => this.drawMap());
     else setTimeout(() => this.drawMap(), 0);
   }
-
+ 
   private loadMapImage(): void {
     if (this.mapImage) return;
     const img = new Image();
@@ -292,7 +293,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.scheduleDraw();
     };
   }
-
+ 
   private computeImageContentBounds(img: HTMLImageElement): void {
     try {
       const iw = img.naturalWidth || img.width || 600;
@@ -304,7 +305,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       if (!tctx) return;
       tctx.clearRect(0, 0, iw, ih);
       tctx.drawImage(img, 0, 0, iw, ih);
-
+ 
       const maxScan = 800;
       const step = Math.max(1, Math.floor(Math.max(iw, ih) / maxScan));
       const data = tctx.getImageData(0, 0, iw, ih).data;
@@ -321,7 +322,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         }
       }
-
+ 
       if (minX <= maxX && minY <= maxY) {
         const padX = Math.min(10, Math.floor((maxX - minX) * 0.03));
         const padY = Math.min(10, Math.floor((maxY - minY) * 0.03));
@@ -337,27 +338,27 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.mapImageContentBounds = null;
     }
   }
-
+ 
   // ----- helpers for players/colors -----
   private normalizeUid(u: any): string | null {
     if (u == null) return null;
     try { return String(u).trim().toLowerCase(); } catch { return null; }
   }
-
+ 
   private resolvePlayerColor(masterUid: any, mapPayload?: any): string | null {
     const key = this.normalizeUid(masterUid);
     if (!key) return null;
-
+ 
     const cached = this.playersByUid.get(key);
     if (cached && cached.color) return cached.color;
-
+ 
     const payload = mapPayload ?? this.mapData;
     const playersList = payload?.players ?? payload?.playerList ?? null;
     if (Array.isArray(playersList)) {
       const p = playersList.find((pp: any) => this.normalizeUid(pp?.uid ?? pp?.playerUid ?? pp?.playerId ?? pp?.id) === key);
       if (p && typeof p?.color === 'string' && p.color) return p.color;
     }
-
+ 
     try {
       const sessionInfo: any = this.store?.sessionInfo?.() ?? this.store?.sessionInfo ?? null;
       const sessionPlayers = sessionInfo?.players ?? sessionInfo?.playerList ?? null;
@@ -366,10 +367,10 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         if (sp && typeof sp?.color === 'string' && sp.color) return sp.color;
       }
     } catch {}
-
+ 
     return null;
   }
-
+ 
   private updatePlayersFromMap(mapPayload: any): void {
     this.playersByUid.clear();
     if (!mapPayload) {
@@ -388,11 +389,11 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.updateLegend();
       return;
     }
-
+ 
     const playersList = mapPayload.players ?? mapPayload.playerList ?? mapPayload.playersInfo ?? mapPayload.playersData ?? null;
     const sessionInfo: any = this.store?.sessionInfo?.() ?? this.store?.sessionInfo ?? null;
     const sessionPlayers = sessionInfo?.players ?? sessionInfo?.playerList ?? null;
-
+ 
     if (Array.isArray(playersList) && playersList.length) {
       for (const p of playersList) {
         const uidRaw = p?.uid ?? p?.playerUid ?? p?.playerId ?? p?.id ?? null;
@@ -436,17 +437,17 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
     }
-
+ 
     this.updateLegend();
   }
-
+ 
   private updateLegend(): void {
     const entries: { uid: string; name: string; color: string }[] = [];
     for (const [uid, info] of this.playersByUid.entries()) entries.push({ uid, name: info.name, color: info.color });
     entries.sort((a, b) => a.name.localeCompare(b.name));
     this.legendEntries = entries;
   }
-
+ 
   // deterministic fallback color for player uid
   private colorForFallback(key: string | number | null | undefined): string {
     if (key == null) return this.unownedColor;
@@ -459,7 +460,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     const hue = Math.abs(h) % 360;
     return `hsl(${hue} 65% 45%)`;
   }
-
+ 
   // helper: safely show/hide canvas element used in this component
   private setCanvasVisibility(visible: boolean): void {
     try {
@@ -468,26 +469,27 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       canvas.style.display = visible ? 'block' : 'none';
     } catch {}
   }
-
+ 
   // ----- rendering -----
   private drawMap(): void {
+    console.log('BEGIN DRAW MAP');
     const canvas = this.canvasRef?.nativeElement;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-
+ 
     // clear and white background
     ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
-
+ 
     // draw background image (Deutschland.svg) centered, keep aspect
     let imgLeft = 0;
     let imgTop = 0;
     let drawW = this.canvasWidth;
     let drawH = this.canvasHeight;
-
-    if (this.mapImage && this.imageLoaded) {
+ 
+    if (this.mapImage/*  && this.imageLoaded */) {
       const img = this.mapImage;
       const imgAspect = (img.width || 1) / (img.height || 1);
       const canvasAspect = this.canvasWidth / this.canvasHeight;
@@ -502,7 +504,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       imgTop = Math.max(0, (this.canvasHeight - drawH) / 2);
       try { ctx.drawImage(img, imgLeft, imgTop, drawW, drawH); } catch {}
     }
-
+ 
     // black border around the svg area
     const borderWidth = Math.max(2, Math.round(2 * this.scale));
     const inset = borderWidth / 2;
@@ -511,10 +513,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     ctx.strokeStyle = '#000';
     ctx.strokeRect(imgLeft + inset, imgTop + inset, Math.max(0, drawW - inset * 2), Math.max(0, drawH - inset * 2));
     ctx.restore();
-
-    const map = this.mapData;
-    if (!map?.map || !map.map.length) return;
-
+ 
+    const map = this.mapData?.map;
+ 
     // compute content box for stations
     let contentLeft = imgLeft;
     let contentTop = imgTop;
@@ -529,38 +530,48 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       contentW = Math.max(1, ib.width * scaleX);
       contentH = Math.max(1, ib.height * scaleY);
     }
-
-    const rows = map.map.length || 0;
-    const cols = map.map[0]?.length || 0;
+ 
+    const rows = map?.length || 0;
+    const cols = map?.length ? map[0].length : 0;
     const cellW = contentW / Math.max(1, cols);
     const cellH = contentH / Math.max(1, rows);
 
+    const locationCordinatFactor = 17;
+ 
     for (let ry = 0; ry < rows; ry++) {
       for (let rx = 0; rx < cols; rx++) {
-        const field = map.map[ry][rx];
-
-        const location = field.location;
+        const field = map !== undefined ? map[ry][rx] : undefined;
+ 
+        const location = field?.location;
         if (location === null) continue;
-
-        const station = location.station;
-        if (station === null) continue; 
-
-        const masterUid = station.masterUid;
-        if (!masterUid) continue;
-
+ 
+        const station = location?.station;
+        if (station === null) continue;
+ 
+        const masterUid = station?.masterUid;
+        if (!masterUid) {
+          ctx.beginPath();
+          ctx.arc((location?.x || -10) * locationCordinatFactor + Math.floor(Math.random() * 10), (location?.y || -10) * locationCordinatFactor + Math.floor(Math.random() * 10), 5, 0, 2 * Math.PI);
+          ctx.fillStyle = '#5f5f5fff';
+          ctx.fill();
+          continue;
+        };
+        console.log('masterUid found:', masterUid);
+        debugger
         const player =  this.store.sessionInfo().players.find((player: Player) => player.uid === masterUid);  
         if (!player) continue;
-
+ 
         const playerColor = player.color;
         if (!playerColor) continue;
-        
+       
         ctx.beginPath();
-        ctx.arc(location.x, location.y, 5, 0, 360);
+        ctx.arc((location?.x || -10) * locationCordinatFactor + Math.floor(Math.random() * 10), (location?.y || -10) * locationCordinatFactor + Math.floor(Math.random() * 10), 5, 0, 2 * Math.PI);
         ctx.fillStyle = playerColor;
         ctx.fill();
-        console.log("color: ", playerColor);
       }
     }
   }
 }
-
+ 
+ 
+ 
