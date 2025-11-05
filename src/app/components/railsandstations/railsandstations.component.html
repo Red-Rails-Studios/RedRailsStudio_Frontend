@@ -19,8 +19,8 @@
         <div class="requirements">
         UPGRADE REQUIRMENTS: <br>
         db coins:{{upgradesRail[i].requiredDbCoin}} <br>
-        power: {{upgradesRail[i].requiredPower}}<br>
-        employees: {{upgradesRail[i].requiredEmployees}}  
+        power: {{ playerInfo().power - freePower + upgradesRail[i].requiredPower }}<br>
+        employees: {{ playerInfo().employees - freeEmployee + upgradesRail[i].requiredEmployees}}  
         </div>
       </div>
 
@@ -48,8 +48,8 @@
           <div class="requirements">  
             UPGRADE REQUIRMENTS: <br>
             db coins:{{upgradesStation[i].requiredDbCoin}} <br>
-            power: {{upgradesStation[i].requiredPower}}<br>
-            employees: {{upgradesStation[i].requiredEmployees}}
+            power: {{ playerInfo().power - freePower + upgradesStation[i].requiredPower }}<br>
+            employees: {{ playerInfo().employees - freeEmployee + upgradesStation[i].requiredEmployees }}
           </div>
         </div>
 

@@ -20,6 +20,14 @@ export class UpgradesComponent {
   playerInfo = inject(Store).playerInfo;
   sessionInfo = inject(Store).sessionInfo;
 
+  get freeEmployee(): number {
+    return this.store.freeEmployee() ?? 0;
+  }
+
+  get freePower(): number {
+    return this.store.freePower() ?? 0;
+  }
+
   constructor(public store: Store) {}
 
   ngOnInit(): void {
@@ -55,9 +63,9 @@ export class UpgradesComponent {
    onUpgradeRail(railNr: number) {  
     const sessionName = this.sessionInfo().sessionName;
     const uid = this.playerInfo().uId;
-    const railId = this.store.resources().railDtos[railNr].uId;
+    const railId = this.store.resources().railDtos[railNr].uid;
     //console.log(railId);
-    this.store.upgradeTrain(sessionName, uid, railId);
+    this.store.upgradeRail(sessionName, uid, railId);
     this.upgradesRail = this.store.upgradeResourcesRail();
   }
 
@@ -75,9 +83,9 @@ export class UpgradesComponent {
   onUpgradeStation(stationNr: number) {
     const sessionName = this.sessionInfo().sessionName;
     const uid = this.playerInfo().uId;
-    const stationId = this.store.resources().stationDtos[stationNr].uId;
+    const stationId = this.store.resources().stationDtos[stationNr].uid;
     //console.log(stationId);
-    this.store.upgradeTrain(sessionName, uid, stationId);
+    this.store.upgradeRail(sessionName, uid, stationId);
     this.upgradesStation = this.store.upgradeResourcesStation();
   }
 

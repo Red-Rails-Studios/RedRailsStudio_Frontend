@@ -17,9 +17,9 @@
                 <div class="requirements">
                 UPGRADE REQUIRMENTS: <br>
                 db coins:{{upgrades[i].requiredDbCoin}} <br>
-                power: {{ playerInfo().employees + (upgrades[i].requiredPower - freePower) }}<br>
-                employees: {{ playerInfo().employees + (upgrades[i].requiredEmployees - freeEmployee)}}
-                </div>
+                power: {{ playerInfo().power - freePower + upgrades[i].requiredPower }}<br>
+                employees: {{ playerInfo().employees - freeEmployee + upgrades[i].requiredEmployees }}
+                </div> 
             </div>
             <div class="upgrade_button_area">
             <button (click)="onUpgradeTrain(i)" class="upgrade-button">

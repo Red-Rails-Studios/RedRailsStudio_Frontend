@@ -1,7 +1,7 @@
 import { Requirements } from "./requierment.model";
 
 export interface Train {
-  uId: string;
+  uid: string;
   level: number;
-  requirements: Requirements[]; 
+  //requirements: Requirements[]; 
 }

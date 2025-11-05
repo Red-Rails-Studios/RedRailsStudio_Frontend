@@ -15,6 +15,7 @@ import { Requirements } from "../models/requierment.model";
 })
 export class Store {
     resources = signal<Resources>( {
+        color: '',
         dbCoin: 0,
         employees: 0,
         power:0,
@@ -128,8 +129,9 @@ export class Store {
     setResources(sessionName: string, playerUid: string) {
         this.apiService.getResources(sessionName, playerUid).subscribe((resources: Resources) => {
             this.resources.set(resources);
-            console.log('Resources updated:', this.resources());
+            console.log('Resources updated:', this.resources(), this.resources().trainDtos[0].uid);
         })
+        console.log(this.resources().trainDtos[0]);
     }
 
     joinPlayer(sessionName: string, playerName: string) {
@@ -218,8 +220,8 @@ export class Store {
         });
     }
 
-    upgradeTrain(sessionName: string, playerUid: string, trainId: string) {
-         this.apiService.upgradeTrain(sessionName, playerUid, trainId).subscribe({
+    upgradeTrain(sessionName: string, playerUid: string, trainNr: number) {//trainId: string) {
+         this.apiService.upgradeTrain(sessionName, playerUid, this.resources().trainDtos[trainNr].uid).subscribe({
             next: () => {
                 this.getPlayerInfos(sessionName, playerUid);
             },

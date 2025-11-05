@@ -74,10 +74,11 @@ export class TrainsComponent {
   onUpgradeTrain(trainNr: number) {  //TODO: fix upgrades on trains
     const sessionName = this.sessionInfo().sessionName;
     const uId = this.playerInfo().uId;
-    const trainId = this.store.resources().trainDtos[trainNr].uId;
-    //const trainId = this.trains[trainNr].id;
+    //const trainId = this.store.playerInfo().trains[trainNr].uId;
+
     //console.log(trainId);
-    this.store.upgradeTrain(sessionName, uId, trainId);
+    this.store.upgradeTrain(sessionName, uId, trainNr);
+    console.log("test", trainNr)
     this.store.getUpgradeRequirementsTrain(sessionName, uId);
   }
 

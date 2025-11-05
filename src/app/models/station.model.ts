@@ -1,5 +1,5 @@
 export interface Station {
-  uId: string;
+  uid: string;
   level: number;
   masterUid: string;
 }
