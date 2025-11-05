@@ -3,8 +3,8 @@
         Buy Train 
         <div class="requirements">
             Db coins: {{store.elementBuyRequirements()[0].requiredDbCoin}}
-            power: {{store.elementBuyRequirements()[0].requiredPower}}
-            employee: {{store.elementBuyRequirements()[0].requiredEmployees}}
+            power: {{ playerInfo().power - freePower + store.elementBuyRequirements()[0].requiredPower }}
+            employee: {{ playerInfo().employees - freeEmployee + store.elementBuyRequirements()[0].requiredEmployees }}
         </div>
     </button>
     <div class="train-list">
