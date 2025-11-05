@@ -33,7 +33,7 @@ export class Store {
     })
 
     playerInfo = signal<Player>({
-        uId: '',
+        uid: '',
         name: '',
         color: '',
         trains: [] as Train[],
@@ -88,7 +88,7 @@ export class Store {
 
     setPlayerUid(uid: string) {
         this.playerUid.set(uid);
-        this.playerInfo().uId = uid;
+        this.playerInfo().uid = uid;
     }
 
     setSessionName(name: string) {
@@ -152,7 +152,7 @@ export class Store {
             this.sessionInfo.set(res);
             console.log('Session Started ', sessionName);
         })
-        this.getPlayerInfos(sessionName, this.playerInfo().uId)
+        this.getPlayerInfos(sessionName, this.playerInfo().uid)
     }
 
     killSession (sessionName: string) {
