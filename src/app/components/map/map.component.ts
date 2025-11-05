@@ -548,7 +548,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         const masterUid = station.masterUid;
         if (!masterUid) continue;
 
-        const player =  this.store.sessionInfo().players.find((player: Player) => player.uId === masterUid);  
+        const player =  this.store.sessionInfo().players.find((player: Player) => player.uid === masterUid);  
         if (!player) continue;
 
         const playerColor = player.color;

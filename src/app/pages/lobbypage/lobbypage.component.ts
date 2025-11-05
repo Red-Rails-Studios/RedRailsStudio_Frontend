@@ -60,14 +60,7 @@ export class LobbypageComponent {
   }
 
   // deterministic color generator - same logic as map component fallback
-  colorForUid(player: any): string {
-    const uid = player?.uid ?? player?.playerUid ?? player?.uId ?? player?.id ?? player?.UId ?? null;
-    if (!uid) return '#9e9e9e';
-    const s = String(uid);
-    let h = 0;
-    for (let i = 0; i < s.length; i++) h = (h << 5) - h + s.charCodeAt(i);
-    h = Math.abs(h);
-    const hue = h % 360;
-    return `hsl(${hue} 65% 45%)`;
+  colorForUid(player: Player): string {
+    return player.color;
   }
 }
