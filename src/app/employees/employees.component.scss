@@ -28,6 +28,20 @@
   font-family:  "Silkscreen", sans-serif;
 }
 
+.buy-button:active {
+  background-color: green;
+  color: white;
+  width: 97%;
+  height: 70px;
+  margin: 8px 0;
+  display: block;
+  text-align: center;
+  font-size: 1.2rem;
+  //border-color: 10px solid gray;
+  border: none;
+  font-family:  "Silkscreen", sans-serif;
+}
+
 .employee-Pic{
   width: 30px;
   height: 30px;

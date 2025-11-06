@@ -16,7 +16,7 @@ import { Requirements } from '../models/requierment.model';
 })
 export class APISService {
 
-  private host: string = '192.168.178.35';
+  private host: string = 'localhost';
   private apiUrl = `http://${this.host}:8080`; // URL to web api
 
   constructor(private http: HttpClient) {
@@ -91,8 +91,8 @@ export class APISService {
     return this.http.post(`http://${this.host}:8080/session/${sessionName}/player/${playerUid}/station`, null, { responseType: 'text'}); // kauft ein baahnhof
   }
 
-  upgradeStation(sessionName: string, playerUid: string, stationUid: string) { //find URL
-    return this.http.patch(`http://${this.host}:8080/session/${sessionName}/player/${playerUid}/Station/${stationUid}/upgrade`, null, {responseType: 'text'})
+  upgradeStation(sessionName: string, playerUid: string, stationUid: string) { 
+    return this.http.patch(`http://${this.host}:8080/session/${sessionName}/player/${playerUid}/station/${stationUid}/upgrade`, null, {responseType: 'text'})
   }
 
   upgradeRequirementsStation(sessionName: string, playerUid: string): Observable<Requirements[]>{
