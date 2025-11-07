@@ -392,8 +392,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     ctx.strokeRect(imgLeft + inset, imgTop + inset, Math.max(0, drawW - inset * 2), Math.max(0, drawH - inset * 2));
     ctx.restore();
 
-    const map = this.mapData;
-    if (!map?.map || !map.map.length) return;
+    const map = this.mapData?.map;
 
     // compute content box for stations
     let contentLeft = imgLeft;
@@ -416,7 +415,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     // }
 
     // draw stations
-    const rows = map.map.length;
+    const rows = map?.map.length;
     const cols = map.map[0]?.length || 0;
     const cellWidth = contentWidth / Math.max(1, cols);
     const cellHeight = contentHeight / Math.max(1, rows);
