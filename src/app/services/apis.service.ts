@@ -54,7 +54,21 @@ export class APISService {
   }
 
   buyTrain(sessionName: string, playerUid: string) {
-    return this.http.post(`http://localhost:8080/session/${sessionName}/player/${playerUid}/train`, null, { responseType: 'text'}); // kauft ein zug
+    const url = `http://localhost:8080/session/${sessionName}/player/${playerUid}/train`;
+    console.log('Making buyTrain API request to:', url);
+    return this.http.post(url, null, { 
+      responseType: 'text',
+      observe: 'response'  // This will give us the full HTTP response
+    }).pipe(
+      map(response => {
+        console.log('Buy train response:', {
+          status: response.status,
+          headers: response.headers,
+          body: response.body
+        });
+        return response.body;
+      })
+    );
   }
 
   upgradeTrain(sessionName: string, playerUid: string, trainUid: string) { //find URL

@@ -335,17 +335,37 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
  
   private updatePlayersFromMap(mapPayload: any): void {
+    const oldPlayers = new Map(this.playersByUid);
     this.playersByUid.clear();
+    
+    const formatHexColor = (color: string | undefined | null): string => {
+      if (!color) return '#999999';
+      // Ensure proper hex color format
+      color = color.replace('#', '').toUpperCase();
+      if (color === '000000') return '#999999'; // Replace black with gray
+      return `#${color}`;
+    };
+
+    // First, try to get colors from store's current player info
+    const currentPlayer = this.store.playerInfo();
+    if (currentPlayer?.uid) {
+      const color = formatHexColor(currentPlayer.color);
+      console.log('Setting color from player info:', currentPlayer.uid, color);
+      this.playersByUid.set(currentPlayer.uid, { 
+        name: currentPlayer.name, 
+        color: color 
+      });
+    }
+
     if (!mapPayload) {
       const sessionInfo: any = this.store?.sessionInfo?.();
       const sessionPlayers = sessionInfo?.players;
       if (Array.isArray(sessionPlayers)) {
         for (const p of sessionPlayers) {
           const uid = p?.uid;
-          
           if (!uid) continue;
-          const color = p.color;
-          const name =  p?.name;
+          const name = p?.name;
+          const color = formatHexColor(p.color);
           this.playersByUid.set(uid, { name: String(name), color });
         }
       }
@@ -369,12 +389,13 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         const name = p?.name;
         this.playersByUid.set(uid, { name: String(name), color: color });
       }
-    } else if (Array.isArray(sessionPlayers) && sessionPlayers.length) {
+      } else if (Array.isArray(sessionPlayers) && sessionPlayers.length) {
       for (const p of sessionPlayers) {
-        const uid = p?.uid ;
+        const uid = p?.uid;
         if (!uid) continue;
-        const color = p.color;
-        const name = p?.name;
+        const color = formatHexColor(p.color);
+        const name = p?.name || uid;
+        console.log('Setting color from session players:', uid, color);
         this.playersByUid.set(uid, { name: String(name), color });
       }
     } else {
@@ -418,6 +439,26 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     } catch {}
   }
  
+  // Helper method to adjust a color's brightness
+  private adjustColor(color: string, percent: number): string {
+    try {
+      // Convert hex to RGB first
+      let r = parseInt(color.slice(1, 3), 16);
+      let g = parseInt(color.slice(3, 5), 16);
+      let b = parseInt(color.slice(5, 7), 16);
+
+      // Adjust brightness
+      r = Math.max(0, Math.min(255, r + percent));
+      g = Math.max(0, Math.min(255, g + percent));
+      b = Math.max(0, Math.min(255, b + percent));
+
+      // Convert back to hex
+      return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+    } catch {
+      return "#666666"; // Fallback color if adjustment fails
+    }
+  }
+
   private drawMap(): void {
     const canvas = this.canvasRef?.nativeElement;
     if (!canvas) return;
@@ -496,62 +537,61 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         const centerY = contentTop + y * cellHeight + cellHeight / 2;
         const cell =  map !== undefined ? map[y][x] : undefined;
 
-        const location = cell?.location;
-        if(location === null) continue;
-
-        const station = location?.station;
-        if(station === null) continue;
+        const station = cell?.location?.station;
+        if (!station) continue;
         
-        // const stationUid = station?.uid; 
-        // if(!stationUid) continue;
-
-        // const players = this.store.sessionInfo().players;
-        // if(!players) continue;
-
-        // for (let i = 0; i < players.length; i++){
-        //   for(let j = 0; j < players[i].stations.length; j++){
-        //     if(players[i].stations[j].uid === stationUid){
-
-        //       const playerColor = players[i].color
-        //       if(!playerColor) continue;
-
-        //       ctx.beginPath();
-        //       const radius = Math.max(4, Math.floor(Math.min(cellWidth, cellHeight) * 0.18));
-        //       ctx.arc(centerX + Math.floor(Math.random() * 10), centerY + Math.floor(Math.random() * 10), radius, 0, Math.PI * 2);
-        //       ctx.fillStyle = playerColor;
-        //       ctx.fill();
-        //     } 
-        //     else {
-        //       ctx.beginPath();
-        //       const radius = Math.max(4, Math.floor(Math.min(cellWidth, cellHeight) * 0.18));
-        //       ctx.arc(centerX + Math.floor(Math.random() * 10), centerY + Math.floor(Math.random() * 10), radius, 0, Math.PI * 2);
-        //       ctx.fillStyle = "#999999ff";
-        //       ctx.fill();
-        //     }
-        //   }
-        // }
-
-        const masterUid = station?.masterUid;
-        if(!masterUid) {
-          ctx.beginPath();
-          const radius = Math.max(4, Math.floor(Math.min(cellWidth, cellHeight) * 0.18));
-          ctx.arc(centerX + Math.floor(Math.random() * 10), centerY + Math.floor(Math.random() * 10), radius, 0, Math.PI * 2);
-          ctx.fillStyle = "#6b6b6bff";
-          ctx.fill();
-          continue;
-        };
-
-        const player = this.store.sessionInfo().players.find((player : Player) => player.uid === masterUid);
-        if(!player) continue;
-
-        const playerColor = player.color; 
-        if(!playerColor) continue;
-
+        // Draw station circle
         ctx.beginPath();
         const radius = Math.max(4, Math.floor(Math.min(cellWidth, cellHeight) * 0.18));
         ctx.arc(centerX + Math.floor(Math.random() * 10), centerY + Math.floor(Math.random() * 10), radius, 0, Math.PI * 2);
-        ctx.fillStyle = playerColor;
+
+        const masterUid = station.masterUid;
+        let fillColor = "#999999"; // Default gray for unowned stations
+        
+        if (masterUid) {
+          console.log(`Coloring station with masterUid: ${masterUid}`);
+          
+          // Try to find player color in order of priority
+          const sessionInfo = this.store.sessionInfo();
+          if (sessionInfo?.players) {
+            // 1. Check session info (most up-to-date)
+            const player = sessionInfo.players.find(p => p.uid === masterUid);
+            console.log('Found player in session:', player);
+            if (player?.color) {
+              fillColor = player.color.startsWith('#') ? player.color : `#${player.color}`;
+              console.log('Color from session info:', fillColor);
+            }
+          }
+          
+          // 2. Fallback to playersByUid map if no color found
+          if (fillColor === "#999999") {
+            const playerInfo = this.playersByUid.get(masterUid);
+            console.log('Player from playersByUid:', playerInfo);
+            if (playerInfo?.color) {
+              fillColor = playerInfo.color.startsWith('#') ? playerInfo.color : `#${playerInfo.color}`;
+              console.log('Color from playersByUid:', fillColor);
+            }
+          }
+
+          // Skip black color (unassigned)
+          if (fillColor === "#000000") {
+            console.log('Found black color, using grey instead');
+            fillColor = "#999999";
+          }
+
+          console.log('Final color for station:', fillColor);
+        }
+
+        // Draw the station
+        ctx.fillStyle = fillColor;
         ctx.fill();
+
+        // Add contrasting border for better visibility
+        ctx.strokeStyle = fillColor !== "#999999" ? 
+                         this.adjustColor(fillColor, -40) : 
+                         "#666666";
+        ctx.lineWidth = Math.max(1, radius * 0.2);
+        ctx.stroke();
       }
     }
   }

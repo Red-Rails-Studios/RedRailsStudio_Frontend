@@ -8,6 +8,7 @@ import { Player } from '../../models/player.model';
 
 @Component({
   selector: 'app-lobbypage',
+  standalone: true,
   imports: [FormsModule, CommonModule],
   templateUrl: './lobbypage.component.html',
   styleUrls: ['./lobbypage.component.scss']
@@ -26,7 +27,11 @@ export class LobbypageComponent {
     const sessionName = this.store.sessionName();
     if (sessionName) {
       this.apiService.getSessionPlayers(sessionName).subscribe(players => {
+        console.log('Received lobby players:', players);
         this.lobbyPlayers = players || [];
+        this.lobbyPlayers.forEach(player => {
+          console.log(`Player ${player.name} color: ${this.colorForUid(player)}`);
+        });
       });
     }
   } 
@@ -59,7 +64,11 @@ export class LobbypageComponent {
     }
   }
 
-  colorForUid(player: Player): string | undefined {
-    return player.color;
+  colorForUid(player: Player): string {
+    if (!player.color) return '#999999';
+    // Ensure proper hex color format
+    const color = player.color.replace('#', '').toUpperCase();
+    if (color === '000000') return '#999999'; // Replace black with gray
+    return `#${color}`;
   }
 }

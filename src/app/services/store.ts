@@ -167,11 +167,18 @@ export class Store {
     }
 
     getSessionPlayers(sessionName: string) {
+        console.log('Getting session players for session:', sessionName);
         this.apiService.getSessionPlayers(sessionName).subscribe((players: Player[]) => {
-            this.sessionInfo.update(session => ({
-                ...session,
-                players: players
-            }));
+            console.log('Received players from API:', players);
+            this.sessionInfo.update(session => {
+                console.log('Updating session info, current players:', session.players);
+                const updated = {
+                    ...session,
+                    players: players
+                };
+                console.log('Updated session info players:', updated.players);
+                return updated;
+            });
         });
     }
 
@@ -196,6 +203,9 @@ export class Store {
 
     buyTrain(sessionName: string, playerUid: string) {
         console.log('Store.buyTrain called with', { sessionName, playerUid });
+        console.log('Current resources:', this.resources());
+        console.log('Current player info:', this.playerInfo());
+        
         if (!sessionName) {
             console.error('buyTrain aborted: sessionName is undefined');
             return;
@@ -205,13 +215,20 @@ export class Store {
             return;
         }
 
+        console.log('Attempting to buy train with session:', sessionName, 'player:', playerUid);
         this.apiService.buyTrain(sessionName, playerUid).subscribe({
             next: () => {
                 console.log('buyTrain API call succeeded, refreshing player infos');
                 this.getPlayerInfos(sessionName, playerUid);
+                this.setResources(sessionName, playerUid); // Refresh resources after purchase
             },
             error: (err) => {
                 console.error('Error buying train:', err);
+                console.error('Error details:', {
+                    status: err.status,
+                    message: err.message,
+                    error: err.error
+                });
                 alert("not enough resources");
             }
         });
