@@ -59,7 +59,7 @@ export class LobbypageComponent {
     }
   }
 
-  colorForUid(player: Player): string {
+  colorForUid(player: Player): string | undefined {
     return player.color;
   }
 }

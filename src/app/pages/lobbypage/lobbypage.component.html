@@ -20,10 +20,3 @@
         <button class="menu-button" (click)="onLeaveLobby()"> Leave Lobby </button>
     </div>  
 </div>
-
-<div *ngFor="let p of lobbyPlayers">
-  <span class="player-color"
-        [style.background]= colorForUid(p)
-        [title]="p.name"></span>
-  <span class="player-name">{{p.name }}</span>
-</div>
