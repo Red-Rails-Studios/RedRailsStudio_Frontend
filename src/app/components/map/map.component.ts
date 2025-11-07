@@ -334,82 +334,48 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
  
-  // ----- helpers for players/colors -----
-  private normalizeUid(u: any): string | null {
-    if (u == null) return null;
-    try { return String(u).trim().toLowerCase(); } catch { return null; }
-  }
- 
-  private resolvePlayerColor(masterUid: any, mapPayload?: any): string | null {
-    const key = this.normalizeUid(masterUid);
-    if (!key) return null;
- 
-    const cached = this.playersByUid.get(key);
-    if (cached && cached.color) return cached.color;
- 
-    const payload = mapPayload ?? this.mapData;
-    const playersList = payload?.players ?? payload?.playerList ?? null;
-    if (Array.isArray(playersList)) {
-      const p = playersList.find((pp: any) => this.normalizeUid(pp?.uid ?? pp?.playerUid ?? pp?.playerId ?? pp?.id) === key);
-      if (p && typeof p?.color === 'string' && p.color) return p.color;
-    }
- 
-    try {
-      const sessionInfo: any = this.store?.sessionInfo?.() ?? this.store?.sessionInfo ?? null;
-      const sessionPlayers = sessionInfo?.players ?? sessionInfo?.playerList ?? null;
-      if (Array.isArray(sessionPlayers)) {
-        const sp = sessionPlayers.find((pp: any) => this.normalizeUid(pp?.uid ?? pp?.playerUid ?? pp?.playerId ?? pp?.id) === key);
-        if (sp && typeof sp?.color === 'string' && sp.color) return sp.color;
-      }
-    } catch {}
- 
-    return null;
-  }
- 
   private updatePlayersFromMap(mapPayload: any): void {
     this.playersByUid.clear();
     if (!mapPayload) {
-      const sessionInfo: any = this.store?.sessionInfo?.() ?? this.store?.sessionInfo ?? null;
-      const sessionPlayers = sessionInfo?.players ?? sessionInfo?.playerList ?? null;
+      const sessionInfo: any = this.store?.sessionInfo?.();
+      const sessionPlayers = sessionInfo?.players;
       if (Array.isArray(sessionPlayers)) {
         for (const p of sessionPlayers) {
-          const uidRaw = p?.uid ?? p?.playerUid ?? p?.playerId ?? p?.id ?? null;
-          const key = this.normalizeUid(uidRaw);
-          if (!key) continue;
-          const color = (typeof p?.color === 'string' && p.color) ? p.color : this.colorForFallback(key);
-          const name = p?.displayName ?? p?.name ?? p?.playerName ?? key;
-          this.playersByUid.set(key, { name: String(name), color });
+          const uid = p?.uid;
+          
+          if (!uid) continue;
+          const color = p.color;
+          const name =  p?.name;
+          this.playersByUid.set(uid, { name: String(name), color });
         }
       }
       this.updateLegend();
       return;
     }
  
-    const playersList = mapPayload.players ?? mapPayload.playerList ?? mapPayload.playersInfo ?? mapPayload.playersData ?? null;
-    const sessionInfo: any = this.store?.sessionInfo?.() ?? this.store?.sessionInfo ?? null;
-    const sessionPlayers = sessionInfo?.players ?? sessionInfo?.playerList ?? null;
+    const playersList = mapPayload.players;
+    const sessionInfo: any = this.store?.sessionInfo?.();
+    const sessionPlayers = sessionInfo?.players;
  
     if (Array.isArray(playersList) && playersList.length) {
       for (const p of playersList) {
-        const uidRaw = p?.uid ?? p?.playerUid ?? p?.playerId ?? p?.id ?? null;
-        const key = this.normalizeUid(uidRaw);
-        if (!key) continue;
-        let color = (typeof p?.color === 'string' && p.color) ? p.color : undefined;
+        const uid = p?.uid;
+        if (!uid) continue;
+        let color = p.color;
         if (!color && Array.isArray(sessionPlayers)) {
-          const sp = sessionPlayers.find((s: any) => this.normalizeUid(s?.uid ?? s?.playerUid ?? s?.playerId ?? s?.id) === key);
+          const sp = sessionPlayers.find((s: any) => s?.uid === uid);
           if (sp && typeof sp?.color === 'string' && sp.color) color = sp.color;
         }
-        const name = p?.displayName ?? p?.name ?? p?.playerName ?? key;
-        this.playersByUid.set(key, { name: String(name), color: color ?? this.colorForFallback(key) });
+        const name = p?.name;
+        this.playersByUid.set(uid, { name: String(name), color: color });
       }
     } else if (Array.isArray(sessionPlayers) && sessionPlayers.length) {
       for (const p of sessionPlayers) {
-        const uidRaw = p?.uid ?? p?.playerUid ?? p?.playerId ?? p?.id ?? null;
-        const key = this.normalizeUid(uidRaw);
-        if (!key) continue;
-        const color = (typeof p?.color === 'string' && p.color) ? p.color : this.colorForFallback(key);
-        const name = p?.displayName ?? p?.name ?? p?.playerName ?? key;
-        this.playersByUid.set(key, { name: String(name), color });
+        const uid = p?.uid ;
+        if (!uid) continue;
+        const color = p.color;
+        const name = p?.name;
+        this.playersByUid.set(uid, { name: String(name), color });
       }
     } else {
       const rows = mapPayload.map?.length || 0;
@@ -417,17 +383,17 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
           const cell = mapPayload.map[y][x];
-          const stationObj = cell?.location?.station ?? cell?.location ?? cell;
-          const masterUid = stationObj?.masterUid ?? stationObj?.ownerUid ?? stationObj?.playerUid ?? stationObj?.uId ?? null;
-          const k = this.normalizeUid(masterUid);
+          const stationObj = cell?.location?.station;
+          const masterUid = stationObj?.masterUid;
+          const k = masterUid;
           if (!k) continue;
           if (!this.playersByUid.has(k)) {
             let color = null;
             if (Array.isArray(sessionPlayers)) {
-              const sp = sessionPlayers.find((s: any) => this.normalizeUid(s?.uid ?? s?.playerUid ?? s?.playerId ?? s?.id) === k);
+              const sp = sessionPlayers.find((s: any) =>s?.uid === k);
               if (sp && typeof sp?.color === 'string' && sp.color) color = sp.color;
             }
-            this.playersByUid.set(k, { name: k, color: color ?? this.colorForFallback(k) });
+            this.playersByUid.set(k, { name: k, color: color });
           }
         }
       }
@@ -441,19 +407,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     for (const [uid, info] of this.playersByUid.entries()) entries.push({ uid, name: info.name, color: info.color });
     entries.sort((a, b) => a.name.localeCompare(b.name));
     this.legendEntries = entries;
-  }
- 
-  // deterministic fallback color for player uid
-  private colorForFallback(key: string | number | null | undefined): string {
-    if (key == null) return this.unownedColor;
-    const s = String(key);
-    let h = 0;
-    for (let i = 0; i < s.length; i++) {
-      h = (h << 5) - h + s.charCodeAt(i);
-      h |= 0;
-    }
-    const hue = Math.abs(h) % 360;
-    return `hsl(${hue} 65% 45%)`;
   }
  
   // helper: safely show/hide canvas element used in this component
