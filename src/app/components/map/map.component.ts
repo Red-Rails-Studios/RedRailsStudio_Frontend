@@ -527,7 +527,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
               ctx.arc(centerX + Math.floor(Math.random() * 10), centerY + Math.floor(Math.random() * 10), radius, 0, Math.PI * 2);
               ctx.fillStyle = "#999999ff";
               ctx.fill();
-              continue;
             }
           }
         }
