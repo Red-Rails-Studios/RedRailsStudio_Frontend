@@ -32,7 +32,7 @@ export class Store {
     })
 
     playerInfo = signal<Player>({
-        uId: '',
+        uid: '',
         name: '',
         color: '',
         trains: [] as Train[],
@@ -49,21 +49,21 @@ export class Store {
     })
 
     upgradeResourcesTrain = signal<Requirements[]>([{
-        uId: '',
+        uid: '',
         requiredDbCoin: 0,
         requiredEmployees: 0,
         requiredPower: 0
     }])
 
     upgradeResourcesRail = signal<Requirements[]>([{
-        uId: '',
+        uid: '',
         requiredDbCoin: 0,
         requiredEmployees: 0,
         requiredPower: 0
     }])
 
     upgradeResourcesStation = signal<Requirements[]>([{
-        uId: '',
+        uid: '',
         requiredDbCoin: 0,
         requiredEmployees: 0,
         requiredPower: 0
@@ -71,7 +71,7 @@ export class Store {
 
     elementBuyRequirements = signal<Requirements[]>([{
         requiredEmployees: 0,
-        uId: '',
+        uid: '',
         requiredPower: 0,
         requiredDbCoin: 0
     }])
@@ -86,7 +86,7 @@ export class Store {
 
     setPlayerUid(uid: string) {
         this.playerUid.set(uid);
-        this.playerInfo().uId = uid;
+        this.playerInfo().uid = uid;
     }
 
     setSessionName(name: string) {
@@ -149,7 +149,7 @@ export class Store {
             this.sessionInfo.set(res);
             console.log('Session Started ', sessionName);
         })
-        this.getPlayerInfos(sessionName, this.playerInfo().uId)
+        this.getPlayerInfos(sessionName, this.playerInfo().uid)
     }
 
     killSession (sessionName: string) {

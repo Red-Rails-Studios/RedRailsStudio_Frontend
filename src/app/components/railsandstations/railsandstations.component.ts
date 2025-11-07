@@ -24,7 +24,7 @@ export class UpgradesComponent {
 
   ngOnInit(): void {
     const sessionName = this.sessionInfo().sessionName;
-    const playerUid = this.playerInfo().uId;
+    const playerUid = this.playerInfo().uid;
     this.store.getUpgradeRequirementsRail(sessionName, playerUid);
     this.store.getUpgradeRequirementsStation(sessionName, playerUid);
 
@@ -54,8 +54,8 @@ export class UpgradesComponent {
 
    onUpgradeRail(railNr: number) {  
     const sessionName = this.sessionInfo().sessionName;
-    const uid = this.playerInfo().uId;
-    const railId = this.store.resources().railDtos[railNr].uId;
+    const uid = this.playerInfo().uid;
+    const railId = this.store.resources().railDtos[railNr].uid;
     console.log(railId);
     this.store.upgradeTrain(sessionName, uid, railId);
     this.upgradesRail = this.store.upgradeResourcesRail();
@@ -74,8 +74,8 @@ export class UpgradesComponent {
 
   onUpgradeStation(stationNr: number) {
     const sessionName = this.sessionInfo().sessionName;
-    const uid = this.playerInfo().uId;
-    const stationId = this.store.resources().stationDtos[stationNr].uId;
+    const uid = this.playerInfo().uid;
+    const stationId = this.store.resources().stationDtos[stationNr].uid;
     console.log(stationId);
     this.store.upgradeTrain(sessionName, uid, stationId);
     this.upgradesStation = this.store.upgradeResourcesStation();

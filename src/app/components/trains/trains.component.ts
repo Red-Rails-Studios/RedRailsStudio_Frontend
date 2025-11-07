@@ -43,7 +43,7 @@ export class TrainsComponent {
     const sessionName = this.sessionInfo().sessionName;
     // prefer store.playerUid() signal because it is the authoritative uid
     const uIdFromStore = this.store.playerUid();
-    const uIdFromPlayerInfo = this.playerInfo().uId;
+    const uIdFromPlayerInfo = this.playerInfo().uid;
     const uId = uIdFromStore || uIdFromPlayerInfo;
 
     console.log('onBuyTrain called. sessionName:', sessionName, 'uIdFromStore:', uIdFromStore, 'uIdFromPlayerInfo:', uIdFromPlayerInfo);
@@ -65,8 +65,8 @@ export class TrainsComponent {
 
   onUpgradeTrain(trainNr: number) {  
     const sessionName = this.sessionInfo().sessionName;
-    const uId = this.playerInfo().uId;
-    const trainId = this.store.resources().trainDtos[trainNr].uId;
+    const uId = this.playerInfo().uid;
+    const trainId = this.store.resources().trainDtos[trainNr].uid;
     //const trainId = this.trains[trainNr].id;
     console.log(trainId);
     this.store.upgradeTrain(sessionName, uId, trainId);

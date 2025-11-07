@@ -502,27 +502,57 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         const station = location?.station;
         if(station === null) continue;
         
-        const stationUid = station?.uid;
-        if(!masterUid) {
-          ctx.beginPath();
-          const radius = Math.max(4, Math.floor(Math.min(cellWidth, cellHeight) * 0.18));
-          ctx.arc(centerX + Math.floor(Math.random() * 10), centerY + Math.floor(Math.random() * 10), radius, 0, Math.PI * 2);
-          ctx.fillStyle = "#6b6b6bff";
-          ctx.fill();
-          continue;
-        };
+        const stationUid = station?.uid; 
+        if(!stationUid) continue;
 
-        const player = this.store.sessionInfo().players.find((player : Player) => player.uId === masterUid);
-        if(!player) continue;
+        const players = this.store.sessionInfo().players;
+        if(!players) continue;
 
-        const playerColor = player.color; 
-        if(!playerColor) continue;
+        for (let i = 0; i < players.length; i++){
+          for(let j = 0; j < players[i].stations.length; j++){
+            if(players[i].stations[j].uid === stationUid){
 
-        ctx.beginPath();
-        const radius = Math.max(4, Math.floor(Math.min(cellWidth, cellHeight) * 0.18));
-        ctx.arc(centerX + Math.floor(Math.random() * 10), centerY + Math.floor(Math.random() * 10), radius, 0, Math.PI * 2);
-        ctx.fillStyle = playerColor;
-        ctx.fill();
+              const playerColor = players[i].color
+              if(!playerColor) continue;
+
+              ctx.beginPath();
+              const radius = Math.max(4, Math.floor(Math.min(cellWidth, cellHeight) * 0.18));
+              ctx.arc(centerX + Math.floor(Math.random() * 10), centerY + Math.floor(Math.random() * 10), radius, 0, Math.PI * 2);
+              ctx.fillStyle = playerColor;
+              ctx.fill();
+            } 
+            else {
+              ctx.beginPath();
+              const radius = Math.max(4, Math.floor(Math.min(cellWidth, cellHeight) * 0.18));
+              ctx.arc(centerX + Math.floor(Math.random() * 10), centerY + Math.floor(Math.random() * 10), radius, 0, Math.PI * 2);
+              ctx.fillStyle = "#6b6b6bff";
+              ctx.fill();
+              continue;
+            }
+          }
+        }
+
+
+        // if(!masterUid) {
+        //   ctx.beginPath();
+        //   const radius = Math.max(4, Math.floor(Math.min(cellWidth, cellHeight) * 0.18));
+        //   ctx.arc(centerX + Math.floor(Math.random() * 10), centerY + Math.floor(Math.random() * 10), radius, 0, Math.PI * 2);
+        //   ctx.fillStyle = "#6b6b6bff";
+        //   ctx.fill();
+        //   continue;
+        // };
+
+        // const player = this.store.sessionInfo().players.find((player : Player) => player.uId === masterUid);
+        // if(!player) continue;
+
+        // const playerColor = player.color; 
+        // if(!playerColor) continue;
+
+        // ctx.beginPath();
+        // const radius = Math.max(4, Math.floor(Math.min(cellWidth, cellHeight) * 0.18));
+        // ctx.arc(centerX + Math.floor(Math.random() * 10), centerY + Math.floor(Math.random() * 10), radius, 0, Math.PI * 2);
+        // ctx.fillStyle = playerColor;
+        // ctx.fill();
       }
     }
   }

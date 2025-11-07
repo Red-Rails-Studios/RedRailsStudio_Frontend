@@ -35,14 +35,14 @@ export class EmployeesComponent {
 
   onBuyPower(){
     const sessionName = this.sessionInfo().sessionName;
-    const uid = this.playerInfo().uId;
+    const uid = this.playerInfo().uid;
     this.store.buyPower(sessionName, uid);
     console.log('Power bought', sessionName, uid);
   }
 
   onBuyEmployee(){
     const sessionName = this.sessionInfo().sessionName;
-    const uid = this.playerInfo().uId;
+    const uid = this.playerInfo().uid;
     this.store.buyEmployee(sessionName, uid);
     console.log("Employee bought");
   }
