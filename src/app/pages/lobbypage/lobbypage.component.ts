@@ -62,16 +62,7 @@ export class LobbypageComponent {
   colorForUid(player: Player): string {
     for (let index = 0; index < this.lobbyPlayers.length; index++) {
       if(this.lobbyPlayers[index].uId == player.uId) {
-        switch(this.lobbyPlayers[index].color) {
-          case '#FF0000':
-            return '#FF0000';
-          case '#00FF00':
-            return '#00FF00';
-          case '#0000FF':
-            return '#0000FF';
-          case '#FFFF00':
-            return '#FFFF00';
-        }
+        return "";
       }
     }
 
