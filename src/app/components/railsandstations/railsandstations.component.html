@@ -3,8 +3,8 @@
     Buy Rail
     <div class="requirements">
             Db coins: {{store.elementBuyRequirements()[2].requiredDbCoin}}
-            power: {{store.elementBuyRequirements()[2].requiredPower}}
-            employee: {{store.elementBuyRequirements()[2].requiredEmployees}}
+            power: {{ playerInfo().power - freePower + store.elementBuyRequirements()[2].requiredPower }}
+            employee: {{ playerInfo().employees - freeEmployee + store.elementBuyRequirements()[2].requiredEmployees }}
     </div>
   </button>
 
@@ -19,8 +19,8 @@
         <div class="requirements">
         UPGRADE REQUIRMENTS: <br>
         db coins:{{upgradesRail[i].requiredDbCoin}} <br>
-        power: {{upgradesRail[i].requiredPower}}<br>
-        employees: {{upgradesRail[i].requiredEmployees}}  
+        power: {{ playerInfo().power - freePower + upgradesRail[i].requiredPower }}<br>
+        employees: {{ playerInfo().employees - freeEmployee + upgradesRail[i].requiredEmployees}}  
         </div>
       </div>
 
@@ -34,8 +34,8 @@
     Buy Station
     <div class="requirements">
             Db coins:{{store.elementBuyRequirements()[1].requiredDbCoin}}
-            power:{{store.elementBuyRequirements()[1].requiredPower}}
-            employee:{{store.elementBuyRequirements()[1].requiredEmployees}}
+            power:{{ playerInfo().power - freePower +  store.elementBuyRequirements()[1].requiredPower }}
+            employee:{{ playerInfo().employees - freeEmployee + store.elementBuyRequirements()[1].requiredEmployees }}
         </div>
   </button>
 
@@ -48,8 +48,8 @@
           <div class="requirements">  
             UPGRADE REQUIRMENTS: <br>
             db coins:{{upgradesStation[i].requiredDbCoin}} <br>
-            power: {{upgradesStation[i].requiredPower}}<br>
-            employees: {{upgradesStation[i].requiredEmployees}}
+            power: {{ playerInfo().power - freePower + upgradesStation[i].requiredPower }}<br>
+            employees: {{ playerInfo().employees - freeEmployee + upgradesStation[i].requiredEmployees }}
           </div>
         </div>
 

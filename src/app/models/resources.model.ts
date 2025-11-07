@@ -3,6 +3,7 @@ import { Train } from "./train.model";
 import { Station } from "./station.model";
 
 export interface Resources {
+  color: '';
   dbCoin: number;
   employees: number;
   power: number;

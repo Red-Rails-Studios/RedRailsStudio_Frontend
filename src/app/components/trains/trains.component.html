@@ -3,23 +3,23 @@
         Buy Train 
         <div class="requirements">
             Db coins: {{store.elementBuyRequirements()[0].requiredDbCoin}}
-            power: {{store.elementBuyRequirements()[0].requiredPower}}
-            employee: {{store.elementBuyRequirements()[0].requiredEmployees}}
+            power: {{ playerInfo().power - freePower + store.elementBuyRequirements()[0].requiredPower }}
+            employee: {{ playerInfo().employees - freeEmployee + store.elementBuyRequirements()[0].requiredEmployees }}
         </div>
     </button>
     <div class="train-list">
-        <div *ngFor="let trainDtos of trains; let i=index" class="train-block">
+        <div *ngFor="let train of trains; let i=index" class="train-block">
             <img class="train-pic" src="assets/retro-pixel-art-train-tracks-vibrant-detailed-digital-illustration_1292377-15709.avif" alt="button Image">
             
             <div class="inhalt">
                 train Nr.{{i+1}} 
-                level:{{trainDtos.level}}
+                level:{{train.level}}
                 <div class="requirements">
                 UPGRADE REQUIRMENTS: <br>
                 db coins:{{upgrades[i].requiredDbCoin}} <br>
-                power: {{upgrades[i].requiredPower}}<br>
-                employees: {{upgrades[i].requiredEmployees}}
-                </div>
+                power: {{ playerInfo().power - freePower + upgrades[i].requiredPower }}<br>
+                employees: {{ playerInfo().employees - freeEmployee + upgrades[i].requiredEmployees }}
+                </div> 
             </div>
             <div class="upgrade_button_area">
             <button (click)="onUpgradeTrain(i)" class="upgrade-button">

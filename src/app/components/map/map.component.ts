@@ -460,16 +460,17 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private drawMap(): void {
+    console.log('BEGIN DRAW MAP');
     const canvas = this.canvasRef?.nativeElement;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-
+ 
     // clear and white background
     ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
-
+ 
     // draw background image (Deutschland.svg) centered, keep aspect
     let imgLeft = 0;
     let imgTop = 0;

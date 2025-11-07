@@ -15,6 +15,7 @@ import { Requirements } from "../models/requierment.model";
 })
 export class Store {
     resources = signal<Resources>( {
+        color: '',
         dbCoin: 0,
         employees: 0,
         power:0,
@@ -78,11 +79,12 @@ export class Store {
 
 
     session = signal<SessionOverview | null>(null);
-    apiService = inject(APISService)
+    apiService = inject(APISService);
     playerUid = signal<string | null>(null);
     sessionName = signal<string | null>(null);
     playerName = signal<string | null>(null);
-    //upgradeResourcesStation = signal<Requirements[]>(null);
+    freePower = signal<number | null>(null);
+    freeEmployee = signal<number | null>(null);
 
     setPlayerUid(uid: string) {
         this.playerUid.set(uid);
@@ -127,8 +129,9 @@ export class Store {
     setResources(sessionName: string, playerUid: string) {
         this.apiService.getResources(sessionName, playerUid).subscribe((resources: Resources) => {
             this.resources.set(resources);
-            console.log('Resources updated:', this.resources());
+            console.log('Resources updated:', this.resources(), this.resources().trainDtos[0].uid);
         })
+        console.log(this.resources().trainDtos[0]);
     }
 
     joinPlayer(sessionName: string, playerName: string) {
@@ -197,15 +200,12 @@ export class Store {
 
     getTrain (sessionName: string, playerName: string, trainUid: string) {
         this.apiService.getTrainInfo(sessionName, playerName, trainUid).subscribe((res: Player) => {
-            console.log('');
+            
         })
     }
 
     buyTrain(sessionName: string, playerUid: string) {
-        console.log('Store.buyTrain called with', { sessionName, playerUid });
-        console.log('Current resources:', this.resources());
-        console.log('Current player info:', this.playerInfo());
-        
+        //console.log('Store.buyTrain called with', { sessionName, playerUid });
         if (!sessionName) {
             console.error('buyTrain aborted: sessionName is undefined');
             return;
@@ -224,18 +224,13 @@ export class Store {
             },
             error: (err) => {
                 console.error('Error buying train:', err);
-                console.error('Error details:', {
-                    status: err.status,
-                    message: err.message,
-                    error: err.error
-                });
-                alert("not enough resources");
+                //alert("not enough resources");
             }
         });
     }
 
-    upgradeTrain(sessionName: string, playerUid: string, trainId: string) {
-         this.apiService.upgradeTrain(sessionName, playerUid, trainId).subscribe({
+    upgradeTrain(sessionName: string, playerUid: string, trainNr: number) {//trainId: string) {
+         this.apiService.upgradeTrain(sessionName, playerUid, this.resources().trainDtos[trainNr].uid).subscribe({
             next: () => {
                 this.getPlayerInfos(sessionName, playerUid);
             },
@@ -249,7 +244,7 @@ export class Store {
         this.apiService.upgradeRequirementsTrain(sessionName, playerUid).subscribe({
             next: (requirements: Requirements[]) => {
             this.upgradeResourcesTrain.set(requirements);
-            console.log('got upgrade reqiirments train', requirements)
+            //console.log('got upgrade reqiirments train', requirements)
         },
         error: (err) => {
         console.error('Error fetching train upgrades:', err);
@@ -264,7 +259,7 @@ export class Store {
             },
             error: (err) => {
                 console.error('Error buying station:', err);
-                alert("not enough resources");
+                //alert("not enough resources");
             }
         });
     }
@@ -284,7 +279,7 @@ export class Store {
         this.apiService.upgradeRequirementsRail(sessionName, playerUid).subscribe({
             next: (requirements: Requirements[]) => {
             this.upgradeResourcesRail.set(requirements);
-            console.log('got upgrade reqirments rail', requirements)
+            //console.log('got upgrade reqirments rail', requirements)
         },
         error: (err) => {
         console.error('Error fetching rail upgrades:', err);
@@ -299,7 +294,7 @@ export class Store {
             },
             error: (err) => {
                 console.error('Error buying station:', err);
-                alert("not enough resources");
+                //alert("not enough resources");
             }
         });
     }
@@ -325,6 +320,10 @@ export class Store {
     }
 
     buyEmployee(sessionName: string, playerUid: string) {
+        if (!sessionName || !playerUid) {
+            console.error('buyEmployee aborted: sessionName or playerUid missing');
+            return;
+        }
         this.apiService.buyEmployee(sessionName, playerUid).subscribe({
             next: () => {
                 this.getPlayerInfos(sessionName, playerUid);
@@ -333,6 +332,17 @@ export class Store {
                 console.error('Error buying employee:', err);
             }
         });
+    }
+
+    updateEmployee(sessionName: string, playerUid: string){
+        this.apiService.getEmployee(sessionName, playerUid).subscribe({
+        next: (employees: number) => {
+            this.freeEmployee.set(employees);
+        },
+        error: (err) => {
+            console.error('Error getting employee count:', err);
+            //this.freeEmployee.set(0); 
+        }});
     }
 
     buyPower(sessionName: string, playerUid: string) {
@@ -348,5 +358,16 @@ export class Store {
                 console.error('Error buying power:', err);
             }
         });
+    }
+
+    updatePower(sessionName: string, playerUid: string){
+        this.apiService.getPower(sessionName, playerUid).subscribe({
+        next: (power: number) => {
+            this.freePower.set(power);
+        },
+        error: (err) => {
+            console.error('Error getting power count:', err);
+            //this.freePower.set(0); 
+        }});
     }
 }

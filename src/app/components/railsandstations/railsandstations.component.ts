@@ -20,6 +20,14 @@ export class UpgradesComponent {
   playerInfo = inject(Store).playerInfo;
   sessionInfo = inject(Store).sessionInfo;
 
+  get freeEmployee(): number {
+    return this.store.freeEmployee() ?? 0;
+  }
+
+  get freePower(): number {
+    return this.store.freePower() ?? 0;
+  }
+
   constructor(public store: Store) {}
 
   ngOnInit(): void {
@@ -42,12 +50,12 @@ export class UpgradesComponent {
 
   onBuyRail() {
     const sessionName = this.sessionInfo().sessionName;
-    const uId = this.store.playerUid();
-    if (!sessionName || !uId) {
+    const uid = this.store.playerUid();
+    if (!sessionName || !uid) {
       console.error('Cannot buy rail: sessionName or playerUid missing');
       return;
     }
-    this.store.buyRail(sessionName, uId);
+    this.store.buyRail(sessionName, uid);
     this.upgradesRail = this.store.upgradeResourcesRail();
     //console.log('buying Rail with', sessionName, uid);
   }
@@ -56,8 +64,8 @@ export class UpgradesComponent {
     const sessionName = this.sessionInfo().sessionName;
     const uid = this.playerInfo().uid;
     const railId = this.store.resources().railDtos[railNr].uid;
-    console.log(railId);
-    this.store.upgradeTrain(sessionName, uid, railId);
+    //console.log(railId);
+    this.store.upgradeRail(sessionName, uid, railId);
     this.upgradesRail = this.store.upgradeResourcesRail();
   }
 
@@ -76,8 +84,8 @@ export class UpgradesComponent {
     const sessionName = this.sessionInfo().sessionName;
     const uid = this.playerInfo().uid;
     const stationId = this.store.resources().stationDtos[stationNr].uid;
-    console.log(stationId);
-    this.store.upgradeTrain(sessionName, uid, stationId);
+    //console.log(stationId);
+    this.store.upgradeStation(sessionName, uid, stationId);
     this.upgradesStation = this.store.upgradeResourcesStation();
   }
 

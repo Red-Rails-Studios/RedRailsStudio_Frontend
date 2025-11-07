@@ -19,6 +19,14 @@ export class TrainsComponent {
   upgrades: Requirements[] = [];
   buy: Requirements | undefined;
 
+  get freeEmployee(): number {
+    return this.store.freeEmployee() ?? 0;
+  }
+
+  get freePower(): number {
+    return this.store.freePower() ?? 0;
+  }
+
   constructor(public store: Store) {}
 
   ngOnInit(): void { 
@@ -34,7 +42,7 @@ export class TrainsComponent {
         this.trains = this.store.resources().trainDtos;
         this.upgrades = this.store.upgradeResourcesTrain();
         this.store.getBuyRequirements(sessionName, playerUId);
-        console.log('upgrade requirements train',this.upgrades, playerUId);
+        //console.log('upgrade requirements train',this.upgrades, playerUId);
       }, 500);
     }
   }
@@ -63,13 +71,14 @@ export class TrainsComponent {
     this.buy = this.store.elementBuyRequirements()[0];
   }
 
-  onUpgradeTrain(trainNr: number) {  
+  onUpgradeTrain(trainNr: number) {  //TODO: fix upgrades on trains
     const sessionName = this.sessionInfo().sessionName;
     const uId = this.playerInfo().uid;
-    const trainId = this.store.resources().trainDtos[trainNr].uid;
-    //const trainId = this.trains[trainNr].id;
-    console.log(trainId);
-    this.store.upgradeTrain(sessionName, uId, trainId);
+    //const trainId = this.store.playerInfo().trains[trainNr].uId;
+
+    //console.log(trainId);
+    this.store.upgradeTrain(sessionName, uId, trainNr);
+    console.log("test", trainNr)
     this.store.getUpgradeRequirementsTrain(sessionName, uId);
   }
 
