@@ -415,8 +415,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     // }
 
     // draw stations
-    const rows = map?.map.length;
-    const cols = map.map[0]?.length || 0;
+    const rows = map?.length || 0;
+    const cols = map?.length ? map[0].length : 0;
     const cellWidth = contentWidth / Math.max(1, cols);
     const cellHeight = contentHeight / Math.max(1, rows);
 
