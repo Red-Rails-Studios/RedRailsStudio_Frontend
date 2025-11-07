@@ -424,15 +424,15 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       for (let x = 0; x < cols; x++) {
         const centerX = contentLeft + x * cellWidth + cellWidth / 2;
         const centerY = contentTop + y * cellHeight + cellHeight / 2;
-        const cell = map.map[y][x];
+        const cell =  map !== undefined ? map[y][x] : undefined;
 
-        const location = cell.location;
+        const location = cell?.location;
         if(location === null) continue;
 
-        const station = location.station;
+        const station = location?.station;
         if(station === null) continue;
         
-        const masterUid = station.masterUid;
+        const masterUid = station?.masterUid;
         if(!masterUid) {
           ctx.beginPath();
           const radius = Math.max(4, Math.floor(Math.min(cellWidth, cellHeight) * 0.18));
