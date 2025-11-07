@@ -400,21 +400,20 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     let contentTop = imgTop;
     let contentWidth = drawW;
     let contentHeight = drawH;
-    if (this.mapImageContentBounds /*&& this.mapImage*/) {
-      const b = this.mapImageContentBounds;
-      const img = this.mapImage;
-      const imgNaturalW = img?.naturalWidth;
-      const imgNaturalH = img?.naturalHeight;
+    // if (this.mapImageContentBounds && this.mapImage) {
+    const b = this.mapImageContentBounds;
+    const imgNaturalW = img?.naturalWidth;
+    const imgNaturalH = img?.naturalHeight;
 
-      if(imgNaturalW && imgNaturalH){
-        const scaleX = drawW / imgNaturalW;
-        const scaleY = drawH / imgNaturalH;
-        contentLeft = imgLeft + (b.left * scaleX);
-        contentTop = imgTop + (b.top * scaleY);
-        contentWidth = Math.max(0, b.width * scaleX);
-        contentHeight = Math.max(0, b.height * scaleY);
-      }
+    if(imgNaturalW && imgNaturalH && b){
+      const scaleX = drawW / imgNaturalW;
+      const scaleY = drawH / imgNaturalH;
+      contentLeft = imgLeft + (b.left * scaleX);
+      contentTop = imgTop + (b.top * scaleY);
+      contentWidth = Math.max(0, b.width * scaleX);
+      contentHeight = Math.max(0, b.height * scaleY);
     }
+    // }
 
     // draw stations
     const rows = map.map.length;
