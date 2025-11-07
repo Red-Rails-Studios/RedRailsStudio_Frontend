@@ -436,7 +436,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         if(!masterUid) {
           ctx.beginPath();
           const radius = Math.max(4, Math.floor(Math.min(cellWidth, cellHeight) * 0.18));
-          ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+          ctx.arc(centerX + Math.floor(Math.random() * 10), centerY + Math.floor(Math.random() * 10), radius, 0, Math.PI * 2);
           ctx.fillStyle = "#6b6b6bff";
           ctx.fill();
         };
@@ -449,7 +449,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
         ctx.beginPath();
         const radius = Math.max(4, Math.floor(Math.min(cellWidth, cellHeight) * 0.18));
-        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        ctx.arc(centerX + Math.floor(Math.random() * 10), centerY + Math.floor(Math.random() * 10), radius, 0, Math.PI * 2);
         ctx.fillStyle = playerColor;
         ctx.fill();
       }
