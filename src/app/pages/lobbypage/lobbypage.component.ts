@@ -60,12 +60,6 @@ export class LobbypageComponent {
   }
 
   colorForUid(player: Player): string {
-    for (let index = 0; index < this.lobbyPlayers.length; index++) {
-      if(this.lobbyPlayers[index].uId == player.uId) {
-        return "";
-      }
-    }
-
-    return '#000000';
+    return player.color;
   }
 }
