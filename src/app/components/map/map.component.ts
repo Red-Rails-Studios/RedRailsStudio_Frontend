@@ -509,6 +509,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
           ctx.arc(centerX + Math.floor(Math.random() * 10), centerY + Math.floor(Math.random() * 10), radius, 0, Math.PI * 2);
           ctx.fillStyle = "#6b6b6bff";
           ctx.fill();
+          continue;
         };
 
         const player = this.store.sessionInfo().players.find((player : Player) => player.uId === masterUid);
