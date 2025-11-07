@@ -1,7 +1,7 @@
 import { Requirements } from "./requierment.model";
 
 export interface Rail {
-  uId: string;
+  uid: string;
   level: number;
   requirements: Requirements[]; 
 }

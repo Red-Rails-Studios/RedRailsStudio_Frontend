@@ -502,7 +502,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         const station = location?.station;
         if(station === null) continue;
         
-        const masterUid = station?.masterUid;
+        const stationUid = station?.uid;
         if(!masterUid) {
           ctx.beginPath();
           const radius = Math.max(4, Math.floor(Math.min(cellWidth, cellHeight) * 0.18));
