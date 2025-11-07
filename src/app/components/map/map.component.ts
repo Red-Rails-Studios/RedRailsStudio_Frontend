@@ -365,9 +365,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     let drawW = this.canvasWidth;
     let drawH = this.canvasHeight;
 
-    if (this.mapImage && this.imageLoaded) {
+    // if (this.mapImage && this.imageLoaded) { 
       const img = this.mapImage;
-      const imgAspect = (img.width || 1) / (img.height || 1);
+      const imgAspect = (img?.width || 1) / (img?.height || 1);
       const canvasAspect = this.canvasWidth / this.canvasHeight;
       if (imgAspect > canvasAspect) {
         drawW = this.canvasWidth;
@@ -378,8 +378,10 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       imgLeft = Math.max(0, (this.canvasWidth - drawW) / 2);
       imgTop = Math.max(0, (this.canvasHeight - drawH) / 2);
-      try { ctx.drawImage(img, imgLeft, imgTop, drawW, drawH); } catch {}
-    }
+      if(img){
+        try { ctx.drawImage(img, imgLeft, imgTop, drawW, drawH); } catch {}
+      }
+    // }
 
     // black border around the svg area
     const borderWidth = Math.max(2, Math.round(2 * this.scale));
@@ -398,17 +400,20 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     let contentTop = imgTop;
     let contentWidth = drawW;
     let contentHeight = drawH;
-    if (this.mapImageContentBounds && this.mapImage) {
+    if (this.mapImageContentBounds /*&& this.mapImage*/) {
       const b = this.mapImageContentBounds;
       const img = this.mapImage;
-      const imgNaturalW = img.naturalWidth || img.width || drawW;
-      const imgNaturalH = img.naturalHeight || img.height || drawH;
-      const scaleX = drawW / imgNaturalW;
-      const scaleY = drawH / imgNaturalH;
-      contentLeft = imgLeft + (b.left * scaleX);
-      contentTop = imgTop + (b.top * scaleY);
-      contentWidth = Math.max(0, b.width * scaleX);
-      contentHeight = Math.max(0, b.height * scaleY);
+      const imgNaturalW = img?.naturalWidth;
+      const imgNaturalH = img?.naturalHeight;
+
+      if(imgNaturalW && imgNaturalH){
+        const scaleX = drawW / imgNaturalW;
+        const scaleY = drawH / imgNaturalH;
+        contentLeft = imgLeft + (b.left * scaleX);
+        contentTop = imgTop + (b.top * scaleY);
+        contentWidth = Math.max(0, b.width * scaleX);
+        contentHeight = Math.max(0, b.height * scaleY);
+      }
     }
 
     // draw stations
@@ -416,8 +421,11 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     const cols = map.map[0]?.length || 0;
     const cellWidth = contentWidth / Math.max(1, cols);
     const cellHeight = contentHeight / Math.max(1, rows);
+
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
+        const centerX = contentLeft + x * cellWidth + cellWidth / 2;
+        const centerY = contentTop + y * cellHeight + cellHeight / 2;
         const cell = map.map[y][x];
 
         const location = cell.location;
@@ -427,16 +435,19 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         if(station === null) continue;
         
         const masterUid = station.masterUid;
-        if(!masterUid) continue;
+        if(!masterUid) {
+          ctx.beginPath();
+          const radius = Math.max(4, Math.floor(Math.min(cellWidth, cellHeight) * 0.18));
+          ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+          ctx.fillStyle = "#6b6b6bff";
+          ctx.fill();
+        };
 
         const player = this.store.sessionInfo().players.find((player : Player) => player.uId === masterUid);
         if(!player) continue;
 
         const playerColor = player.color; 
         if(!playerColor) continue;
-
-        const centerX = contentLeft + x * cellWidth + cellWidth / 2;
-        const centerY = contentTop + y * cellHeight + cellHeight / 2;
 
         ctx.beginPath();
         const radius = Math.max(4, Math.floor(Math.min(cellWidth, cellHeight) * 0.18));
