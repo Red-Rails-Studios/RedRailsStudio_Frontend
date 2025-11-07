@@ -98,7 +98,7 @@ export class APISService {
   }
 
   getSessionInfo(sessionName: string): Observable<SessionOverview> {
-    return this.http.get<SessionOverview>(`http://localhost:8080/session/${sessionName}`);
+    return this.http.get<SessionOverview>(`http://localhost:8080/session/${sessionName}/info`);
   }
 
   getSessionPlayers(sessionName: string): Observable<Player[]> {
